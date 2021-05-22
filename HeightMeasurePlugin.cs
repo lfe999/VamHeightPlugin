@@ -12,14 +12,12 @@ namespace LFE
 {
     public class HeightMeasurePlugin : MVRScript
     {
-
-        private const float METERS_PER_UNIT = 1;
-        private const float X_OFFSET = -0.25f;
-
         JSONStorableFloat fullHeightStorable;
         JSONStorableFloat headHeightStorable;
         JSONStorableFloat heightInHeadsStorable;
         JSONStorableString textStorable;
+        JSONStorableFloat markerLeftRightStorable;
+        JSONStorableFloat markerFrontBackStorable;
 
         Atom sign;
 
@@ -34,12 +32,23 @@ namespace LFE
             });
             CreateTextField(textStorable);
 
+            markerLeftRightStorable = new JSONStorableFloat("Marker Left/Right", 0.25f, -1, 1);
+            CreateSlider(markerLeftRightStorable, rightSide: true);
+            RegisterFloat(markerLeftRightStorable);
+
+            markerFrontBackStorable = new JSONStorableFloat("Marker Front/Back", 0.15f, -1, 1);
+            CreateSlider(markerFrontBackStorable, rightSide: true);
+            RegisterFloat(markerFrontBackStorable);
+
             fullHeightStorable = new JSONStorableFloat("Full Height In Meters", 0, 0, 100);
             RegisterFloat(fullHeightStorable);
             headHeightStorable = new JSONStorableFloat("Head Height In Meters", 0, 0, 100);
             RegisterFloat(headHeightStorable);
             heightInHeadsStorable = new JSONStorableFloat("Full Height In Heads", 0, 0, 100);
             RegisterFloat(heightInHeadsStorable);
+
+
+
 
         }
 
@@ -153,7 +162,8 @@ namespace LFE
 
                 var rot = Quaternion.Euler(acHeadHard6.transform.rotation.eulerAngles);
                 var pos = rot * new Vector3(0, capsuleCollider.radius * acHeadHard6.scale, 0) + capsuleCollider.transform.position;
-                pos.x = pos.x + X_OFFSET;
+                pos.x = pos.x - markerLeftRightStorable.val;
+                pos.z = pos.z + markerFrontBackStorable.val;
 
                 markerHead.transform.position = pos;
             }
@@ -172,9 +182,10 @@ namespace LFE
                 lFoot = containingAtom.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("lFoot/_Collider1"));
             }
 
-            if(markerFoot && rFoot && lFoot) {
+            if(markerFoot && markerHead && rFoot && lFoot) {
                 var pos = Midpoint(rFoot.transform.position, lFoot.transform.position);
-                pos.x = pos.x + X_OFFSET;
+                pos.x = markerHead.transform.position.x;
+                pos.z = markerHead.transform.position.z;
                 markerFoot.transform.position = pos - new Vector3(0, rFoot.radius, 0);
             }
 
@@ -193,7 +204,7 @@ namespace LFE
             if(markerChin && chin && markerHead) {
                 var pos = chin.transform.position - new Vector3(0, chin.radius, 0);
                 pos.z = markerHead.transform.position.z;
-                pos.x = pos.x + X_OFFSET;
+                pos.x = markerHead.transform.position.x;
 
                 markerChin.transform.position = pos;
             }
@@ -233,13 +244,13 @@ namespace LFE
 
         private GameObject CreateMarker(Color color) {
 
-            var gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            var gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
             // random position to help avoid physics problems.
             gameObject.transform.position = new Vector3 ((UnityEngine.Random.value*461)+10, (UnityEngine.Random.value*300)+10, 0F);
 
             // make it smaller
-            gameObject.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+            gameObject.transform.localScale = new Vector3(0.75f, 0.005f, 0.005f);
 
             // make it red
             var r = gameObject.GetComponent<Renderer>();
@@ -268,7 +279,7 @@ namespace LFE
         }
 
         private float UnityToMeters(float unit) {
-            return unit * METERS_PER_UNIT;
+            return unit;
         }
 
         private float UnityToFeet(float unit) {
