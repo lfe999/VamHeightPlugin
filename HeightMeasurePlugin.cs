@@ -23,7 +23,6 @@ namespace LFE
 
         public override void Init()
         {
-
             textStorable = new JSONStorableString("Text", "", (string text) => {
                 if(sign != null) {
                     var t = sign.GetStorableByID("Sign") as TextStorable;
@@ -46,10 +45,6 @@ namespace LFE
             RegisterFloat(headHeightStorable);
             heightInHeadsStorable = new JSONStorableFloat("Full Height In Heads", 0, 0, 100);
             RegisterFloat(heightInHeadsStorable);
-
-
-
-
         }
 
         private string CalculateText() {
@@ -151,7 +146,7 @@ namespace LFE
         AutoCollider acHeadHard6;
         private void UpdateHeadMarker() {
             if(markerHead == null) {
-                markerHead = CreateMarker(Color.red);
+                markerHead = CreateMarker(Color.red, "Cube");
             }
             if(acHeadHard6 == null) {
                 acHeadHard6 = containingAtom.GetComponentsInChildren<AutoCollider>().FirstOrDefault(ac => ac.name.Equals("AutoColliderAutoCollidersHeadHard6"));
@@ -174,7 +169,7 @@ namespace LFE
         CapsuleCollider lFoot;
         private void UpdateFootMarker() {
             if(markerFoot == null) {
-                markerFoot = CreateMarker(Color.red);
+                markerFoot = CreateMarker(Color.red, "Cube");
             }
 
             if(!rFoot || !lFoot) {
@@ -195,7 +190,7 @@ namespace LFE
         CapsuleCollider chin;
         private void UpdateChinMarker() {
             if(markerChin == null) {
-                markerChin = CreateMarker(Color.red);
+                markerChin = CreateMarker(Color.red, "Cube");
             }
             if(!chin) {
                 chin = containingAtom.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("lowerJaw/_ColliderL1fb"));
@@ -219,7 +214,7 @@ namespace LFE
             if(heightInHeadsRoundedUp != extraHeadMarkers.Count) {
                 if(heightInHeadsRoundedUp > extraHeadMarkers.Count) {
                     for(var i = extraHeadMarkers.Count; i < heightInHeadsRoundedUp; i++) {
-                        extraHeadMarkers.Add(CreateMarker(Color.green));
+                        extraHeadMarkers.Add(CreateMarker(Color.green, "Cube"));
                     }
                 }
 
@@ -242,15 +237,26 @@ namespace LFE
             }
         }
 
-        private GameObject CreateMarker(Color color) {
+        private GameObject CreateMarker(Color color, string type) {
 
-            var gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-
+            GameObject gameObject;
+            if(type == "Cube") {
+                gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            }
+            else {
+                gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            }
+        
             // random position to help avoid physics problems.
             gameObject.transform.position = new Vector3 ((UnityEngine.Random.value*461)+10, (UnityEngine.Random.value*300)+10, 0F);
 
             // make it smaller
-            gameObject.transform.localScale = new Vector3(0.75f, 0.005f, 0.005f);
+            if(type == "Cube") {
+                gameObject.transform.localScale = new Vector3(0.75f, 0.005f, 0.005f);
+            }
+            else {
+                gameObject.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
+            }
 
             // make it red
             var r = gameObject.GetComponent<Renderer>();
