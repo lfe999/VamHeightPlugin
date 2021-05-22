@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace LFE
 {
-    public class CharacterHeight : MVRScript
+    public class HeightMeasurePlugin : MVRScript
     {
 
         private const float METERS_PER_UNIT = 1;
