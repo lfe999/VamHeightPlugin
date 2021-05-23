@@ -25,6 +25,7 @@ namespace LFE
 
 
         Atom sign;
+        string signAtomName;
 
         public override void Init()
         {
@@ -77,9 +78,12 @@ namespace LFE
         }
 
         public void OnEnable() {
-            sign = SuperController.singleton.GetAtomByUid("CharacterHeightSign");
+            if(signAtomName == null) {
+                signAtomName = Guid.NewGuid().ToString();
+            }
+            sign = SuperController.singleton.GetAtomByUid(signAtomName);
             if(sign == null) {
-                StartCoroutine(SuperController.singleton.AddAtomByType("SimpleSign", useuid: "CharacterHeightSign"));
+                StartCoroutine(SuperController.singleton.AddAtomByType("SimpleSign", useuid: signAtomName));
             }
         }
 
@@ -133,7 +137,7 @@ namespace LFE
 
             try {
                 if(sign == null) {
-                    sign = SuperController.singleton.GetAtomByUid("CharacterHeightSign");
+                    sign = SuperController.singleton.GetAtomByUid(signAtomName);
                 }
                 UpdateHeadMarker();
                 UpdateFootMarker();
