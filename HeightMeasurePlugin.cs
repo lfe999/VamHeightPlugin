@@ -12,10 +12,6 @@ namespace LFE
 {
     public class HeightMeasurePlugin : MVRScript
     {
-        // public const float BUST_FUDGE_FACTOR = 0.75f;
-        // public const float BAND_FUDGE_FACTOR = 0.80f;
-
-
         JSONStorableFloat fullHeightStorable;
         JSONStorableFloat headHeightStorable;
         JSONStorableFloat heightInHeadsStorable;
@@ -24,10 +20,17 @@ namespace LFE
         JSONStorableFloat markerFrontBackStorable;
         JSONStorableBool showBreastMarkersStorable;
 
+        DAZCharacter dazCharacter;
+        DAZSkinV2 skin;
+
+
         Atom sign;
 
         public override void Init()
         {
+            dazCharacter = containingAtom.GetComponentInChildren<DAZCharacter>();
+            skin = dazCharacter.skin;
+
             textStorable = new JSONStorableString("Text", "", (string text) => {
                 if(sign != null) {
                     var t = sign.GetStorableByID("Sign") as TextStorable;
@@ -59,22 +62,18 @@ namespace LFE
         private string CalculateText() {
             var height = fullHeightStorable.val;
             var heightInHeads = heightInHeadsStorable.val;
-            // var bustCircumference = GetBustCircumference();
-            // var bustCircumferenceInch = Mathf.RoundToInt(UnityToFeet(bustCircumference) * 12);
-            // var bandCircumference = GetBandCircumference();
-            // var bandCircumferenceInch = Mathf.RoundToInt(UnityToFeet(bandCircumference) * 12);
-            // var cupUs = GetCupSizeUS(bustCircumference, bandCircumference);
             var cupUsV2 = GetCupSizeUS(circumferenceBust, circumferenceBand);
 
-            return $"{UnityToMeters(height):0.##} meters tall\n"
+            var text = "";
+            text += $"{UnityToMeters(height):0.##} meters tall\n"
                 + $"{UnityToFeet(height):0.##} feet tall ({FeetInchString(UnityToFeet(height))})\n"
-                + $"{heightInHeads:0.##} heads tall\n\n"
-                // + $"Bust: {(bustCircumference * 100):0} cm / {bustCircumferenceInch} in\n"
-                // + $"Band : {(bandCircumference * 100):0} cm / {bandCircumferenceInch} in\n"
-                // + $"Cup : {cupUs} US\n"
-                + $"Bust: {(circumferenceBust * 100):0} cm / {Mathf.RoundToInt(UnityToFeet(circumferenceBust) * 12)} in\n"
+                + $"{heightInHeads:0.##} heads tall\n\n";
+            if(!dazCharacter.isMale) {
+                text += $"Bust: {(circumferenceBust * 100):0} cm / {Mathf.RoundToInt(UnityToFeet(circumferenceBust) * 12)} in\n"
                 + $"Band : {(circumferenceBand * 100):0} cm / {Mathf.RoundToInt(UnityToFeet(circumferenceBand) * 12)} in\n"
                 + $"Cup : {cupUsV2} US";
+            }
+            return text;
         }
 
         public void OnEnable() {
@@ -104,16 +103,6 @@ namespace LFE
             }
             extraHeadMarkers = new List<GameObject>();
 
-            // foreach(var h in bustMarkers) {
-            //     Destroy(h);
-            // }
-            // bustMarkers = new List<GameObject>();
-
-            // foreach(var h in underbustMarkers) {
-            //     Destroy(h);
-            // }
-            // underbustMarkers = new List<GameObject>();
-
             if(sign != null) {
                 SuperController.singleton.RemoveAtom(sign);
                 sign = null;
@@ -135,6 +124,9 @@ namespace LFE
         TextStorable signStorable;
         public void Update() {
 
+            dazCharacter = containingAtom.GetComponentInChildren<DAZCharacter>();
+            skin = dazCharacter.skin;
+
             if(SuperController.singleton.freezeAnimation) {
                 return;
             }
@@ -148,10 +140,10 @@ namespace LFE
                 UpdateChinMarker();
                 UpdateHeadHeightMarkers();
 
-                UpdateBustMarkersFromMorphVertex();
-                UpdateBandMarkersFromMorphVertex();
-                // UpdateBustMarkers(); // TODO: check male for bug
-                // UpdateUnderbustMarkers(); // TODO: check male for bug
+                if(!dazCharacter.isMale) {
+                    UpdateBustMarkersFromMorphVertex();
+                    UpdateBandMarkersFromMorphVertex();
+                }
 
                 fullHeightStorable.val = GetHeight();
                 headHeightStorable.val = GetHeadHeight();
@@ -173,6 +165,10 @@ namespace LFE
         List<GameObject> bustMarkersFromMorph = new List<GameObject>();
         float circumferenceBust = 0;
         private void UpdateBustMarkersFromMorphVertex() {
+            if(skin == null) {
+                return;
+            }
+
             var vertexIndexes = new List<int> {
                 15, // bust - left nipple flattened
                 10939, // bust -- right nipple flattened
@@ -187,9 +183,6 @@ namespace LFE
                 // 8951, // bust -- left breast side ??
                 // 11021, // bust -- right breast side
             };
-
-            DAZCharacter dazCharacter = containingAtom.GetComponentInChildren<DAZCharacter>();
-            DAZSkinV2 skin = dazCharacter.skin;
 
             if(showBreastMarkersStorable.val) {
                 if(bustMarkersFromMorph.Count != vertexIndexes.Count) {
@@ -232,6 +225,10 @@ namespace LFE
         List<GameObject> bandMarkersFromMorph = new List<GameObject>();
         float circumferenceBand = 0;
         private void UpdateBandMarkersFromMorphVertex() {
+            if(skin == null) {
+                return;
+            }
+
             var vertexIndexes = new List<int> {
                 7221,  // band - left breast under nipple
                 13240, // band - right breast under nipple
@@ -240,9 +237,6 @@ namespace LFE
                 11022, // bust -- right back
                 10495, // bust -- back center
             };
-
-            DAZCharacter dazCharacter = containingAtom.GetComponentInChildren<DAZCharacter>();
-            DAZSkinV2 skin = dazCharacter.skin;
 
             if(showBreastMarkersStorable.val){
                 if(bandMarkersFromMorph.Count != vertexIndexes.Count) {
@@ -308,60 +302,6 @@ namespace LFE
             return 0;
         }
 
-        // string bustLog = "";
-
-        // private float GetBustCircumference() {
-
-        //     float circumference = 0;
-
-        //     // order: left nipple, right nipple, right side, back right, back left, left side
-
-        //     var distances = new List<string>();
-        //     for(var i = 0; i < bustMarkers.Count; i++) {
-        //         var prev = i == 0 ? bustMarkers[bustMarkers.Count - 1] : bustMarkers[i - 1];
-        //         var me = bustMarkers[i];
-
-        //         var distance = Mathf.Abs(Vector3.Distance(prev.transform.position, me.transform.position));
-        //         if(i == 0 || i == 2 || i == 3 || i == 5) {
-        //             distance *= BUST_FUDGE_FACTOR;
-        //         }
-
-        //         distances.Add(distance.ToString("0.000"));
-
-        //         circumference += distance;
-        //     }
-
-        //     // var s = string.Join(",", distances.ToArray());
-        //     // if(!s.Equals(bustLog)) {
-        //     //     SuperController.LogMessage($"Bust: {s}");
-        //     // }
-        //     // bustLog = s;
-
-        //     return circumference;
-        // }
-
-        // private float GetBandCircumference() {
-        //     float circumference = 0;
-
-        //     // order: left nipple, right nipple, right side, back right, back left, left side
-
-        //     var distances = new List<string>();
-        //     for(var i = 0; i < underbustMarkers.Count; i++) {
-        //         var prev = i == 0 ? underbustMarkers[underbustMarkers.Count - 1] : underbustMarkers[i - 1];
-        //         var me = underbustMarkers[i];
-
-        //         var distance = Mathf.Abs(Vector3.Distance(prev.transform.position, me.transform.position));
-        //         if(i == 0 || i == 2 || i == 3 || i == 5) {
-        //             distance *= BAND_FUDGE_FACTOR;
-        //         }
-
-        //         distances.Add(distance.ToString("0.0000"));
-
-        //         circumference += distance;
-        //     }
-
-        //     return circumference;
-        // }
 
         private string GetCupSizeUS(float bust, float band) {
             var bustIn = Mathf.RoundToInt(UnityToFeet(bust) * 12);
@@ -402,178 +342,6 @@ namespace LFE
             }
         }
 
-        // List<GameObject> underbustMarkers = new List<GameObject>();
-        // CapsuleCollider chest1b;
-        // private void UpdateUnderbustMarkers() {
-        //     if(chest1b == null) {
-        //         chest1b = containingAtom.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("AutoColliderFemaleAutoColliderschest1bJoint"));
-        //     }
-
-        //     if(!bustFinished) {
-        //         return;
-        //     }
-
-        //     int i = 0;
-        //     if(chest1b != null) {
-        //         GameObject m;
-        //         Vector3 pos;
-
-        //         var p = chest1b.GetComponentInParent<AutoCollider>();
-
-        //         // underbust - below left nipple
-        //         if(underbustMarkers.Count == i) {
-        //             m = CreateMarker(Color.red, "Sphere");
-        //             underbustMarkers.Add(m);
-        //         }
-        //         pos = chest1b.transform.position;
-        //         pos.z = pos.z + (chest1b.radius * p.scale) - 0.01f;
-        //         pos.x = pos.x - (chest1b.height * p.scale / 2) + (chest1b.radius * p.scale / 3.14f);
-        //         underbustMarkers[i].transform.position = pos;
-        //         i++;
-
-        //         // underbust - below right nipple
-        //         if(underbustMarkers.Count == i) {
-        //             m = CreateMarker(Color.white, "Sphere");
-        //             underbustMarkers.Add(m);
-        //         }
-        //         pos = chest1b.transform.position;
-        //         pos.z = pos.z + (chest1b.radius * p.scale) - 0.01f;
-        //         pos.x = pos.x + (chest1b.height * p.scale / 2) - (chest1b.radius * p.scale / 3.14f);
-        //         underbustMarkers[i].transform.position = pos;
-        //         i++;
-
-        //         // underbust - right side marker
-        //         if(underbustMarkers.Count == i) {
-        //             m = CreateMarker(Color.yellow, "Sphere");
-        //             underbustMarkers.Add(m);
-        //         }
-        //         pos = chest1b.transform.position;
-        //         pos.x = pos.x + (chest1b.height * p.scale / 2);
-        //         underbustMarkers[i].transform.position = pos;
-        //         i++;
-
-        //         // underbust - right back marker
-        //         if(underbustMarkers.Count == i) {
-        //             m = CreateMarker(Color.green, "Sphere");
-        //             underbustMarkers.Add(m);
-        //         }
-        //         pos = chest1b.transform.position;
-        //         pos.z = pos.z - (chest1b.radius * p.scale);
-        //         pos.x = pos.x + (chest1b.height * p.scale / 2) - (chest1b.radius * p.scale / 3.14f);
-        //         underbustMarkers[i].transform.position = pos;
-        //         i++;
-
-        //         // underbust - left back marker
-        //         if(underbustMarkers.Count == i) {
-        //             m = CreateMarker(Color.blue, "Sphere");
-        //             underbustMarkers.Add(m);
-        //         }
-        //         pos = chest1b.transform.position;
-        //         pos.z = pos.z - (chest1b.radius * p.scale);
-        //         pos.x = pos.x - (chest1b.height * p.scale / 2) + (chest1b.radius * p.scale / 3.14f);
-        //         underbustMarkers[i].transform.position = pos;
-        //         i++;
-
-        //         // underbust - left side marker
-        //         if(underbustMarkers.Count == i) {
-        //             m = CreateMarker(Color.magenta, "Sphere");
-        //             underbustMarkers.Add(m);
-        //         }
-        //         pos = chest1b.transform.position;
-        //         pos.x = pos.x - (chest1b.height * p.scale / 2);
-        //         underbustMarkers[i].transform.position = pos;
-        //         i++;
-        //     }
-
-        // }
-
-        // Collider lNipple;
-        // Collider rNipple;
-        // CapsuleCollider chest3;
-        // List<GameObject> bustMarkers = new List<GameObject>();
-        // bool bustFinished = false;
-        // private void UpdateBustMarkers() {
-        //     if(lNipple == null) {
-        //         lNipple = containingAtom.GetComponentsInChildren<Collider>().FirstOrDefault(c => ColliderName(c).Equals("lNipple"));
-        //     }
-        //     if(rNipple == null) {
-        //         rNipple = containingAtom.GetComponentsInChildren<Collider>().FirstOrDefault(c => ColliderName(c).Equals("rNipple"));
-        //     }
-        //     if(chest3 == null) {
-        //         chest3 = containingAtom.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("AutoColliderFemaleAutoColliderschest3Joint"));
-        //     }
-
-        //     int i = 0;
-        //     if(lNipple != null) {
-        //         if(bustMarkers.Count == i) {
-        //             var m = CreateMarker(Color.red, "Sphere");
-        //             bustMarkers.Add(m);
-        //         }
-        //         bustMarkers[i].transform.position = lNipple.transform.position;
-        //         i++;
-        //     }
-
-        //     if(rNipple != null) {
-        //         if(bustMarkers.Count == i) {
-        //             var m = CreateMarker(Color.white, "Sphere");
-        //             bustMarkers.Add(m);
-        //         }
-        //         bustMarkers[i].transform.position = rNipple.transform.position;
-        //         i++;
-        //     }
-
-        //     if(chest3 != null) {
-        //         GameObject m;
-        //         Vector3 pos;
-
-        //         AutoCollider p;
-
-        //         // bust - right side marker
-        //         if(bustMarkers.Count == i) {
-        //             m = CreateMarker(Color.yellow, "Sphere");
-        //             bustMarkers.Add(m);
-        //         }
-        //         p = chest3.GetComponentInParent<AutoCollider>();
-        //         pos = chest3.transform.position;
-        //         pos.x = pos.x + (chest3.height * p.scale / 2) - 0.005f;
-        //         bustMarkers[i].transform.position = pos;
-        //         i++;
-
-        //         // bust - right back marker
-        //         if(bustMarkers.Count == i) {
-        //             m = CreateMarker(Color.green, "Sphere");
-        //             bustMarkers.Add(m);
-        //         }
-        //         pos = chest3.transform.position;
-        //         pos.z = pos.z - (chest3.radius * p.scale) + 0.01f;
-        //         pos.x = pos.x + (chest3.height * p.scale / 2) - (chest3.radius * p.scale / 3.14f);
-        //         bustMarkers[i].transform.position = pos;
-        //         i++;
-
-        //         // bust - left back marker
-        //         if(bustMarkers.Count == i) {
-        //             m = CreateMarker(Color.blue, "Sphere");
-        //             bustMarkers.Add(m);
-        //         }
-        //         pos = chest3.transform.position;
-        //         pos.z = pos.z - (chest3.radius * p.scale) + 0.01f;
-        //         pos.x = pos.x - (chest3.height  * p.scale / 2) + (chest3.radius * p.scale / 3.14f);
-        //         bustMarkers[i].transform.position = pos;
-        //         i++;
-
-        //         // bust - left side marker
-        //         if(bustMarkers.Count == i) {
-        //             m = CreateMarker(Color.magenta, "Sphere");
-        //             bustMarkers.Add(m);
-        //         }
-        //         pos = chest3.transform.position;
-        //         pos.x = pos.x - (chest3.height * p.scale / 2) + 0.005f;
-        //         bustMarkers[i].transform.position = pos;
-        //         i++;
-        //     }
-
-        //     bustFinished = true;
-        // }
 
         GameObject markerHead;
         AutoCollider acHeadHard6;
