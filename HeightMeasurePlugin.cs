@@ -231,7 +231,7 @@ namespace LFE
                 pos.x = _markerHead.Origin.x;
                 pos.z = _markerHead.Origin.z;
                 _markerNipple.Origin = pos;
-                _markerNipple.Enabled = _showFeatureMarkersStorable.val;
+                _markerNipple.Enabled = _dazCharacter.isMale ? false : _showFeatureMarkersStorable.val; // TODO: better male nipple detection
                 _markerNipple.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
 
                 // underbust
@@ -239,7 +239,7 @@ namespace LFE
                 pos.x = _markerHead.Origin.x;
                 pos.z = _markerHead.Origin.z;
                 _markerUnderbust.Origin = pos;
-                _markerUnderbust.Enabled = _showFeatureMarkersStorable.val;
+                _markerUnderbust.Enabled = _dazCharacter.isMale ? false : _showFeatureMarkersStorable.val;
                 _markerUnderbust.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
 
                 // navel
