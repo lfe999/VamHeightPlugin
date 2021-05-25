@@ -1,17 +1,37 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using static System.Uri;
 using UnityEngine;
 
 namespace LFE
 {
     public class HeightMeasurePlugin : MVRScript
     {
+        readonly IVertexPosition[] verticesBust = new IVertexPosition[] {
+            new VertexPositionMiddle(7213, 17920), // midchest 1/2 way between the nipples at bust height
+            new VertexPositionExact(17920), // bust -- right nipple just to the left
+            new VertexPositionExact(10939), // bust -- right nipple just to the right
+            new VertexPositionExact(19588),
+            new VertexPositionExact(19617),
+            new VertexPositionExact(13233),
+            new VertexPositionExact(11022), // bust -- right back
+            new VertexPositionExact(10495), // bust -- back center
+        };
+
+        readonly IVertexPosition[] verticesUnderbust = new IVertexPosition[] {
+            new VertexPositionMiddle(10822, 10820), // mid chest
+            new VertexPositionExact(21469), // right breast under nipple
+            new VertexPositionExact(21470), // right breast under nipple
+            new VertexPositionExact(21394), // right side 
+            new VertexPositionMiddle(11022, 21508, 0.4f),
+            new VertexPositionExact(2100), // back
+        };
+
+        readonly IVertexPosition vertexHeadTop = new VertexPositionExact(2087);
+        readonly IVertexPosition vertexHeadLeft = new VertexPositionExact(3236);
+        readonly IVertexPosition vertexHeadRight = new VertexPositionExact(20646);
+        readonly IVertexPosition vertexHeadBottom = new VertexPositionExact(2079);
+
         JSONStorableFloat fullHeightStorable;
         JSONStorableFloat headHeightStorable;
         JSONStorableFloat heightInHeadsStorable;
@@ -19,18 +39,32 @@ namespace LFE
         JSONStorableFloat markerLeftRightStorable;
         JSONStorableFloat markerFrontBackStorable;
         JSONStorableBool showBreastMarkersStorable;
+        JSONStorableStringChooser cupAlgorithmStorable;
 
         DAZCharacter dazCharacter;
-        DAZSkinV2 skin;
+        public DAZSkinV2 skin;
 
 
         Atom sign;
         string signAtomName;
 
+        ICupCalculator[] cupCalculators = new ICupCalculator[] {
+            new SizeChartCupCalculator(),
+            new KnixComCupCalculator()
+        };
+
         public override void Init()
         {
             dazCharacter = containingAtom.GetComponentInChildren<DAZCharacter>();
             skin = dazCharacter.skin;
+
+            cupAlgorithmStorable = new JSONStorableStringChooser(
+                "Cup Size Method",
+                cupCalculators.Select(cc => cc.Name).ToList(),
+                cupCalculators[0].Name,
+                "Cup Size Method"
+            );
+            CreateScrollablePopup(cupAlgorithmStorable);
 
             textStorable = new JSONStorableString("Text", "", (string text) => {
                 if(sign != null) {
@@ -63,16 +97,20 @@ namespace LFE
         private string CalculateText() {
             var height = fullHeightStorable.val;
             var heightInHeads = heightInHeadsStorable.val;
-            var cupUsV2 = GetCupSizeUS(circumferenceBust, circumferenceBand);
-
+            var headHeight = headHeightStorable.val;
             var text = "";
-            text += $"{UnityToMeters(height):0.##} meters tall\n"
-                + $"{UnityToFeet(height):0.##} feet tall ({FeetInchString(UnityToFeet(height))})\n"
-                + $"{heightInHeads:0.##} heads tall\n\n";
-            if(!dazCharacter.isMale) {
-                text += $"Bust: {(circumferenceBust * 100):0} cm / {Mathf.RoundToInt(UnityToFeet(circumferenceBust) * 12)} in\n"
-                + $"Band : {(circumferenceBand * 100):0} cm / {Mathf.RoundToInt(UnityToFeet(circumferenceBand) * 12)} in\n"
-                + $"Cup : {cupUsV2} US";
+            text += $"Body: {height:0.##} meters tall\n"
+                + $"Body: {UnityToFeet(height):0.##} feet tall ({FeetInchString(UnityToFeet(height))})\n"
+                + $"Body: {heightInHeads:0.##} heads tall\n\n"
+                + $"Head: {headHeight:0.##} meters tall\n"
+                + $"Head: {UnityToFeet(headHeight):0.##} feet tall ({FeetInchString(UnityToFeet(headHeight))})\n\n";
+
+            var cupCalculator = cupCalculators.FirstOrDefault(cc => cc.Name.Equals(cupAlgorithmStorable.val));
+            if(!dazCharacter.isMale && cupCalculator != null) {
+                var cupInfo = cupCalculator.Calculate(circumferenceBust, circumferenceUnderbust);
+                text += $"Bust: {circumferenceBust * 100:0} cm / {Mathf.RoundToInt(UnityToFeet(circumferenceBust) * 12)} in\n"
+                + $"Underbust: {circumferenceUnderbust * 100:0} cm / {Mathf.RoundToInt(UnityToFeet(circumferenceUnderbust) * 12)} in\n"
+                + $"Cup : {cupInfo.Band}{cupInfo.Cup}\n";
             }
             return text;
         }
@@ -118,16 +156,15 @@ namespace LFE
             }
             bustMarkersFromMorph = new List<GameObject>();
 
-            foreach(var h in bandMarkersFromMorph) {
+            foreach(var h in underbustMarkersFromMorph) {
                 Destroy(h);
             }
-            bandMarkersFromMorph = new List<GameObject>();
+            underbustMarkersFromMorph = new List<GameObject>();
 
         }
 
         TextStorable signStorable;
         public void Update() {
-
             dazCharacter = containingAtom.GetComponentInChildren<DAZCharacter>();
             skin = dazCharacter.skin;
 
@@ -146,7 +183,7 @@ namespace LFE
 
                 if(!dazCharacter.isMale) {
                     UpdateBustMarkersFromMorphVertex();
-                    UpdateBandMarkersFromMorphVertex();
+                    UpdateUnderbustMarkersFromMorphVertex();
                 }
 
                 fullHeightStorable.val = GetHeight();
@@ -166,6 +203,18 @@ namespace LFE
 
         }
 
+        private float LineLength(Vector3[] vertices) {
+            float total = 0;
+            var distances = new List<string>();
+            for(var i = 1; i < vertices.Length; i++) {
+                var distance = Mathf.Abs(Vector3.Distance(vertices[i-1], vertices[i]));
+                distances.Add((distance * 2).ToString("0.000"));
+                total += distance;
+            }
+            var s = string.Join(",", distances.ToArray());
+            return total;
+        }
+
         List<GameObject> bustMarkersFromMorph = new List<GameObject>();
         float circumferenceBust = 0;
         private void UpdateBustMarkersFromMorphVertex() {
@@ -173,34 +222,20 @@ namespace LFE
                 return;
             }
 
-            var vertexIndexes = new List<int> {
-                15, // bust - left nipple flattened
-                10939, // bust -- right nipple flattened
-                // 13233, // bust -- right breast side 1
-                13234, // bust -- right breast side 1
-                //13674, // bust -- right breast side 2
-                11022, // bust -- right back
-                10495, // bust -- back center
-                // 10895, // bust -- back center
-                // 8922, // bust - left breast side ??
-                // 8928, // bust - left breast side ??
-                // 8951, // bust -- left breast side ??
-                // 11021, // bust -- right breast side
-            };
-
             if(showBreastMarkersStorable.val) {
-                if(bustMarkersFromMorph.Count != vertexIndexes.Count) {
+                if(bustMarkersFromMorph.Count != verticesBust.Length)
+                {
                     foreach(var m in bustMarkersFromMorph) {
                         Destroy(m);
                     }
                     bustMarkersFromMorph.Clear();
-                    foreach(var m in vertexIndexes){
+                    foreach(var m in verticesBust){
                         bustMarkersFromMorph.Add(CreateMarker(Color.red, "Sphere"));
                     }
                 }
 
-                for(var i = 0; i < vertexIndexes.Count; i++) {
-                    bustMarkersFromMorph[i].transform.position = skin.rawSkinnedVerts[vertexIndexes[i]];
+                for(var i = 0; i < verticesBust.Length; i++) {
+                    bustMarkersFromMorph[i].transform.position = verticesBust[i].Position(this);
                 }
             }
             else {
@@ -211,72 +246,39 @@ namespace LFE
             }
 
 
-            var circumference = 0f;
-            // we are only calculating 1/2 of the measurements around the bust so double most measurements
-            for(var i = 0; i < vertexIndexes.Count; i++) {
-                if(i == 0) {
-                    continue;
-                }
-
-                var distance = Vector3.Distance(skin.rawSkinnedVerts[vertexIndexes[i-1]], skin.rawSkinnedVerts[vertexIndexes[i]]);
-                distance = i == 1 ? distance : distance * 2;
-
-                circumference += distance;
-            }
-            circumferenceBust = circumference;
+            circumferenceBust = LineLength(verticesBust.Select(v => v.Position(this)).ToArray()) * 2;
         }
 
-        List<GameObject> bandMarkersFromMorph = new List<GameObject>();
-        float circumferenceBand = 0;
-        private void UpdateBandMarkersFromMorphVertex() {
+        List<GameObject> underbustMarkersFromMorph = new List<GameObject>();
+        float circumferenceUnderbust = 0;
+        private void UpdateUnderbustMarkersFromMorphVertex() {
             if(skin == null) {
                 return;
             }
 
-            var vertexIndexes = new List<int> {
-                7221,  // band - left breast under nipple
-                13240, // band - right breast under nipple
-                21472,
-                21384,
-                11022, // bust -- right back
-                10495, // bust -- back center
-            };
-
             if(showBreastMarkersStorable.val){
-                if(bandMarkersFromMorph.Count != vertexIndexes.Count) {
-                    foreach(var m in bandMarkersFromMorph) {
+                if(underbustMarkersFromMorph.Count != verticesUnderbust.Length) {
+                    foreach(var m in underbustMarkersFromMorph) {
                         Destroy(m);
                     }
-                    bandMarkersFromMorph.Clear();
-                    foreach(var m in vertexIndexes){
-                        bandMarkersFromMorph.Add(CreateMarker(Color.white, "Sphere"));
+                    underbustMarkersFromMorph.Clear();
+                    foreach(var m in verticesUnderbust){
+                        underbustMarkersFromMorph.Add(CreateMarker(Color.white, "Sphere"));
                     }
                 }
 
-                for(var i = 0; i < vertexIndexes.Count; i++) {
-                    bandMarkersFromMorph[i].transform.position = skin.rawSkinnedVerts[vertexIndexes[i]];
+                for(var i = 0; i < verticesUnderbust.Length; i++) {
+                    underbustMarkersFromMorph[i].transform.position = verticesUnderbust[i].Position(this);
                 }
             }
             else {
-                foreach(var m in bandMarkersFromMorph) {
+                foreach(var m in underbustMarkersFromMorph) {
                     Destroy(m);
                 }
-                bandMarkersFromMorph.Clear();
+                underbustMarkersFromMorph.Clear();
             }
 
-            var circumference = 0f;
-            // we are only calculating 1/2 of the measurements around the bust so double most measurements
-            for(var i = 0; i < vertexIndexes.Count; i++) {
-                if(i == 0) {
-                    continue;
-                }
-
-                var distance = Vector3.Distance(skin.rawSkinnedVerts[vertexIndexes[i-1]], skin.rawSkinnedVerts[vertexIndexes[i]]);
-                distance = i == 1 ? distance : distance * 2;
-
-                circumference += distance;
-            }
-            circumferenceBand = circumference;
+            circumferenceUnderbust = LineLength(verticesUnderbust.Select(v => v.Position(this)).ToArray()) * 2;
         }
 
         private float GetHeight() {
@@ -305,47 +307,6 @@ namespace LFE
             }
             return 0;
         }
-
-
-        private string GetCupSizeUS(float bust, float band) {
-            var bustIn = Mathf.RoundToInt(UnityToFeet(bust) * 12);
-            var bandIn = Mathf.RoundToInt(UnityToFeet(band) * 12);
-            var diff = Mathf.Clamp(Mathf.RoundToInt(bustIn - bandIn), 0, 100);
-
-            switch(diff) {
-                case 0:
-                    return $"{bandIn}AA";
-                case 1:
-                    return $"{bandIn}A";
-                case 2:
-                    return $"{bandIn}B";
-                case 3:
-                    return $"{bandIn}C";
-                case 4:
-                    return $"{bandIn}D";
-                case 5:
-                    return $"{bandIn}E/DD";
-                case 6:
-                    return $"{bandIn}F/DDD";
-                case 7:
-                    return $"{bandIn}G/DDDD";
-                case 8:
-                    return $"{bandIn}H";
-                case 9:
-                    return $"{bandIn}I";
-                case 10:
-                    return $"{bandIn}J";
-                case 11:
-                    return $"{bandIn}K";
-                case 12:
-                    return $"{bandIn}L";
-                case 13:
-                    return $"{bandIn}M";
-                default:
-                    return $"{bandIn}N";
-            }
-        }
-
 
         GameObject markerHead;
         AutoCollider acHeadHard6;
@@ -489,18 +450,164 @@ namespace LFE
             return label;
         }
 
-        private float UnityToMeters(float unit) {
-            return unit;
+        public static float UnityToFeet(float unit) {
+            return unit/0.3048f;
         }
 
-        private float UnityToFeet(float unit) {
-            return UnityToMeters(unit)/0.3048f;
-        }
-
-        private string FeetInchString(float feet) {
+        public static string FeetInchString(float feet) {
             int f = (int)feet;
             int inches = (int)((feet - f) * 12);
             return $"{f}'{inches}\"";
+        }
+    }
+
+    public interface IVertexPosition {
+        Vector3 Position(HeightMeasurePlugin plugin);
+    }
+
+    public class VertexPositionExact : IVertexPosition {
+        int _indexA;
+        public VertexPositionExact(int indexA)
+        {
+            _indexA = indexA;
+        }
+
+        public Vector3 Position(HeightMeasurePlugin plugin) {
+            if(plugin.skin == null) {
+                return Vector3.zero;
+            }
+            if(_indexA < 0 || _indexA >= plugin.skin.rawSkinnedVerts.Length) {
+                return Vector3.zero;
+            }
+
+            return plugin.skin.rawSkinnedVerts[_indexA];
+        }
+    }
+
+    public class VertexPositionMiddle : IVertexPosition {
+        int _indexA;
+        int _indexB;
+        float _ratio;
+
+        public VertexPositionMiddle(int indexA, int indexB, float ratio = 0.5f)
+        {
+            _indexA = indexA;
+            _indexB = indexB;
+            _ratio = Mathf.Clamp01(ratio);
+        }
+
+        public Vector3 Position(HeightMeasurePlugin plugin) {
+            if(plugin.skin == null) {
+                return Vector3.zero;
+            }
+            if(_indexA < 0 || _indexA >= plugin.skin.rawSkinnedVerts.Length) {
+                return Vector3.zero;
+            }
+            if(_indexB < 0 || _indexB >= plugin.skin.rawSkinnedVerts.Length) {
+                return Vector3.zero;
+            }
+
+            var vertexA = plugin.skin.rawSkinnedVerts[_indexA];
+            var vertexB = plugin.skin.rawSkinnedVerts[_indexB];
+
+            return Vector3.Lerp(vertexA, vertexB, _ratio);
+        }
+    }
+
+    public class CupSize {
+        public int Band;
+        public string Cup;
+        public string Units;
+    }
+
+    public interface ICupCalculator {
+        string Name { get; }
+        CupSize Calculate(float bust, float underbust);
+    }
+
+
+    public class KnixComCupCalculator : ICupCalculator {
+
+        // https://knix.com/blogs/resources/how-to-measure-bra-band-size#:~:text=Finally%2C%20Find%20Your%20Cup%20Size%20%20%20Bust,%20%20C%20%207%20more%20rows%20
+        public string Name => "https://knix.com/";
+
+        public CupSize Calculate(float bust, float underbust) {
+            var bustIn = Mathf.RoundToInt(HeightMeasurePlugin.UnityToFeet(bust) * 12);
+            var underbustIn = Mathf.RoundToInt(HeightMeasurePlugin.UnityToFeet(underbust) * 12);
+
+            // bust size + 2 inches - if it is odd, add one more
+            var band = underbustIn + 2 + (underbustIn % 2);
+            var diff = Mathf.Max(0, bustIn - band);
+
+            var bustBandDiffToCup = new Dictionary<Vector2, string>() {
+                { new Vector2(0, 1), "AA"},
+                { new Vector2(1, 2), "A"},
+                { new Vector2(2, 3), "B"},
+                { new Vector2(3, 4), "C"},
+                { new Vector2(4, 5), "D"},
+                { new Vector2(5, 6), "DD/E"},
+                { new Vector2(6, 7), "DDD/F"},
+                { new Vector2(7, 8), "G"},
+                { new Vector2(8, 9), "H"},
+                { new Vector2(9, 10), "I"},
+                { new Vector2(10, 11), "J"},
+                { new Vector2(11, 100000), "HUGE"},
+            };
+            var cupMapping = bustBandDiffToCup.FirstOrDefault(kv => diff >= kv.Key.x && diff < kv.Key.y);
+
+            return new CupSize {
+                Units = "in",
+                Cup = cupMapping.Value,
+                Band = band
+            };
+        }
+    }
+
+    public class SizeChartCupCalculator : ICupCalculator {
+
+        public string Name => "sizechart.com/brasize/us/index.html";
+
+        public CupSize Calculate(float bust, float underbust) {
+            var bustIn = Mathf.RoundToInt(HeightMeasurePlugin.UnityToFeet(bust) * 12);
+            var underbustIn = Mathf.RoundToInt(HeightMeasurePlugin.UnityToFeet(underbust) * 12);
+
+            var bustToBand = new Dictionary<Vector2, int>() {
+                { new Vector2(23, 25), 28 },
+                { new Vector2(25, 27), 30 },
+                { new Vector2(27, 29), 32 },
+                { new Vector2(29, 31), 34 },
+                { new Vector2(31, 33), 36 },
+                { new Vector2(33, 35), 38 },
+                { new Vector2(35, 37), 40 },
+                { new Vector2(37, 39), 42 },
+                { new Vector2(39, 40), 44 },
+                { new Vector2(41, 43), 46 },
+            };
+
+            var bustMapping = bustToBand.FirstOrDefault(kv => underbustIn >= kv.Key.x && underbustIn < kv.Key.y);
+            var band = bustMapping.Value;
+
+            var bustBandDiffToCup = new Dictionary<Vector2, string>() {
+                { new Vector2(0, 1), "AA"},
+                { new Vector2(1, 2), "A"},
+                { new Vector2(2, 3), "B"},
+                { new Vector2(3, 4), "C"},
+                { new Vector2(4, 5), "D"},
+                { new Vector2(5, 6), "DD/E"},
+                { new Vector2(6, 7), "DDD/F"},
+                { new Vector2(7, 8), "G"},
+                { new Vector2(8, 9), "H"},
+                { new Vector2(9, 10), "I"},
+                { new Vector2(10, 11), "J"},
+                { new Vector2(11, 100000), "HUGE"},
+            };
+            var cupMapping = bustBandDiffToCup.FirstOrDefault(kv => Mathf.Max(0, bustIn-band) >= kv.Key.x && Mathf.Max(0, bustIn-band) < kv.Key.y);
+
+            return new CupSize {
+                Units = "in",
+                Cup = cupMapping.Value,
+                Band = band
+            };
         }
     }
 }
