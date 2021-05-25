@@ -30,6 +30,27 @@ namespace LFE
             new VertexPositionExact(2100), // back
         };
 
+        readonly IVertexPosition[] _verticesWaist = new IVertexPosition[] {
+            new VertexPositionExact(8152), // front and center
+            new VertexPositionExact(19663), // front right 1
+            new VertexPositionExact(13675), // front right 2
+            new VertexPositionExact(13715), // front right 3
+            new VertexPositionExact(13727), // right side
+            new VertexPositionExact(13725), // back curve 1
+            new VertexPositionExact(2921), // back
+        };
+
+        readonly IVertexPosition[] _verticesHip = new IVertexPosition[] {
+            new VertexPositionExact(22843), // front and center
+            new VertexPositionExact(13750), // front right 1
+            new VertexPositionExact(18460), // front right 2
+            new VertexPositionMiddle(11234, 18491, 0.8f), // front right 3
+            new VertexPositionExact(18512), // right side
+            new VertexPositionExact(18529), // glute curve 1
+            new VertexPositionExact(18562), // glute curve 2
+            new VertexPositionMiddle(18562, 7878), // glute middle
+        };
+
         readonly IVertexPosition _vertexHead = new VertexPositionExact(2087);
         readonly IVertexPosition _vertexChin = new VertexPositionExact(2079);
         readonly IVertexPosition _vertexEarLeft = new VertexPositionExact(3236);
@@ -45,7 +66,7 @@ namespace LFE
         JSONStorableFloat _heightInHeadsStorable;
         JSONStorableFloat _markerLeftRightStorable;
         JSONStorableFloat _markerFrontBackStorable;
-        JSONStorableBool _showBreastMarkersStorable;
+        JSONStorableBool _showTapeMarkersStorable;
         JSONStorableBool _showHeadHeightMarkersStorable;
         JSONStorableBool _showFeatureMarkersStorable;
         JSONStorableBool _showFeatureMarkerLabelsStorable;
@@ -120,8 +141,8 @@ namespace LFE
             _markerFrontBackStorable = new JSONStorableFloat("Marker Front/Back", 0.15f, -1, 1);
             RegisterFloat(_markerFrontBackStorable);
 
-            _showBreastMarkersStorable = new JSONStorableBool("Show Breast Measure Markers", false);
-            RegisterBool(_showBreastMarkersStorable);
+            _showTapeMarkersStorable = new JSONStorableBool("Show Tape Measure Markers", false);
+            RegisterBool(_showTapeMarkersStorable);
 
             _showHeadHeightMarkersStorable = new JSONStorableBool("Show Head Height Markers", true);
             RegisterBool(_showHeadHeightMarkersStorable);
@@ -145,7 +166,7 @@ namespace LFE
             CreateScrollablePopup(_cupAlgorithmStorable);
             CreateSlider(_markerLeftRightStorable, rightSide: true);
             CreateSlider(_markerFrontBackStorable, rightSide: true);
-            CreateToggle(_showBreastMarkersStorable);
+            CreateToggle(_showTapeMarkersStorable);
             CreateToggle(_showHeadHeightMarkersStorable);
             CreateToggle(_showFeatureMarkersStorable);
             CreateToggle(_showFeatureMarkerLabelsStorable);
@@ -166,6 +187,16 @@ namespace LFE
                 Destroy(h);
             }
             _underbustMarkersFromMorph = new List<GameObject>();
+
+            foreach(var h in _waistMarkersFromMorph) {
+                Destroy(h);
+            }
+            _waistMarkersFromMorph = new List<GameObject>();
+
+            foreach(var h in _hipMarkersFromMorph) {
+                Destroy(h);
+            }
+            _hipMarkersFromMorph = new List<GameObject>();
         }
 
         public void Update() {
@@ -252,6 +283,8 @@ namespace LFE
                     UpdateBustMarkersFromMorphVertex();
                     UpdateUnderbustMarkersFromMorphVertex();
                 }
+                UpdateWaistMarkersFromMorphVertex();
+                UpdateHipMarkersFromMorphVertex();
 
                 _fullHeightStorable.val = GetHeight();
                 _headHeightStorable.val = GetHeadHeight();
@@ -259,9 +292,10 @@ namespace LFE
                 var cupInfo = GetCupInfo();
                 var crotchToKnee = Vector3.Distance(_markerGroin.Origin, _markerKnee.Origin);
                 var kneeToHeel = Vector3.Distance(_markerKnee.Origin, _markerHeel.Origin);
+                var headWidth = GetHeadWidth();
 
                 _markerHead.Label = $"Head (Head To Heel {(int)(_fullHeightStorable.val * 100)} cm / {UnitUtils.FeetInchString(UnitUtils.UnityToFeet(_fullHeightStorable.val))} / {_heightInHeadsStorable.val:0.0} heads)";
-                _markerChin.Label = $"Neck (Head To Neck {(int)(_headHeightStorable.val * 100)} cm / {UnitUtils.FeetInchString(UnitUtils.UnityToFeet(_headHeightStorable.val))})";
+                _markerChin.Label = $"Neck (Head Height {(int)(_headHeightStorable.val * 100)} cm / {UnitUtils.FeetInchString(UnitUtils.UnityToFeet(_headHeightStorable.val))}; Width {(int)(headWidth * 100)} cm / {UnitUtils.FeetInchString(UnitUtils.UnityToFeet(headWidth))})";
                 if(cupInfo == null) {
                     _markerNipple.Label = "Nipple";
                     _markerUnderbust.Label = "Underbust";
@@ -270,8 +304,8 @@ namespace LFE
                     _markerNipple.Label = $"Nipple (Cup {cupInfo}; Around {cupInfo.BustToCentimeters} cm / {cupInfo.BustToInches} in)";
                     _markerUnderbust.Label = $"Underbust (Around {cupInfo.UnderbustToCentimeters} cm / {cupInfo.UnderbustToInches} in)";
                 }
-                _markerNavel.Label = "Navel";
-                _markerGroin.Label = $"Crotch";
+                _markerNavel.Label = $"Navel (Waist {(int)(_circumferenceWaist * 100)} cm / {Mathf.RoundToInt(UnitUtils.UnityToFeet(_circumferenceWaist) * 12)} in)";
+                _markerGroin.Label = $"Crotch (Hip {(int)(_circumferenceHip * 100)} cm / {Mathf.RoundToInt(UnitUtils.UnityToFeet(_circumferenceHip) * 12)} in)";
                 _markerKnee.Label = $"Knee Bottom (Crotch to Knee {(int)(crotchToKnee * 100)} cm / {UnitUtils.FeetInchString(UnitUtils.UnityToFeet(crotchToKnee))} / {crotchToKnee / _headHeightStorable.val:0.0} heads)";
                 _markerHeel.Label = $"Heel (Knee to Heel {(int)(kneeToHeel * 100)} cm / {UnitUtils.FeetInchString(UnitUtils.UnityToFeet(kneeToHeel))} / {kneeToHeel / _headHeightStorable.val:0.0} heads)";
             }
@@ -299,7 +333,7 @@ namespace LFE
                 return;
             }
 
-            if(_showBreastMarkersStorable.val) {
+            if(_showTapeMarkersStorable.val) {
                 if(_bustMarkersFromMorph.Count != _verticesBust.Length)
                 {
                     foreach(var m in _bustMarkersFromMorph) {
@@ -333,7 +367,7 @@ namespace LFE
                 return;
             }
 
-            if(_showBreastMarkersStorable.val){
+            if(_showTapeMarkersStorable.val){
                 if(_underbustMarkersFromMorph.Count != _verticesUnderbust.Length) {
                     foreach(var m in _underbustMarkersFromMorph) {
                         Destroy(m);
@@ -358,12 +392,80 @@ namespace LFE
             _circumferenceUnderbust = LineLength(_verticesUnderbust.Select(v => v.Position(this)).ToArray()) * 2;
         }
 
+        List<GameObject> _waistMarkersFromMorph = new List<GameObject>();
+        float _circumferenceWaist = 0;
+        private void UpdateWaistMarkersFromMorphVertex() {
+            if(Skin == null) {
+                return;
+            }
+
+            if(_showTapeMarkersStorable.val){
+                if(_waistMarkersFromMorph.Count != _verticesWaist.Length) {
+                    foreach(var m in _waistMarkersFromMorph) {
+                        Destroy(m);
+                    }
+                    _waistMarkersFromMorph.Clear();
+                    foreach(var m in _verticesWaist){
+                        _waistMarkersFromMorph.Add(CreateMarker(Color.white));
+                    }
+                }
+
+                for(var i = 0; i < _verticesWaist.Length; i++) {
+                    _waistMarkersFromMorph[i].transform.position = _verticesWaist[i].Position(this);
+                }
+            }
+            else {
+                foreach(var m in _waistMarkersFromMorph) {
+                    Destroy(m);
+                }
+                _waistMarkersFromMorph.Clear();
+            }
+
+            _circumferenceWaist = LineLength(_verticesWaist.Select(v => v.Position(this)).ToArray()) * 2;
+        }
+
+        List<GameObject> _hipMarkersFromMorph = new List<GameObject>();
+        float _circumferenceHip = 0;
+        private void UpdateHipMarkersFromMorphVertex() {
+            if(Skin == null) {
+                return;
+            }
+
+            if(_showTapeMarkersStorable.val){
+                if(_hipMarkersFromMorph.Count != _verticesHip.Length) {
+                    foreach(var m in _hipMarkersFromMorph) {
+                        Destroy(m);
+                    }
+                    _hipMarkersFromMorph.Clear();
+                    foreach(var m in _verticesHip){
+                        _hipMarkersFromMorph.Add(CreateMarker(Color.white));
+                    }
+                }
+
+                for(var i = 0; i < _verticesHip.Length; i++) {
+                    _hipMarkersFromMorph[i].transform.position = _verticesHip[i].Position(this);
+                }
+            }
+            else {
+                foreach(var m in _hipMarkersFromMorph) {
+                    Destroy(m);
+                }
+                _hipMarkersFromMorph.Clear();
+            }
+
+            _circumferenceHip = LineLength(_verticesHip.Select(v => v.Position(this)).ToArray()) * 2;
+        }
+
         private float GetHeight() {
             return Vector3.Distance(_markerHead.Origin, _markerHeel.Origin);
         }
 
         private float GetHeadHeight() {
             return Vector3.Distance(_markerHead.Origin, _markerChin.Origin);
+        }
+        
+        private float GetHeadWidth() {
+            return Vector3.Distance(_vertexEarLeft.Position(this), _vertexEarRight.Position(this));
         }
 
         private float GetHeightInHeads() {
@@ -616,7 +718,7 @@ namespace LFE
         public string Name { get; set; } = "Name";
         public string Label { get; set; }
         public Color Color { get; set; } = Color.green;
-        public float Length { get; set; } = 0.8f;
+        public float Length { get; set; } = 0.5f;
         public Vector3 Origin { get; set; } = Vector3.zero;
         public Vector3 LineDirection { get; set; } = Vector3.left;
         public bool Enabled { get; set; } = true;
@@ -650,7 +752,8 @@ namespace LFE
                 CalculateEndpoint(Origin)
             });
             _lineRenderer.gameObject.SetActive(Enabled);
-            _canvas.gameObject.SetActive(Enabled);
+            // SuperController.LogMessage($"{_lineRenderer.gameObject.layer} - {_canvas.gameObject.layer}");
+            _canvas.gameObject.SetActive(_lineRenderer.gameObject.activeInHierarchy);
             if(Enabled) {
                 var text = _canvas.GetComponentInChildren<Text>();
                 if(text) {
@@ -705,7 +808,7 @@ namespace LFE
             cs.scaleFactor = 80.0f;
             cs.dynamicPixelsPerUnit = 1f;
 
-            GraphicRaycaster gr = canvasObject.AddComponent<GraphicRaycaster>();
+            // GraphicRaycaster gr = canvasObject.AddComponent<GraphicRaycaster>();
             _canvas.transform.localScale = new Vector3(0.002f, 0.002f, 0.002f);
             //canvas.transform.localPosition = new Vector3(-0.7f, 0, 0);
             _canvas.transform.localPosition = new Vector3(0.26f, -0.14f, 0.0f);
