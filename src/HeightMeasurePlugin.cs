@@ -7,6 +7,10 @@ namespace LFE
 {
     public class HeightMeasurePlugin : MVRScript
     {
+
+        private const float FACE_MARKER_THICKNESS = 0.001f;
+        private static Color FACE_MARKER_COLOR = Color.blue;
+
         public DAZSkinV2 Skin;
 
         readonly IVertexPosition[] _verticesBust = new IVertexPosition[] {
@@ -305,69 +309,69 @@ namespace LFE
 
             _markerEyeMidHeight = gameObject.AddComponent<HorizontalMarker>();
             _markerEyeMidHeight.Name = "Eye Height";
-            _markerEyeMidHeight.Color = Color.blue;
-            _markerEyeMidHeight.Thickness = 0.001f;
+            _markerEyeMidHeight.Color = FACE_MARKER_COLOR;
+            _markerEyeMidHeight.Thickness = FACE_MARKER_THICKNESS;
 
             _markerEyeRightOuter = gameObject.AddComponent<HorizontalMarker>();
             _markerEyeRightOuter.Name = "Eye Right Outer";
-            _markerEyeRightOuter.Color = Color.blue;
-            _markerEyeRightOuter.Thickness = 0.001f;
+            _markerEyeRightOuter.Color = FACE_MARKER_COLOR;
+            _markerEyeRightOuter.Thickness = FACE_MARKER_THICKNESS;
             _markerEyeRightOuter.LineDirection = Vector3.up;
 
             _markerEyeLeftOuter = gameObject.AddComponent<HorizontalMarker>();
             _markerEyeLeftOuter.Name = "Eye Left Outer";
-            _markerEyeLeftOuter.Color = Color.blue;
-            _markerEyeLeftOuter.Thickness = 0.001f;
+            _markerEyeLeftOuter.Color = FACE_MARKER_COLOR;
+            _markerEyeLeftOuter.Thickness = FACE_MARKER_THICKNESS;
             _markerEyeLeftOuter.LineDirection = Vector3.up;
 
             _markerNoseBottomHeight = gameObject.AddComponent<HorizontalMarker>();
             _markerNoseBottomHeight.Name = "Nose Bottom Height";
-            _markerNoseBottomHeight.Color = Color.blue;
-            _markerNoseBottomHeight.Thickness = 0.001f;
+            _markerNoseBottomHeight.Color = FACE_MARKER_COLOR;
+            _markerNoseBottomHeight.Thickness = FACE_MARKER_THICKNESS;
 
             _markerMouthMidHeight = gameObject.AddComponent<HorizontalMarker>();
             _markerMouthMidHeight.Name = "Mouth Height";
-            _markerMouthMidHeight.Color = Color.blue;
-            _markerMouthMidHeight.Thickness = 0.001f;
+            _markerMouthMidHeight.Color = FACE_MARKER_COLOR;
+            _markerMouthMidHeight.Thickness = FACE_MARKER_THICKNESS;
 
             _markerMouthLeft = gameObject.AddComponent<HorizontalMarker>();
             _markerMouthLeft.Name = "Mouth Left";
-            _markerMouthLeft.Color = Color.blue;
-            _markerMouthLeft.Thickness = 0.001f;
+            _markerMouthLeft.Color = FACE_MARKER_COLOR;
+            _markerMouthLeft.Thickness = FACE_MARKER_THICKNESS;
             _markerMouthLeft.LineDirection = Vector3.up;
 
             _markerMouthRight = gameObject.AddComponent<HorizontalMarker>();
             _markerMouthRight.Name = "Mouth Right";
-            _markerMouthRight.Color = Color.blue;
-            _markerMouthRight.Thickness = 0.001f;
+            _markerMouthRight.Color = FACE_MARKER_COLOR;
+            _markerMouthRight.Thickness = FACE_MARKER_THICKNESS;
             _markerMouthRight.LineDirection = Vector3.up;
 
             _markerChinSmall = gameObject.AddComponent<HorizontalMarker>();
             _markerChinSmall.Name = "Chin Small";
-            _markerChinSmall.Color = Color.blue;
-            _markerChinSmall.Thickness = 0.001f;
+            _markerChinSmall.Color = FACE_MARKER_COLOR;
+            _markerChinSmall.Thickness = FACE_MARKER_THICKNESS;
 
             _markerHeadSmall = gameObject.AddComponent<HorizontalMarker>();
             _markerHeadSmall.Name = "Head Small";
-            _markerHeadSmall.Color = Color.blue;
-            _markerHeadSmall.Thickness = 0.001f;
+            _markerHeadSmall.Color = FACE_MARKER_COLOR;
+            _markerHeadSmall.Thickness = FACE_MARKER_THICKNESS;
 
             _markerHeadRight = gameObject.AddComponent<HorizontalMarker>();
             _markerHeadRight.Name = "Head Right";
-            _markerHeadRight.Color = Color.blue;
-            _markerHeadRight.Thickness = 0.001f;
-            _markerHeadRight.LineDirection = Vector3.up;
+            _markerHeadRight.Color = FACE_MARKER_COLOR;
+            _markerHeadRight.Thickness = FACE_MARKER_THICKNESS;
+            _markerHeadRight.LineDirection = Vector2.up;
 
             _markerHeadLeft = gameObject.AddComponent<HorizontalMarker>();
             _markerHeadLeft.Name = "Head Left";
-            _markerHeadLeft.Color = Color.blue;
-            _markerHeadLeft.Thickness = 0.001f;
+            _markerHeadLeft.Color = FACE_MARKER_COLOR;
+            _markerHeadLeft.Thickness = FACE_MARKER_THICKNESS;
             _markerHeadLeft.LineDirection = Vector3.up;
 
             _markerFaceCenter = gameObject.AddComponent<HorizontalMarker>();
             _markerFaceCenter.Name = "Face Center";
-            _markerFaceCenter.Color = Color.blue;
-            _markerFaceCenter.Thickness = 0.001f;
+            _markerFaceCenter.Color = FACE_MARKER_COLOR;
+            _markerFaceCenter.Thickness = FACE_MARKER_THICKNESS;
             _markerFaceCenter.LineDirection = Vector3.up;
 
 
