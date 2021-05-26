@@ -8,7 +8,7 @@ namespace LFE {
         public string Label { get; set; }
         public Color Color { get; set; } = Color.green;
         public float Length { get; set; } = 0.5f;
-        public float Thickness { get; set; } = 0.004f;
+        public float Thickness { get; set; } = 0.003f;
         public Vector3 Origin { get; set; } = Vector3.zero;
         public Vector3 LineDirection { get; set; } = Vector3.left;
         public bool Enabled { get; set; } = true;

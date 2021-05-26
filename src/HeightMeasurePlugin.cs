@@ -60,6 +60,25 @@ namespace LFE
         readonly IVertexPosition _vertexGroin = new VertexPositionExact(22208);
         readonly IVertexPosition _vertexKnee = new VertexPositionMiddle(8508, 19179);
         readonly IVertexPosition _vertexShoulder = new VertexPositionMiddle(11110, 182);
+        readonly IVertexPosition _vertexEyeLeftTopHeight = new VertexPositionMiddle(7478, 1930);
+        // readonly IVertexPosition _vertexEyeLeftMidHeight = new VertexPositionMiddle(14006, 18050, 0.1f);
+        readonly IVertexPosition _vertexEyeLeftMidHeight = new VertexPositionExact(14006);
+        readonly IVertexPosition _vertexEyeLeftInner = new VertexPositionExact(7575); // a little past the lacrimal -- this is actually part of the nose
+        readonly IVertexPosition _vertexEyeLeftBottom = new VertexPositionExact(3187);
+        readonly IVertexPosition _vertexEyeLeftOuterHeight = new VertexPositionExact(7351);
+        readonly IVertexPosition _vertexEyeRightTopHeight = new VertexPositionMiddle(18175, 12858);
+        readonly IVertexPosition _vertexEyeRightMidHeight = new VertexPositionMiddle(3223, 7351, 0.2f);
+        readonly IVertexPosition _vertexEyeRightInner = new VertexPositionExact(18267); // a little past the lacrimal -- this is actually part of the nose
+        readonly IVertexPosition _vertexEyeRightBottom = new VertexPositionExact(13972);
+        readonly IVertexPosition _vertexEyeRightOuter = new VertexPositionExact(18050); 
+        readonly IVertexPosition _vertexNoseTip = new VertexPositionExact(2111);
+        readonly IVertexPosition _vertexNoseBottom = new VertexPositionExact(3252);
+        readonly IVertexPosition _vertexMouthLeftSideMiddle = new VertexPositionExact(1655);
+        readonly IVertexPosition _vertexMouthRightSideMiddle = new VertexPositionExact(12319);
+        readonly IVertexPosition _vertexMouthMidHeight = new VertexPositionMiddle(2136, 2145);
+
+        DAZBone _eyeLeft;
+
 
         // measurement storables
         JSONStorableFloat _fullHeightStorable;
@@ -90,6 +109,7 @@ namespace LFE
         JSONStorableBool _showHeadHeightMarkersStorable;
         JSONStorableBool _showFeatureMarkersStorable;
         JSONStorableBool _showFeatureMarkerLabelsStorable;
+        JSONStorableBool _showFaceMarkersStorable;
         JSONStorableStringChooser _cupAlgorithmStorable;
 
         DAZCharacter _dazCharacter;
@@ -109,6 +129,20 @@ namespace LFE
         HorizontalMarker _markerGroin;
         HorizontalMarker _markerKnee;
         HorizontalMarker _markerHeel;
+
+        HorizontalMarker _markerEyeMidHeight;
+        HorizontalMarker _markerEyeRightOuter;
+        HorizontalMarker _markerEyeLeftOuter;
+        HorizontalMarker _markerMouthMidHeight;
+        HorizontalMarker _markerMouthLeft;
+        HorizontalMarker _markerMouthRight;
+        HorizontalMarker _markerNoseBottomHeight;
+        HorizontalMarker _markerChinSmall;
+        HorizontalMarker _markerHeadSmall;
+        HorizontalMarker _markerHeadLeft;
+        HorizontalMarker _markerHeadRight;
+        HorizontalMarker _markerFaceCenter;
+
 
         public void InitStorables() {
             // Cup algorithm choice
@@ -145,6 +179,10 @@ namespace LFE
 
             // Bool: Show the feature marker labels
             _showFeatureMarkerLabelsStorable = new JSONStorableBool("Show Feature Marker Labels", true);
+            RegisterBool(_showFeatureMarkerLabelsStorable);
+
+            // Bool: Show face markers
+            _showFaceMarkersStorable = new JSONStorableBool("Show Face Markers", true);
             RegisterBool(_showFeatureMarkerLabelsStorable);
 
 
@@ -222,6 +260,7 @@ namespace LFE
             CreateToggle(_showHeadHeightMarkersStorable);
             CreateToggle(_showFeatureMarkersStorable);
             CreateToggle(_showFeatureMarkerLabelsStorable);
+            CreateToggle(_showFaceMarkersStorable);
         }
 
         public void InitLineMarkers() {
@@ -261,6 +300,78 @@ namespace LFE
             _markerHeel = gameObject.AddComponent<HorizontalMarker>();
             _markerHeel.Name = "Heel";
             _markerHeel.Color = Color.green;
+
+            _eyeLeft = containingAtom.GetStorableByID("lEye") as DAZBone;
+
+            _markerEyeMidHeight = gameObject.AddComponent<HorizontalMarker>();
+            _markerEyeMidHeight.Name = "Eye Height";
+            _markerEyeMidHeight.Color = Color.blue;
+            _markerEyeMidHeight.Thickness = 0.001f;
+
+            _markerEyeRightOuter = gameObject.AddComponent<HorizontalMarker>();
+            _markerEyeRightOuter.Name = "Eye Right Outer";
+            _markerEyeRightOuter.Color = Color.blue;
+            _markerEyeRightOuter.Thickness = 0.001f;
+            _markerEyeRightOuter.LineDirection = Vector3.up;
+
+            _markerEyeLeftOuter = gameObject.AddComponent<HorizontalMarker>();
+            _markerEyeLeftOuter.Name = "Eye Left Outer";
+            _markerEyeLeftOuter.Color = Color.blue;
+            _markerEyeLeftOuter.Thickness = 0.001f;
+            _markerEyeLeftOuter.LineDirection = Vector3.up;
+
+            _markerNoseBottomHeight = gameObject.AddComponent<HorizontalMarker>();
+            _markerNoseBottomHeight.Name = "Nose Bottom Height";
+            _markerNoseBottomHeight.Color = Color.blue;
+            _markerNoseBottomHeight.Thickness = 0.001f;
+
+            _markerMouthMidHeight = gameObject.AddComponent<HorizontalMarker>();
+            _markerMouthMidHeight.Name = "Mouth Height";
+            _markerMouthMidHeight.Color = Color.blue;
+            _markerMouthMidHeight.Thickness = 0.001f;
+
+            _markerMouthLeft = gameObject.AddComponent<HorizontalMarker>();
+            _markerMouthLeft.Name = "Mouth Left";
+            _markerMouthLeft.Color = Color.blue;
+            _markerMouthLeft.Thickness = 0.001f;
+            _markerMouthLeft.LineDirection = Vector3.up;
+
+            _markerMouthRight = gameObject.AddComponent<HorizontalMarker>();
+            _markerMouthRight.Name = "Mouth Right";
+            _markerMouthRight.Color = Color.blue;
+            _markerMouthRight.Thickness = 0.001f;
+            _markerMouthRight.LineDirection = Vector3.up;
+
+            _markerChinSmall = gameObject.AddComponent<HorizontalMarker>();
+            _markerChinSmall.Name = "Chin Small";
+            _markerChinSmall.Color = Color.blue;
+            _markerChinSmall.Thickness = 0.001f;
+
+            _markerHeadSmall = gameObject.AddComponent<HorizontalMarker>();
+            _markerHeadSmall.Name = "Head Small";
+            _markerHeadSmall.Color = Color.blue;
+            _markerHeadSmall.Thickness = 0.001f;
+
+            _markerHeadRight = gameObject.AddComponent<HorizontalMarker>();
+            _markerHeadRight.Name = "Head Right";
+            _markerHeadRight.Color = Color.blue;
+            _markerHeadRight.Thickness = 0.001f;
+            _markerHeadRight.LineDirection = Vector3.up;
+
+            _markerHeadLeft = gameObject.AddComponent<HorizontalMarker>();
+            _markerHeadLeft.Name = "Head Left";
+            _markerHeadLeft.Color = Color.blue;
+            _markerHeadLeft.Thickness = 0.001f;
+            _markerHeadLeft.LineDirection = Vector3.up;
+
+            _markerFaceCenter = gameObject.AddComponent<HorizontalMarker>();
+            _markerFaceCenter.Name = "Face Center";
+            _markerFaceCenter.Color = Color.blue;
+            _markerFaceCenter.Thickness = 0.001f;
+            _markerFaceCenter.LineDirection = Vector3.up;
+
+
+
         }
 
         public void OnDestroy() {
@@ -336,7 +447,7 @@ namespace LFE
             _markerChin.Enabled = _showFeatureMarkersStorable.val;
             _markerChin.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
 
-            // sholder
+            // shoulder
             pos = _vertexShoulder.Position(this);
             pos.x = _markerHead.Origin.x;
             pos.z = _markerHead.Origin.z;
@@ -404,7 +515,127 @@ namespace LFE
             UpdateWaistMarkersFromMorphVertex();
             UpdateHipMarkersFromMorphVertex();
 
+            var midpoint = _vertexHead.Position(this);
+            var midpointX = midpoint.x + (_headSizeWidthStorable.val / 2) - _markerLeftRightStorable.val;
+
+            // eye midline
+            pos = _eyeLeft.transform.position; // comes from a daz bone not a vertex
+            pos.x = midpointX;
+            pos.z = _markerHead.Origin.z - 0.045f;
+            _markerEyeMidHeight.Length = _headSizeWidthStorable.val;
+            _markerEyeMidHeight.Origin = pos;
+            _markerEyeMidHeight.Enabled = _showFaceMarkersStorable.val;
+            _markerEyeMidHeight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // eye right outer
+            pos = _vertexEyeRightOuter.Position(this);
+            pos.x = pos.x - _markerLeftRightStorable.val;
+            pos.y = _markerEyeMidHeight.Origin.y - _headSizeHeightStorable.val / 4 / 2;
+            pos.z = _markerHead.Origin.z - 0.045f;
+            _markerEyeRightOuter.Length = _headSizeHeightStorable.val / 4;
+            _markerEyeRightOuter.Origin = pos;
+            _markerEyeRightOuter.Enabled = _showFaceMarkersStorable.val;
+            _markerEyeRightOuter.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // eye left outer
+            pos = _vertexEyeLeftOuterHeight.Position(this);
+            pos.x = pos.x - _markerLeftRightStorable.val;
+            pos.y = _markerEyeMidHeight.Origin.y - _headSizeHeightStorable.val / 4 / 2;
+            pos.z = _markerHead.Origin.z - 0.045f;
+            _markerEyeLeftOuter.Length = _headSizeHeightStorable.val / 4;
+            _markerEyeLeftOuter.Origin = pos;
+            _markerEyeLeftOuter.Enabled = _showFaceMarkersStorable.val;
+            _markerEyeLeftOuter.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // nose bottom
+            pos = _vertexNoseBottom.Position(this);
+            pos.x = midpointX;
+            pos.z = _markerHead.Origin.z - 0.045f;
+            _markerNoseBottomHeight.Length = _headSizeWidthStorable.val;
+            _markerNoseBottomHeight.Origin = pos;
+            _markerNoseBottomHeight.Enabled = _showFaceMarkersStorable.val;
+            _markerNoseBottomHeight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // mouth middle
+            pos = _vertexMouthMidHeight.Position(this);
+            pos.x = midpointX;
+            pos.z = _markerHead.Origin.z - 0.045f;
+            _markerMouthMidHeight.Length = _headSizeWidthStorable.val;
+            _markerMouthMidHeight.Origin = pos;
+            _markerMouthMidHeight.Enabled = _showFaceMarkersStorable.val;
+            _markerMouthMidHeight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // mouth left
+            pos = _vertexMouthLeftSideMiddle.Position(this);
+            pos.x = pos.x - _markerLeftRightStorable.val;
+            pos.y = _markerMouthMidHeight.Origin.y - (_headSizeHeightStorable.val / 8 / 2);
+            pos.z = _markerHead.Origin.z - 0.045f;
+            _markerMouthLeft.Length = _headSizeHeightStorable.val / 8;
+            _markerMouthLeft.Origin = pos;
+            _markerMouthLeft.Enabled = _showFaceMarkersStorable.val;
+            _markerMouthLeft.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // mouth right
+            pos = _vertexMouthRightSideMiddle.Position(this);
+            pos.x = pos.x - _markerLeftRightStorable.val;
+            pos.y = _markerMouthMidHeight.Origin.y - (_headSizeHeightStorable.val / 8 / 2);
+            pos.z = _markerHead.Origin.z - 0.045f;
+            _markerMouthRight.Length = _headSizeHeightStorable.val / 8;
+            _markerMouthRight.Origin = pos;
+            _markerMouthRight.Enabled = _showFaceMarkersStorable.val;
+            _markerMouthRight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // chin small and blue
+            pos = _vertexHead.Position(this);
+            pos.x = pos.x - _markerLeftRightStorable.val + _headSizeWidthStorable.val / 2;
+            pos.z = _markerHead.Origin.z - 0.045f;
+            _markerChinSmall.Length = _headSizeWidthStorable.val;
+            _markerChinSmall.Origin = pos;
+            _markerChinSmall.Enabled = _showFaceMarkersStorable.val;
+            _markerChinSmall.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // head small and blue
+            pos = _vertexHead.Position(this);
+            pos.y = pos.y - _headSizeHeightStorable.val;
+            pos.x = pos.x - _markerLeftRightStorable.val + _headSizeWidthStorable.val / 2;
+            pos.z = _markerHead.Origin.z - 0.045f;
+            _markerHeadSmall.Length = _headSizeWidthStorable.val;
+            _markerHeadSmall.Origin = pos;
+            _markerHeadSmall.Enabled = _showFaceMarkersStorable.val;
+            _markerHeadSmall.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // head left
+            pos = _vertexHead.Position(this);
+            pos.y = pos.y - _headSizeHeightStorable.val;
+            pos.x = pos.x - _markerLeftRightStorable.val + _headSizeWidthStorable.val / 2;
+            pos.z = _markerHead.Origin.z - 0.045f;
+            _markerHeadLeft.Length = _headSizeHeightStorable.val;
+            _markerHeadLeft.Origin = pos;
+            _markerHeadLeft.Enabled = _showFaceMarkersStorable.val;
+            _markerHeadLeft.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // head right
+            pos = _vertexHead.Position(this);
+            pos.y = pos.y - _headSizeHeightStorable.val;
+            pos.x = pos.x - _markerLeftRightStorable.val - _headSizeWidthStorable.val / 2;
+            pos.z = _markerHead.Origin.z - 0.045f;
+            _markerHeadRight.Length = _headSizeHeightStorable.val;
+            _markerHeadRight.Origin = pos;
+            _markerHeadRight.Enabled = _showFaceMarkersStorable.val;
+            _markerHeadRight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // face center
+            pos = _vertexNoseTip.Position(this);
+            pos.y = pos.y - (pos.y - _markerChin.Origin.y);
+            pos.x = pos.x - _markerLeftRightStorable.val;
+            pos.z = _markerHead.Origin.z - 0.045f;
+            _markerFaceCenter.Length = _headSizeHeightStorable.val;
+            _markerFaceCenter.Origin = pos;
+            _markerFaceCenter.Enabled = _showFaceMarkersStorable.val;
+            _markerFaceCenter.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
         }
+
+
 
         private void UpdateMeasurements() {
             // basic body heights
