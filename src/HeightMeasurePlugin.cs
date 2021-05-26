@@ -84,6 +84,7 @@ namespace LFE
 
         // other storables
         JSONStorableFloat _markerSpreadStorable;
+        JSONStorableFloat _markerLeftRightStorable;
         JSONStorableFloat _markerFrontBackStorable;
         JSONStorableBool _showTapeMarkersStorable;
         JSONStorableBool _showHeadHeightMarkersStorable;
@@ -122,8 +123,12 @@ namespace LFE
             RegisterFloat(_markerSpreadStorable);
 
             // Float: Move markers forward or backward relative to center depth of the head
-            _markerFrontBackStorable = new JSONStorableFloat("Move Marker Forward/Backward", 0.15f, -5, 5);
+            _markerFrontBackStorable = new JSONStorableFloat("Move Markers Forward/Backward", 0.15f, -5, 5);
             RegisterFloat(_markerFrontBackStorable);
+
+            // Float: Move markers left or right 
+            _markerLeftRightStorable = new JSONStorableFloat("Move Markers Left/Right", 0, -5, 5);
+            RegisterFloat(_markerLeftRightStorable);
 
             // Bool: Show the tape measures for circumference?
             _showTapeMarkersStorable = new JSONStorableBool("Show Tape Measure Markers", false);
@@ -211,6 +216,7 @@ namespace LFE
             CreateScrollablePopup(_cupAlgorithmStorable);
             CreateSlider(_markerSpreadStorable, rightSide: true);
             CreateSlider(_markerFrontBackStorable, rightSide: true);
+            CreateSlider(_markerLeftRightStorable, rightSide: true);
             CreateToggle(_showTapeMarkersStorable);
             CreateToggle(_showHeadHeightMarkersStorable);
             CreateToggle(_showFeatureMarkersStorable);
@@ -301,7 +307,7 @@ namespace LFE
             Vector3 pos;
             // head
             pos = _vertexHead.Position(this);
-            pos.x -= _markerSpreadStorable.val;
+            pos.x -= _markerSpreadStorable.val + _markerLeftRightStorable.val;
             pos.z += _markerFrontBackStorable.val;
             _markerHead.Origin = pos;
             _markerHead.Enabled = _showFeatureMarkersStorable.val;
@@ -623,7 +629,7 @@ namespace LFE
             if(height > 0 && headHeight > 0) {
                 for(var i = 0; i < heightInHeadsRoundedUp; i++) {
                     var pos = _vertexHead.Position(this);
-                    pos.x += _markerSpreadStorable.val;
+                    pos.x += _markerSpreadStorable.val - _markerLeftRightStorable.val;
                     pos.z += _markerFrontBackStorable.val;
                     pos.y -= headHeight * i;
 
