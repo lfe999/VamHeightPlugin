@@ -7,8 +7,6 @@ namespace LFE
 {
     public class HeightMeasurePlugin : MVRScript
     {
-
-        private const float FACE_MARKER_THICKNESS = 0.001f;
         private static Color FACE_MARKER_COLOR = Color.blue;
 
         public DAZSkinV2 Skin;
@@ -115,6 +113,7 @@ namespace LFE
         JSONStorableBool _showFeatureMarkerLabelsStorable;
         JSONStorableBool _showFaceMarkersStorable;
         JSONStorableStringChooser _cupAlgorithmStorable;
+        JSONStorableFloat _lineThicknessStorable;
 
         DAZCharacter _dazCharacter;
 
@@ -189,6 +188,10 @@ namespace LFE
             _showFaceMarkersStorable = new JSONStorableBool("Show Face Markers", true);
             RegisterBool(_showFeatureMarkerLabelsStorable);
 
+            // Float: Line thickness
+            _lineThicknessStorable = new JSONStorableFloat("Line Thickness", 2, 1, 10, constrain: true);
+            RegisterFloat(_lineThicknessStorable);
+
 
             // calculated positions and distances for other plugins to use if wanted
             _fullHeightStorable = new JSONStorableFloat("figureHeight", 0, 0, 100);
@@ -257,6 +260,7 @@ namespace LFE
 
             // initialize the ui components
             CreateScrollablePopup(_cupAlgorithmStorable);
+            CreateSlider(_lineThicknessStorable);
             CreateSlider(_markerSpreadStorable, rightSide: true);
             CreateSlider(_markerFrontBackStorable, rightSide: true);
             CreateSlider(_markerLeftRightStorable, rightSide: true);
@@ -310,71 +314,57 @@ namespace LFE
             _markerEyeMidHeight = gameObject.AddComponent<HorizontalMarker>();
             _markerEyeMidHeight.Name = "Eye Height";
             _markerEyeMidHeight.Color = FACE_MARKER_COLOR;
-            _markerEyeMidHeight.Thickness = FACE_MARKER_THICKNESS;
 
             _markerEyeRightOuter = gameObject.AddComponent<HorizontalMarker>();
             _markerEyeRightOuter.Name = "Eye Right Outer";
             _markerEyeRightOuter.Color = FACE_MARKER_COLOR;
-            _markerEyeRightOuter.Thickness = FACE_MARKER_THICKNESS;
             _markerEyeRightOuter.LineDirection = Vector3.up;
 
             _markerEyeLeftOuter = gameObject.AddComponent<HorizontalMarker>();
             _markerEyeLeftOuter.Name = "Eye Left Outer";
             _markerEyeLeftOuter.Color = FACE_MARKER_COLOR;
-            _markerEyeLeftOuter.Thickness = FACE_MARKER_THICKNESS;
             _markerEyeLeftOuter.LineDirection = Vector3.up;
 
             _markerNoseBottomHeight = gameObject.AddComponent<HorizontalMarker>();
             _markerNoseBottomHeight.Name = "Nose Bottom Height";
             _markerNoseBottomHeight.Color = FACE_MARKER_COLOR;
-            _markerNoseBottomHeight.Thickness = FACE_MARKER_THICKNESS;
 
             _markerMouthMidHeight = gameObject.AddComponent<HorizontalMarker>();
             _markerMouthMidHeight.Name = "Mouth Height";
             _markerMouthMidHeight.Color = FACE_MARKER_COLOR;
-            _markerMouthMidHeight.Thickness = FACE_MARKER_THICKNESS;
 
             _markerMouthLeft = gameObject.AddComponent<HorizontalMarker>();
             _markerMouthLeft.Name = "Mouth Left";
             _markerMouthLeft.Color = FACE_MARKER_COLOR;
-            _markerMouthLeft.Thickness = FACE_MARKER_THICKNESS;
             _markerMouthLeft.LineDirection = Vector3.up;
 
             _markerMouthRight = gameObject.AddComponent<HorizontalMarker>();
             _markerMouthRight.Name = "Mouth Right";
             _markerMouthRight.Color = FACE_MARKER_COLOR;
-            _markerMouthRight.Thickness = FACE_MARKER_THICKNESS;
             _markerMouthRight.LineDirection = Vector3.up;
 
             _markerChinSmall = gameObject.AddComponent<HorizontalMarker>();
             _markerChinSmall.Name = "Chin Small";
             _markerChinSmall.Color = FACE_MARKER_COLOR;
-            _markerChinSmall.Thickness = FACE_MARKER_THICKNESS;
 
             _markerHeadSmall = gameObject.AddComponent<HorizontalMarker>();
             _markerHeadSmall.Name = "Head Small";
             _markerHeadSmall.Color = FACE_MARKER_COLOR;
-            _markerHeadSmall.Thickness = FACE_MARKER_THICKNESS;
 
             _markerHeadRight = gameObject.AddComponent<HorizontalMarker>();
             _markerHeadRight.Name = "Head Right";
             _markerHeadRight.Color = FACE_MARKER_COLOR;
-            _markerHeadRight.Thickness = FACE_MARKER_THICKNESS;
             _markerHeadRight.LineDirection = Vector2.up;
 
             _markerHeadLeft = gameObject.AddComponent<HorizontalMarker>();
             _markerHeadLeft.Name = "Head Left";
             _markerHeadLeft.Color = FACE_MARKER_COLOR;
-            _markerHeadLeft.Thickness = FACE_MARKER_THICKNESS;
             _markerHeadLeft.LineDirection = Vector3.up;
 
             _markerFaceCenter = gameObject.AddComponent<HorizontalMarker>();
             _markerFaceCenter.Name = "Face Center";
             _markerFaceCenter.Color = FACE_MARKER_COLOR;
-            _markerFaceCenter.Thickness = FACE_MARKER_THICKNESS;
             _markerFaceCenter.LineDirection = Vector3.up;
-
-
 
         }
 
@@ -442,6 +432,7 @@ namespace LFE
             _markerHead.Origin = pos;
             _markerHead.Enabled = _showFeatureMarkersStorable.val;
             _markerHead.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerHead.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // chin
             pos = _vertexChin.Position(this);
@@ -450,6 +441,7 @@ namespace LFE
             _markerChin.Origin = pos;
             _markerChin.Enabled = _showFeatureMarkersStorable.val;
             _markerChin.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerChin.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // shoulder
             pos = _vertexShoulder.Position(this);
@@ -458,6 +450,7 @@ namespace LFE
             _markerShoulder.Origin = pos;
             _markerShoulder.Enabled = _showFeatureMarkersStorable.val;
             _markerShoulder.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerShoulder.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // nipple
             pos = _vertexNipple.Position(this);
@@ -466,6 +459,7 @@ namespace LFE
             _markerNipple.Origin = pos;
             _markerNipple.Enabled = _dazCharacter.isMale ? false : _showFeatureMarkersStorable.val; // TODO: better male nipple detection
             _markerNipple.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerNipple.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // underbust
             pos = _vertexUnderbust.Position(this);
@@ -474,6 +468,7 @@ namespace LFE
             _markerUnderbust.Origin = pos;
             _markerUnderbust.Enabled = _dazCharacter.isMale ? false : _showFeatureMarkersStorable.val;
             _markerUnderbust.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerUnderbust.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // navel
             pos = _vertexNavel.Position(this);
@@ -482,6 +477,7 @@ namespace LFE
             _markerNavel.Origin = pos;
             _markerNavel.Enabled = _showFeatureMarkersStorable.val;
             _markerNavel.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerNavel.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // groin
             pos = _vertexGroin.Position(this);
@@ -490,6 +486,7 @@ namespace LFE
             _markerGroin.Origin = pos;
             _markerGroin.Enabled = _showFeatureMarkersStorable.val;
             _markerGroin.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerGroin.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // knee
             pos = _vertexKnee.Position(this);
@@ -498,6 +495,7 @@ namespace LFE
             _markerKnee.Origin = pos;
             _markerKnee.Enabled = _showFeatureMarkersStorable.val;
             _markerKnee.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerKnee.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // heel - can not find vertex for heel - using colliders
             var rFoot = containingAtom.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("rFoot/_Collider1")); 
@@ -508,6 +506,7 @@ namespace LFE
                 _markerHeel.Origin = pos;
                 _markerHeel.Enabled = _showFeatureMarkersStorable.val;
                 _markerHeel.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+                _markerHeel.Thickness = _lineThicknessStorable.val * 0.001f;
             }
             
             UpdateHeadHeightMarkers();
@@ -530,6 +529,7 @@ namespace LFE
             _markerEyeMidHeight.Origin = pos;
             _markerEyeMidHeight.Enabled = _showFaceMarkersStorable.val;
             _markerEyeMidHeight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerEyeMidHeight.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // eye right outer
             pos = _vertexEyeRightOuter.Position(this);
@@ -540,6 +540,7 @@ namespace LFE
             _markerEyeRightOuter.Origin = pos;
             _markerEyeRightOuter.Enabled = _showFaceMarkersStorable.val;
             _markerEyeRightOuter.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerEyeRightOuter.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // eye left outer
             pos = _vertexEyeLeftOuterHeight.Position(this);
@@ -550,6 +551,7 @@ namespace LFE
             _markerEyeLeftOuter.Origin = pos;
             _markerEyeLeftOuter.Enabled = _showFaceMarkersStorable.val;
             _markerEyeLeftOuter.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerEyeLeftOuter.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // nose bottom
             pos = _vertexNoseBottom.Position(this);
@@ -559,6 +561,7 @@ namespace LFE
             _markerNoseBottomHeight.Origin = pos;
             _markerNoseBottomHeight.Enabled = _showFaceMarkersStorable.val;
             _markerNoseBottomHeight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerNoseBottomHeight.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // mouth middle
             pos = _vertexMouthMidHeight.Position(this);
@@ -568,6 +571,7 @@ namespace LFE
             _markerMouthMidHeight.Origin = pos;
             _markerMouthMidHeight.Enabled = _showFaceMarkersStorable.val;
             _markerMouthMidHeight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerMouthMidHeight.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // mouth left
             pos = _vertexMouthLeftSideMiddle.Position(this);
@@ -578,6 +582,7 @@ namespace LFE
             _markerMouthLeft.Origin = pos;
             _markerMouthLeft.Enabled = _showFaceMarkersStorable.val;
             _markerMouthLeft.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerMouthLeft.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // mouth right
             pos = _vertexMouthRightSideMiddle.Position(this);
@@ -588,6 +593,7 @@ namespace LFE
             _markerMouthRight.Origin = pos;
             _markerMouthRight.Enabled = _showFaceMarkersStorable.val;
             _markerMouthRight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerMouthRight.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // chin small and blue
             pos = _vertexHead.Position(this);
@@ -597,6 +603,7 @@ namespace LFE
             _markerChinSmall.Origin = pos;
             _markerChinSmall.Enabled = _showFaceMarkersStorable.val;
             _markerChinSmall.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerChinSmall.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // head small and blue
             pos = _vertexHead.Position(this);
@@ -607,6 +614,7 @@ namespace LFE
             _markerHeadSmall.Origin = pos;
             _markerHeadSmall.Enabled = _showFaceMarkersStorable.val;
             _markerHeadSmall.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerHeadSmall.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // head left
             pos = _vertexHead.Position(this);
@@ -617,6 +625,7 @@ namespace LFE
             _markerHeadLeft.Origin = pos;
             _markerHeadLeft.Enabled = _showFaceMarkersStorable.val;
             _markerHeadLeft.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerHeadLeft.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // head right
             pos = _vertexHead.Position(this);
@@ -627,6 +636,7 @@ namespace LFE
             _markerHeadRight.Origin = pos;
             _markerHeadRight.Enabled = _showFaceMarkersStorable.val;
             _markerHeadRight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerHeadRight.Thickness = _lineThicknessStorable.val * 0.001f;
 
             // face center
             pos = _vertexNoseTip.Position(this);
@@ -637,6 +647,7 @@ namespace LFE
             _markerFaceCenter.Origin = pos;
             _markerFaceCenter.Enabled = _showFaceMarkersStorable.val;
             _markerFaceCenter.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            _markerFaceCenter.Thickness = _lineThicknessStorable.val * 0.001f;
         }
 
 
@@ -914,6 +925,7 @@ namespace LFE
                     _extraHeadMarkers[i].Origin = pos;
                     _extraHeadMarkers[i].Enabled = _showHeadHeightMarkersStorable.val;
                     _extraHeadMarkers[i].Label = $"{i}";
+                    _extraHeadMarkers[i].Thickness = _lineThicknessStorable.val * 0.001f;
                 }
             }
         }
