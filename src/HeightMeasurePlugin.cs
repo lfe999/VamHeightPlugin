@@ -285,6 +285,8 @@ namespace LFE
             _hipMarkersFromMorph = new List<GameObject>();
         }
 
+        private float _updateEverySeconds = 0.05f;
+        private float _updateCountdown = 0;
         public void Update() {
             _dazCharacter = containingAtom.GetComponentInChildren<DAZCharacter>();
             Skin = _dazCharacter.skin;
@@ -292,6 +294,14 @@ namespace LFE
             if(SuperController.singleton.freezeAnimation) {
                 return;
             }
+
+            // throttle the update loop
+            _updateCountdown -= Time.deltaTime;
+            if(_updateCountdown > 0) {
+                return;
+            }
+            _updateCountdown = _updateEverySeconds;
+
 
             try {
                 UpdateMeasurements();
@@ -419,6 +429,11 @@ namespace LFE
         }
 
         private void UpdateMarkerLabels() {
+
+            if(!_showFeatureMarkerLabelsStorable.val) {
+                return;
+            }
+
             // update marker labels
             _markerHead.Label = "Head (Head To Heel "
                 + $"{(int)(_fullHeightStorable.val * 100)} cm / "
