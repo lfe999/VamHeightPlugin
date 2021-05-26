@@ -59,6 +59,7 @@ namespace LFE
         readonly IVertexPosition _vertexNavel = new VertexPositionMiddle(18824, 8147);
         readonly IVertexPosition _vertexGroin = new VertexPositionExact(22208);
         readonly IVertexPosition _vertexKnee = new VertexPositionMiddle(8508, 19179);
+        readonly IVertexPosition _vertexShoulder = new VertexPositionMiddle(11110, 182);
 
         // measurement storables
         JSONStorableFloat _fullHeightStorable;
@@ -79,7 +80,6 @@ namespace LFE
         JSONStorableFloat _waistSizeStorable;
         JSONStorableFloat _hipSizeStorable;
 
-        // TODO: chin to shoulder
         // TOOD: shoulder width
 
         // other storables
@@ -102,6 +102,7 @@ namespace LFE
 
         HorizontalMarker _markerHead;
         HorizontalMarker _markerChin;
+        HorizontalMarker _markerShoulder;
         HorizontalMarker _markerNipple;
         HorizontalMarker _markerUnderbust;
         HorizontalMarker _markerNavel;
@@ -233,6 +234,10 @@ namespace LFE
             _markerChin.Name = "Chin";
             _markerChin.Color = Color.green;
 
+            _markerShoulder = gameObject.AddComponent<HorizontalMarker>();
+            _markerShoulder.Name = "Shoulder";
+            _markerShoulder.Color = Color.green;
+
             _markerNipple = gameObject.AddComponent<HorizontalMarker>();
             _markerNipple.Name = "Nipple";
             _markerNipple.Color = Color.green;
@@ -285,7 +290,7 @@ namespace LFE
             _hipMarkersFromMorph = new List<GameObject>();
         }
 
-        private float _updateEverySeconds = 0.05f;
+        private readonly float _updateEverySeconds = 0.05f;
         private float _updateCountdown = 0;
         public void Update() {
             _dazCharacter = containingAtom.GetComponentInChildren<DAZCharacter>();
@@ -330,6 +335,14 @@ namespace LFE
             _markerChin.Origin = pos;
             _markerChin.Enabled = _showFeatureMarkersStorable.val;
             _markerChin.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // sholder
+            pos = _vertexShoulder.Position(this);
+            pos.x = _markerHead.Origin.x;
+            pos.z = _markerHead.Origin.z;
+            _markerShoulder.Origin = pos;
+            _markerShoulder.Enabled = _showFeatureMarkersStorable.val;
+            _markerShoulder.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
 
             // nipple
             pos = _vertexNipple.Position(this);
@@ -402,7 +415,7 @@ namespace LFE
             _heightInHeadsStorable.val = _headSizeHeightStorable.val == 0 ? 0 : _fullHeightStorable.val / _headSizeHeightStorable.val;
 
             _chinHeightStorable.val = Vector3.Distance(_markerChin.Origin, _markerHeel.Origin);
-            // TODO: shoulder
+            _shoulderHeightStorable.val = Vector3.Distance(_markerShoulder.Origin, _markerHeel.Origin);
             _nippleHeightStorable.val = Vector3.Distance(_markerNipple.Origin, _markerHeel.Origin);
             _underbustHeightStorable.val = Vector3.Distance(_markerUnderbust.Origin, _markerHeel.Origin);
             _navelHeightStorable.val = Vector3.Distance(_markerNavel.Origin, _markerHeel.Origin);
@@ -440,10 +453,15 @@ namespace LFE
                 + $"{UnitUtils.MetersToFeetString(_fullHeightStorable.val)} / "
                 + $"{_heightInHeadsStorable.val:0.0} heads)";
 
-            _markerChin.Label = "Neck (Head Height "
+            var chinToShoulder = _chinHeightStorable.val - _shoulderHeightStorable.val;
+            _markerChin.Label = "Chin (Head Height "
                 + $"{(int)(_headSizeHeightStorable.val * 100)} cm / "
                 + $"{UnitUtils.MetersToFeetString(_headSizeHeightStorable.val)}; "
-                + $"Width {(int)(_headSizeWidthStorable.val * 100)} cm / {UnitUtils.MetersToFeetString(_headSizeWidthStorable.val)})";
+                + $"Width {(int)(_headSizeWidthStorable.val * 100)} cm / {UnitUtils.MetersToFeetString(_headSizeWidthStorable.val)})\n"
+                + $"Chin To Shoulder "
+                + $"{(int)(chinToShoulder * 100)} cm / "
+                + $"{UnitUtils.MetersToFeetString(chinToShoulder)} / "
+                + $"{chinToShoulder / _headSizeHeightStorable.val:0.0} heads";
 
             if(_breastBustStorable.val == 0) {
                 _markerNipple.Label = "Nipple";
@@ -460,13 +478,23 @@ namespace LFE
                     + $"{(int)UnitUtils.UnityToInches(_breastUnderbustStorable.val)} in)";
             }
 
+            var shoulderToNavel = _shoulderHeightStorable.val - _navelHeightStorable.val;
             _markerNavel.Label = "Navel (Waist "
                 + $"{(int)(_waistSizeStorable.val * 100)} cm / "
-                + $"{Mathf.RoundToInt(UnitUtils.UnityToInches(_waistSizeStorable.val))} in)";
+                + $"{Mathf.RoundToInt(UnitUtils.UnityToInches(_waistSizeStorable.val))} in)\n"
+                + $"Shoulder to Navel "
+                + $"{(int)(shoulderToNavel * 100)} cm / "
+                + $"{UnitUtils.MetersToFeetString(shoulderToNavel)} / "
+                + $"{shoulderToNavel / _headSizeHeightStorable.val:0.0} heads";
 
+            var shoulderToCrotch = _shoulderHeightStorable.val - _crotchHeightStorable.val;
             _markerGroin.Label = "Crotch (Hip "
                 + $"{(int)(_hipSizeStorable.val * 100)} cm / "
-                + $"{Mathf.RoundToInt(UnitUtils.UnityToInches(_hipSizeStorable.val))} in)";
+                + $"{Mathf.RoundToInt(UnitUtils.UnityToInches(_hipSizeStorable.val))} in)\n"
+                + $"Shoulder to Crotch "
+                + $"{(int)(shoulderToCrotch * 100)} cm / "
+                + $"{UnitUtils.MetersToFeetString(shoulderToCrotch)} / "
+                + $"{shoulderToCrotch / _headSizeHeightStorable.val:0.0} heads";
 
             var crotchToKnee = _crotchHeightStorable.val - _kneeBottomHeightStorable.val;
             _markerKnee.Label = $"Knee Bottom (Crotch to Knee "
