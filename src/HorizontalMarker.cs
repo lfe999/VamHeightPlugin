@@ -8,6 +8,7 @@ namespace LFE {
         public string Label { get; set; }
         public Color Color { get; set; } = Color.green;
         public float Length { get; set; } = 0.5f;
+        public float Thickness { get; set; } = 0.004f;
         public Vector3 Origin { get; set; } = Vector3.zero;
         public Vector3 LineDirection { get; set; } = Vector3.left;
         public bool Enabled { get; set; } = true;
@@ -17,12 +18,10 @@ namespace LFE {
         Canvas _canvas;
 
         public void Awake() {
-            // new GameObject because you can only have one renderer per gameobject
             var gameObject = new GameObject();
-            // gameObject.transform.SetParent(transform);
             _lineRenderer = gameObject.AddComponent<LineRenderer>();
-            _lineRenderer.startWidth = 0.005f;
-            _lineRenderer.endWidth = 0.004f;
+            _lineRenderer.startWidth = Thickness;
+            _lineRenderer.endWidth = Thickness;
             _lineRenderer.material.color = Color;
             _lineRenderer.SetPositions(new Vector3[] {
                 Origin,
@@ -36,6 +35,8 @@ namespace LFE {
             _lineRenderer.material.color = Color;
             _lineRenderer.startColor = Color;
             _lineRenderer.endColor = Color;
+            _lineRenderer.startWidth = Thickness;
+            _lineRenderer.endWidth = Thickness;
             _lineRenderer.SetPositions(new Vector3[] {
                 Origin,
                 CalculateEndpoint(Origin)

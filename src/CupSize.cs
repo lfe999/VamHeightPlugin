@@ -17,5 +17,16 @@ namespace LFE
         public override string ToString() {
             return $"{Band}{Cup}";
         }
+
+        readonly static string[] _bustBandDiffToCupUs = new string[] {
+            "AA", "A", "B", "C", "D", "DD", "DDD", "G", "H",
+            "I",  "J", "K", "L", "M", "N",  "O",   "P", "Q",
+            "R",  "S", "T", "U", "V", "W",  "X",   "Z",
+            "ZZ", "ZZZ", "ZZZZ", "ZZZZZ", "ZZZZZZ"
+        };
+        public static string DifferenceToCupUS(int diff) {
+            diff = Mathf.Max(0, diff);
+            return diff >= _bustBandDiffToCupUs.Length ? "HUGE" : _bustBandDiffToCupUs[diff];
+        }
     }
 }

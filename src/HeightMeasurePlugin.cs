@@ -60,10 +60,30 @@ namespace LFE
         readonly IVertexPosition _vertexGroin = new VertexPositionExact(22208);
         readonly IVertexPosition _vertexKnee = new VertexPositionMiddle(8508, 19179);
 
+        // measurement storables
         JSONStorableFloat _fullHeightStorable;
-        JSONStorableFloat _headHeightStorable;
+        JSONStorableFloat _headSizeHeightStorable;
+        JSONStorableFloat _headSizeWidthStorable;
+        JSONStorableFloat _chinHeightStorable;
+        JSONStorableFloat _shoulderHeightStorable;
+        JSONStorableFloat _nippleHeightStorable;
+        JSONStorableFloat _underbustHeightStorable;
+        JSONStorableFloat _navelHeightStorable;
+        JSONStorableFloat _crotchHeightStorable;
+        JSONStorableFloat _kneeBottomHeightStorable;
         JSONStorableFloat _heightInHeadsStorable;
-        JSONStorableFloat _markerLeftRightStorable;
+        JSONStorableFloat _breastBustStorable;
+        JSONStorableFloat _breastUnderbustStorable;
+        JSONStorableFloat _breastBandStorable;
+        JSONStorableString _breastCupStorable;
+        JSONStorableFloat _waistSizeStorable;
+        JSONStorableFloat _hipSizeStorable;
+
+        // TODO: chin to shoulder
+        // TOOD: shoulder width
+
+        // other storables
+        JSONStorableFloat _markerSpreadStorable;
         JSONStorableFloat _markerFrontBackStorable;
         JSONStorableBool _showTapeMarkersStorable;
         JSONStorableBool _showHeadHeightMarkersStorable;
@@ -88,12 +108,117 @@ namespace LFE
         HorizontalMarker _markerKnee;
         HorizontalMarker _markerHeel;
 
+        public void InitStorables() {
+            // Cup algorithm choice
+            _cupAlgorithmStorable = new JSONStorableStringChooser(
+                "Cup Size Method",
+                _cupCalculators.Select(cc => cc.Name).ToList(),
+                _cupCalculators[0].Name,
+                "Cup Size Method"
+            );
+
+            // Float: How far apart markers are spread apart
+            _markerSpreadStorable = new JSONStorableFloat("Spread Markers", 0.02f, -1, 1);
+            RegisterFloat(_markerSpreadStorable);
+
+            // Float: Move markers forward or backward relative to center depth of the head
+            _markerFrontBackStorable = new JSONStorableFloat("Move Marker Forward/Backward", 0.15f, -5, 5);
+            RegisterFloat(_markerFrontBackStorable);
+
+            // Bool: Show the tape measures for circumference?
+            _showTapeMarkersStorable = new JSONStorableBool("Show Tape Measure Markers", false);
+            RegisterBool(_showTapeMarkersStorable);
+
+            // Bool: Show head hight markers (white ones)
+            _showHeadHeightMarkersStorable = new JSONStorableBool("Show Head Height Markers", true);
+            RegisterBool(_showHeadHeightMarkersStorable);
+
+            // Bool: Show the main feature markers for the figure
+            _showFeatureMarkersStorable = new JSONStorableBool("Show Figure Feature Markers", true);
+            RegisterBool(_showFeatureMarkersStorable);
+
+            // Bool: Show the feature marker labels
+            _showFeatureMarkerLabelsStorable = new JSONStorableBool("Show Feature Marker Labels", true);
+            RegisterBool(_showFeatureMarkerLabelsStorable);
+
+
+            // calculated positions and distances for other plugins to use if wanted
+            _fullHeightStorable = new JSONStorableFloat("figureHeight", 0, 0, 100);
+            RegisterFloat(_fullHeightStorable);
+
+            _heightInHeadsStorable = new JSONStorableFloat("figureHeightHeads", 0, 0, 100);
+            RegisterFloat(_heightInHeadsStorable);
+
+            _headSizeHeightStorable = new JSONStorableFloat("headSizeHeight", 0, 0, 100);
+            RegisterFloat(_headSizeHeightStorable);
+
+            _chinHeightStorable = new JSONStorableFloat("chinHeight", 0, 0, 100);
+            RegisterFloat(_chinHeightStorable);
+
+            _shoulderHeightStorable = new JSONStorableFloat("shoulderHeight", 0, 0, 100);
+            RegisterFloat(_shoulderHeightStorable);
+
+            _nippleHeightStorable = new JSONStorableFloat("nippleHeight", 0, 0, 100);
+            RegisterFloat(_nippleHeightStorable);
+
+            _underbustHeightStorable = new JSONStorableFloat("underbustHeight", 0, 0, 100);
+            RegisterFloat(_underbustHeightStorable);
+
+            _navelHeightStorable = new JSONStorableFloat("navelHeight", 0, 0, 100);
+            RegisterFloat(_navelHeightStorable);
+
+            _crotchHeightStorable = new JSONStorableFloat("crotchHeight", 0, 0, 100);
+            RegisterFloat(_crotchHeightStorable);
+
+            _kneeBottomHeightStorable = new JSONStorableFloat("kneeHeight", 0, 0, 100);
+            RegisterFloat(_kneeBottomHeightStorable);
+
+            _headSizeWidthStorable = new JSONStorableFloat("headSizeWidth", 0, 0, 100);
+            RegisterFloat(_headSizeWidthStorable);
+
+            _breastBustStorable = new JSONStorableFloat("breastBustSize", 0, 0, 100);
+            RegisterFloat(_breastBustStorable);
+
+            _breastUnderbustStorable = new JSONStorableFloat("breastUnderbustSize", 0, 0, 100);
+            RegisterFloat(_breastUnderbustStorable);
+
+            _breastBandStorable = new JSONStorableFloat("breastBandSize", 0, 0, 100);
+            RegisterFloat(_breastBandStorable);
+
+            _breastCupStorable = new JSONStorableString("breastCupSize", "");
+            RegisterString(_breastCupStorable);
+
+            _waistSizeStorable = new JSONStorableFloat("waistSize", 0, 0, 100);
+            RegisterFloat(_waistSizeStorable);
+
+            _hipSizeStorable = new JSONStorableFloat("hipSize", 0, 0, 100);
+            RegisterFloat(_hipSizeStorable);
+
+        }
+
         public override void Init()
         {
             _dazCharacter = containingAtom.GetComponentInChildren<DAZCharacter>();
             Skin = _dazCharacter.skin;
 
             // initialize the line markers
+            InitLineMarkers();
+
+            // initialize storables
+            InitStorables();
+
+            // initialize the ui components
+            CreateScrollablePopup(_cupAlgorithmStorable);
+            CreateSlider(_markerSpreadStorable, rightSide: true);
+            CreateSlider(_markerFrontBackStorable, rightSide: true);
+            CreateToggle(_showTapeMarkersStorable);
+            CreateToggle(_showHeadHeightMarkersStorable);
+            CreateToggle(_showFeatureMarkersStorable);
+            CreateToggle(_showFeatureMarkerLabelsStorable);
+        }
+
+        public void InitLineMarkers() {
+            // this does not position them, just creates them
             _markerHead = gameObject.AddComponent<HorizontalMarker>();
             _markerHead.Name = "Head";
             _markerHead.Color = Color.green;
@@ -125,50 +250,6 @@ namespace LFE
             _markerHeel = gameObject.AddComponent<HorizontalMarker>();
             _markerHeel.Name = "Heel";
             _markerHeel.Color = Color.green;
-
-            // initialize storables
-            _cupAlgorithmStorable = new JSONStorableStringChooser(
-                "Cup Size Method",
-                _cupCalculators.Select(cc => cc.Name).ToList(),
-                _cupCalculators[0].Name,
-                "Cup Size Method"
-            );
-
-            _markerLeftRightStorable = new JSONStorableFloat("Marker Left/Right", 0.02f, -1, 1);
-            RegisterFloat(_markerLeftRightStorable);
-
-            _markerFrontBackStorable = new JSONStorableFloat("Marker Front/Back", 0.15f, -1, 1);
-            RegisterFloat(_markerFrontBackStorable);
-
-            _showTapeMarkersStorable = new JSONStorableBool("Show Tape Measure Markers", false);
-            RegisterBool(_showTapeMarkersStorable);
-
-            _showHeadHeightMarkersStorable = new JSONStorableBool("Show Head Height Markers", true);
-            RegisterBool(_showHeadHeightMarkersStorable);
-
-            _showFeatureMarkersStorable = new JSONStorableBool("Show Feature Markers", true);
-            RegisterBool(_showFeatureMarkersStorable);
-
-            _showFeatureMarkerLabelsStorable = new JSONStorableBool("Show Feature Marker Labels", true);
-            RegisterBool(_showFeatureMarkerLabelsStorable);
-
-            _fullHeightStorable = new JSONStorableFloat("Full Height In Meters", 0, 0, 100);
-            RegisterFloat(_fullHeightStorable);
-
-            _headHeightStorable = new JSONStorableFloat("Head Height In Meters", 0, 0, 100);
-            RegisterFloat(_headHeightStorable);
-
-            _heightInHeadsStorable = new JSONStorableFloat("Full Height In Heads", 0, 0, 100);
-            RegisterFloat(_heightInHeadsStorable);
-
-            // initialize the ui components
-            CreateScrollablePopup(_cupAlgorithmStorable);
-            CreateSlider(_markerLeftRightStorable, rightSide: true);
-            CreateSlider(_markerFrontBackStorable, rightSide: true);
-            CreateToggle(_showTapeMarkersStorable);
-            CreateToggle(_showHeadHeightMarkersStorable);
-            CreateToggle(_showFeatureMarkersStorable);
-            CreateToggle(_showFeatureMarkerLabelsStorable);
         }
 
         public void OnDestroy() {
@@ -207,121 +288,184 @@ namespace LFE
             }
 
             try {
-
-                Vector3 pos;
-                // head
-                pos = _vertexHead.Position(this);
-                pos.x -= _markerLeftRightStorable.val;
-                pos.z += _markerFrontBackStorable.val;
-                _markerHead.Origin = pos;
-                _markerHead.Enabled = _showFeatureMarkersStorable.val;
-                _markerHead.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-
-                // chin
-                pos = _vertexChin.Position(this);
-                pos.x = _markerHead.Origin.x;
-                pos.z = _markerHead.Origin.z;
-                _markerChin.Origin = pos;
-                _markerChin.Enabled = _showFeatureMarkersStorable.val;
-                _markerChin.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-
-                // nipple
-                pos = _vertexNipple.Position(this);
-                pos.x = _markerHead.Origin.x;
-                pos.z = _markerHead.Origin.z;
-                _markerNipple.Origin = pos;
-                _markerNipple.Enabled = _dazCharacter.isMale ? false : _showFeatureMarkersStorable.val; // TODO: better male nipple detection
-                _markerNipple.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-
-                // underbust
-                pos = _vertexUnderbust.Position(this);
-                pos.x = _markerHead.Origin.x;
-                pos.z = _markerHead.Origin.z;
-                _markerUnderbust.Origin = pos;
-                _markerUnderbust.Enabled = _dazCharacter.isMale ? false : _showFeatureMarkersStorable.val;
-                _markerUnderbust.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-
-                // navel
-                pos = _vertexNavel.Position(this);
-                pos.x = _markerHead.Origin.x;
-                pos.z = _markerHead.Origin.z;
-                _markerNavel.Origin = pos;
-                _markerNavel.Enabled = _showFeatureMarkersStorable.val;
-                _markerNavel.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-
-                // groin
-                pos = _vertexGroin.Position(this);
-                pos.x = _markerHead.Origin.x;
-                pos.z = _markerHead.Origin.z;
-                _markerGroin.Origin = pos;
-                _markerGroin.Enabled = _showFeatureMarkersStorable.val;
-                _markerGroin.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-
-                // knee
-                pos = _vertexKnee.Position(this);
-                pos.x = _markerHead.Origin.x;
-                pos.z = _markerHead.Origin.z;
-                _markerKnee.Origin = pos;
-                _markerKnee.Enabled = _showFeatureMarkersStorable.val;
-                _markerKnee.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-
-                // heel - can not find vertex for heel - using colliders
-                var rFoot = containingAtom.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("rFoot/_Collider1")); 
-                if(rFoot) {
-                    pos = rFoot.transform.position;
-                    pos.x = _markerHead.Origin.x;
-                    pos.z = _markerHead.Origin.z;
-                    _markerHeel.Origin = pos;
-                    _markerHeel.Enabled = _showFeatureMarkersStorable.val;
-                    _markerHeel.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-                }
-             
-                UpdateHeadHeightMarkers();
-
-                if(!_dazCharacter.isMale) {
-                    UpdateBustMarkersFromMorphVertex();
-                    UpdateUnderbustMarkersFromMorphVertex();
-                }
-                UpdateWaistMarkersFromMorphVertex();
-                UpdateHipMarkersFromMorphVertex();
-
-                _fullHeightStorable.val = GetHeight();
-                _headHeightStorable.val = GetHeadHeight();
-                _heightInHeadsStorable.val = GetHeightInHeads();
-                var cupInfo = GetCupInfo();
-                var crotchToKnee = Vector3.Distance(_markerGroin.Origin, _markerKnee.Origin);
-                var kneeToHeel = Vector3.Distance(_markerKnee.Origin, _markerHeel.Origin);
-                var headWidth = GetHeadWidth();
-
-                _markerHead.Label = $"Head (Head To Heel {(int)(_fullHeightStorable.val * 100)} cm / {UnitUtils.FeetInchString(UnitUtils.UnityToFeet(_fullHeightStorable.val))} / {_heightInHeadsStorable.val:0.0} heads)";
-                _markerChin.Label = $"Neck (Head Height {(int)(_headHeightStorable.val * 100)} cm / {UnitUtils.FeetInchString(UnitUtils.UnityToFeet(_headHeightStorable.val))}; Width {(int)(headWidth * 100)} cm / {UnitUtils.FeetInchString(UnitUtils.UnityToFeet(headWidth))})";
-                if(cupInfo == null) {
-                    _markerNipple.Label = "Nipple";
-                    _markerUnderbust.Label = "Underbust";
-                }
-                else {
-                    _markerNipple.Label = $"Nipple (Cup {cupInfo}; Around {cupInfo.BustToCentimeters} cm / {cupInfo.BustToInches} in)";
-                    _markerUnderbust.Label = $"Underbust (Around {cupInfo.UnderbustToCentimeters} cm / {cupInfo.UnderbustToInches} in)";
-                }
-                _markerNavel.Label = $"Navel (Waist {(int)(_circumferenceWaist * 100)} cm / {Mathf.RoundToInt(UnitUtils.UnityToFeet(_circumferenceWaist) * 12)} in)";
-                _markerGroin.Label = $"Crotch (Hip {(int)(_circumferenceHip * 100)} cm / {Mathf.RoundToInt(UnitUtils.UnityToFeet(_circumferenceHip) * 12)} in)";
-                _markerKnee.Label = $"Knee Bottom (Crotch to Knee {(int)(crotchToKnee * 100)} cm / {UnitUtils.FeetInchString(UnitUtils.UnityToFeet(crotchToKnee))} / {crotchToKnee / _headHeightStorable.val:0.0} heads)";
-                _markerHeel.Label = $"Heel (Knee to Heel {(int)(kneeToHeel * 100)} cm / {UnitUtils.FeetInchString(UnitUtils.UnityToFeet(kneeToHeel))} / {kneeToHeel / _headHeightStorable.val:0.0} heads)";
+                UpdateMeasurements();
+                UpdateMarkerPositions();
+                UpdateMarkerLabels();
             }
             catch(Exception e) {
                 SuperController.LogError(e.ToString());
             }
         }
 
+        private void UpdateMarkerPositions() {
+            Vector3 pos;
+            // head
+            pos = _vertexHead.Position(this);
+            pos.x -= _markerSpreadStorable.val;
+            pos.z += _markerFrontBackStorable.val;
+            _markerHead.Origin = pos;
+            _markerHead.Enabled = _showFeatureMarkersStorable.val;
+            _markerHead.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // chin
+            pos = _vertexChin.Position(this);
+            pos.x = _markerHead.Origin.x;
+            pos.z = _markerHead.Origin.z;
+            _markerChin.Origin = pos;
+            _markerChin.Enabled = _showFeatureMarkersStorable.val;
+            _markerChin.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // nipple
+            pos = _vertexNipple.Position(this);
+            pos.x = _markerHead.Origin.x;
+            pos.z = _markerHead.Origin.z;
+            _markerNipple.Origin = pos;
+            _markerNipple.Enabled = _dazCharacter.isMale ? false : _showFeatureMarkersStorable.val; // TODO: better male nipple detection
+            _markerNipple.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // underbust
+            pos = _vertexUnderbust.Position(this);
+            pos.x = _markerHead.Origin.x;
+            pos.z = _markerHead.Origin.z;
+            _markerUnderbust.Origin = pos;
+            _markerUnderbust.Enabled = _dazCharacter.isMale ? false : _showFeatureMarkersStorable.val;
+            _markerUnderbust.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // navel
+            pos = _vertexNavel.Position(this);
+            pos.x = _markerHead.Origin.x;
+            pos.z = _markerHead.Origin.z;
+            _markerNavel.Origin = pos;
+            _markerNavel.Enabled = _showFeatureMarkersStorable.val;
+            _markerNavel.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // groin
+            pos = _vertexGroin.Position(this);
+            pos.x = _markerHead.Origin.x;
+            pos.z = _markerHead.Origin.z;
+            _markerGroin.Origin = pos;
+            _markerGroin.Enabled = _showFeatureMarkersStorable.val;
+            _markerGroin.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // knee
+            pos = _vertexKnee.Position(this);
+            pos.x = _markerHead.Origin.x;
+            pos.z = _markerHead.Origin.z;
+            _markerKnee.Origin = pos;
+            _markerKnee.Enabled = _showFeatureMarkersStorable.val;
+            _markerKnee.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+
+            // heel - can not find vertex for heel - using colliders
+            var rFoot = containingAtom.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("rFoot/_Collider1")); 
+            if(rFoot) {
+                pos = rFoot.transform.position;
+                pos.x = _markerHead.Origin.x;
+                pos.z = _markerHead.Origin.z;
+                _markerHeel.Origin = pos;
+                _markerHeel.Enabled = _showFeatureMarkersStorable.val;
+                _markerHeel.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
+            }
+            
+            UpdateHeadHeightMarkers();
+
+            if(!_dazCharacter.isMale) {
+                UpdateBustMarkersFromMorphVertex();
+                UpdateUnderbustMarkersFromMorphVertex();
+            }
+            UpdateWaistMarkersFromMorphVertex();
+            UpdateHipMarkersFromMorphVertex();
+
+        }
+
+        private void UpdateMeasurements() {
+            // basic body heights
+            _headSizeHeightStorable.val = Vector3.Distance(_markerHead.Origin, _markerChin.Origin);
+            _headSizeWidthStorable.val = Vector3.Distance(_vertexEarLeft.Position(this), _vertexEarRight.Position(this));
+
+            _fullHeightStorable.val = Vector3.Distance(_markerHead.Origin, _markerHeel.Origin);
+            _heightInHeadsStorable.val = _headSizeHeightStorable.val == 0 ? 0 : _fullHeightStorable.val / _headSizeHeightStorable.val;
+
+            _chinHeightStorable.val = Vector3.Distance(_markerChin.Origin, _markerHeel.Origin);
+            // TODO: shoulder
+            _nippleHeightStorable.val = Vector3.Distance(_markerNipple.Origin, _markerHeel.Origin);
+            _underbustHeightStorable.val = Vector3.Distance(_markerUnderbust.Origin, _markerHeel.Origin);
+            _navelHeightStorable.val = Vector3.Distance(_markerNavel.Origin, _markerHeel.Origin);
+            _crotchHeightStorable.val = Vector3.Distance(_markerGroin.Origin, _markerHeel.Origin);
+            _kneeBottomHeightStorable.val = Vector3.Distance(_markerKnee.Origin, _markerHeel.Origin);
+
+            // measure things around (breast, waist, hip)
+            _waistSizeStorable.val = _circumferenceWaist;
+            _hipSizeStorable.val = _circumferenceHip;
+
+            var cupInfo = GetCupInfo();
+            if(cupInfo == null) {
+                _breastBustStorable.val = 0;
+                _breastUnderbustStorable.val = 0;
+                _breastBandStorable.val = 0;
+                _breastCupStorable.val = "";
+            }
+            else {
+                _breastBustStorable.val = cupInfo.Bust;
+                _breastUnderbustStorable.val = cupInfo.Underbust;
+                _breastBandStorable.val = cupInfo.Band;
+                _breastCupStorable.val = cupInfo.Cup;
+            }
+        }
+
+        private void UpdateMarkerLabels() {
+            // update marker labels
+            _markerHead.Label = "Head (Head To Heel "
+                + $"{(int)(_fullHeightStorable.val * 100)} cm / "
+                + $"{UnitUtils.MetersToFeetString(_fullHeightStorable.val)} / "
+                + $"{_heightInHeadsStorable.val:0.0} heads)";
+
+            _markerChin.Label = "Neck (Head Height "
+                + $"{(int)(_headSizeHeightStorable.val * 100)} cm / "
+                + $"{UnitUtils.MetersToFeetString(_headSizeHeightStorable.val)}; "
+                + $"Width {(int)(_headSizeWidthStorable.val * 100)} cm / {UnitUtils.MetersToFeetString(_headSizeWidthStorable.val)})";
+
+            if(_breastBustStorable.val == 0) {
+                _markerNipple.Label = "Nipple";
+                _markerUnderbust.Label = "Underbust";
+            }
+            else {
+                _markerNipple.Label = $"Nipple "
+                + $"(Cup {_breastBandStorable.val}{_breastCupStorable.val}; "
+                + $"Around {(int)(_breastBustStorable.val * 100)} cm / "
+                + $"{(int)UnitUtils.UnityToInches(_breastBustStorable.val)} in)";
+
+                _markerUnderbust.Label = "Underbust (Around "
+                    + $"{(int)(_breastUnderbustStorable.val * 100)} cm / "
+                    + $"{(int)UnitUtils.UnityToInches(_breastUnderbustStorable.val)} in)";
+            }
+
+            _markerNavel.Label = "Navel (Waist "
+                + $"{(int)(_waistSizeStorable.val * 100)} cm / "
+                + $"{Mathf.RoundToInt(UnitUtils.UnityToInches(_waistSizeStorable.val))} in)";
+
+            _markerGroin.Label = "Crotch (Hip "
+                + $"{(int)(_hipSizeStorable.val * 100)} cm / "
+                + $"{Mathf.RoundToInt(UnitUtils.UnityToInches(_hipSizeStorable.val))} in)";
+
+            var crotchToKnee = _crotchHeightStorable.val - _kneeBottomHeightStorable.val;
+            _markerKnee.Label = $"Knee Bottom (Crotch to Knee "
+                + $"{(int)(crotchToKnee * 100)} cm / "
+                + $"{UnitUtils.MetersToFeetString(crotchToKnee)} / "
+                + $"{crotchToKnee / _headSizeHeightStorable.val:0.0} heads)";
+
+            _markerHeel.Label = $"Heel (Knee to Heel "
+                + $"{(int)(_kneeBottomHeightStorable.val * 100)} cm / "
+                + $"{UnitUtils.MetersToFeetString(_kneeBottomHeightStorable.val)} / "
+                + $"{_kneeBottomHeightStorable.val / _headSizeHeightStorable.val:0.0} heads)";
+
+        }
+
         private float LineLength(Vector3[] vertices) {
             float total = 0;
-            var distances = new List<string>();
             for(var i = 1; i < vertices.Length; i++) {
                 var distance = Mathf.Abs(Vector3.Distance(vertices[i-1], vertices[i]));
-                distances.Add((distance * 2).ToString("0.000"));
                 total += distance;
             }
-            var s = string.Join(",", distances.ToArray());
             return total;
         }
 
@@ -354,7 +498,6 @@ namespace LFE
                 }
                 _bustMarkersFromMorph.Clear();
             }
-
 
             _circumferenceBust = LineLength(_verticesBust.Select(v => v.Position(this)).ToArray()) * 2;
         }
@@ -455,32 +598,11 @@ namespace LFE
             _circumferenceHip = LineLength(_verticesHip.Select(v => v.Position(this)).ToArray()) * 2;
         }
 
-        private float GetHeight() {
-            return Vector3.Distance(_markerHead.Origin, _markerHeel.Origin);
-        }
-
-        private float GetHeadHeight() {
-            return Vector3.Distance(_markerHead.Origin, _markerChin.Origin);
-        }
-        
-        private float GetHeadWidth() {
-            return Vector3.Distance(_vertexEarLeft.Position(this), _vertexEarRight.Position(this));
-        }
-
-        private float GetHeightInHeads() {
-            var height = GetHeight();
-            var headHeight = GetHeadHeight();
-            if(headHeight > 0) {
-                return height/headHeight;
-            }
-            return 0;
-        }
-
-        List<HorizontalMarker> _extraHeadMarkers = new List<HorizontalMarker>();
+        readonly List<HorizontalMarker> _extraHeadMarkers = new List<HorizontalMarker>();
         private void UpdateHeadHeightMarkers() {
-            var height = GetHeight();
-            var headHeight = GetHeadHeight();
-            var heightInHeadsRoundedUp = (int)Mathf.Ceil(GetHeightInHeads());
+            var height = _fullHeightStorable.val;
+            var headHeight = _headSizeHeightStorable.val;
+            var heightInHeadsRoundedUp = (int)Mathf.Ceil(_heightInHeadsStorable.val);
 
             if(heightInHeadsRoundedUp != _extraHeadMarkers.Count) {
                 if(heightInHeadsRoundedUp > _extraHeadMarkers.Count) {
@@ -500,9 +622,8 @@ namespace LFE
 
             if(height > 0 && headHeight > 0) {
                 for(var i = 0; i < heightInHeadsRoundedUp; i++) {
-
                     var pos = _vertexHead.Position(this);
-                    pos.x += _markerLeftRightStorable.val;
+                    pos.x += _markerSpreadStorable.val;
                     pos.z += _markerFrontBackStorable.val;
                     pos.y -= headHeight * i;
 
@@ -553,6 +674,5 @@ namespace LFE
 
             return label;
         }
-
     }
 }

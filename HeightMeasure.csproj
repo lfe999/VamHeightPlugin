@@ -82,7 +82,7 @@
     <Compile Include="src/SizeChartCupCalculator.cs" />
     <Compile Include="src/UnitUtils.cs" />
     <Compile Include="src/VertexPositionExact.cs" />
-    <Compile Include="src/VertexPositionMiddle.cs" />Vy
+    <Compile Include="src/VertexPositionMiddle.cs" />
   </ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
