@@ -7,9 +7,9 @@
    "credits" : "", 
    "instructions" : "If you make anything with this commercially thats cool.  This license just makes sure that if you change THIS plugin, those changes should be pulled back in here for everyone.",
    "promotionalLink" : "https://github.com/lfe999/VamHeightPlugin",
-   "programVersion" : "1.19.0.5", 
+   "programVersion" : "1.20.77.9", 
    "contentList" : [ 
-      "Custom\\Scripts\\LFE\\HeightMeasure\\HeightMeasurePlugin.cs"
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\HeightMeasurePlugin.cs"
    ], 
    "dependencies" : { 
    }

@@ -72,7 +72,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="HeightMeasurePlugin.cs" />
+    <Compile Include="src/ChateLaineCupCalculator.cs" />
+    <Compile Include="src/CupSize.cs" />
+    <Compile Include="src/HeightMeasurePlugin.cs" />
+    <Compile Include="src/HorizontalMarker.cs" />
+    <Compile Include="src/ICupCalculator.cs" />
+    <Compile Include="src/IVertexPosition.cs" />
+    <Compile Include="src/KnixComCupCalculator.cs" />
+    <Compile Include="src/SizeChartCupCalculator.cs" />
+    <Compile Include="src/UnitUtils.cs" />
+    <Compile Include="src/VertexPositionExact.cs" />
+    <Compile Include="src/VertexPositionMiddle.cs" />Vy
   </ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
