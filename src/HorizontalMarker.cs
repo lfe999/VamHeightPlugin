@@ -43,7 +43,6 @@ namespace LFE {
                 CalculateEndpoint(Origin)
             });
             _lineRenderer.gameObject.SetActive(Enabled);
-            // SuperController.LogMessage($"{_lineRenderer.gameObject.layer} - {_canvas.gameObject.layer}");
             _canvas.gameObject.SetActive(_lineRenderer.gameObject.activeInHierarchy);
             if(Enabled) {
                 var text = _canvas.GetComponentInChildren<Text>();

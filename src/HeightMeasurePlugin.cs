@@ -7,9 +7,12 @@ namespace LFE
 {
     public class HeightMeasurePlugin : MVRScript
     {
-        private static Color FACE_MARKER_COLOR = Color.blue;
-
         public DAZSkinV2 Skin;
+        public readonly ICupCalculator[] cupCalculators = new ICupCalculator[] {
+            new SizeChartCupCalculator(),
+            new KnixComCupCalculator(),
+            new ChateLaineCupCalculator()
+        };
 
         readonly IVertexPosition[] _verticesBust = new IVertexPosition[] {
             new VertexPositionMiddle(7213, 17920), // midchest 1/2 way between the nipples at bust height
@@ -80,48 +83,7 @@ namespace LFE
         readonly IVertexPosition _vertexMouthMidHeight = new VertexPositionMiddle(2136, 2145);
 
         DAZBone _eyeLeft;
-
-
-        // measurement storables
-        JSONStorableFloat _fullHeightStorable;
-        JSONStorableFloat _headSizeHeightStorable;
-        JSONStorableFloat _headSizeWidthStorable;
-        JSONStorableFloat _chinHeightStorable;
-        JSONStorableFloat _shoulderHeightStorable;
-        JSONStorableFloat _nippleHeightStorable;
-        JSONStorableFloat _underbustHeightStorable;
-        JSONStorableFloat _navelHeightStorable;
-        JSONStorableFloat _crotchHeightStorable;
-        JSONStorableFloat _kneeBottomHeightStorable;
-        JSONStorableFloat _heightInHeadsStorable;
-        JSONStorableFloat _breastBustStorable;
-        JSONStorableFloat _breastUnderbustStorable;
-        JSONStorableFloat _breastBandStorable;
-        JSONStorableString _breastCupStorable;
-        JSONStorableFloat _waistSizeStorable;
-        JSONStorableFloat _hipSizeStorable;
-
-        // TOOD: shoulder width
-
-        // other storables
-        JSONStorableFloat _markerSpreadStorable;
-        JSONStorableFloat _markerLeftRightStorable;
-        JSONStorableFloat _markerFrontBackStorable;
-        JSONStorableBool _showTapeMarkersStorable;
-        JSONStorableBool _showHeadHeightMarkersStorable;
-        JSONStorableBool _showFeatureMarkersStorable;
-        JSONStorableBool _showFeatureMarkerLabelsStorable;
-        JSONStorableBool _showFaceMarkersStorable;
-        JSONStorableStringChooser _cupAlgorithmStorable;
-        JSONStorableFloat _lineThicknessStorable;
-
         DAZCharacter _dazCharacter;
-
-        readonly ICupCalculator[] _cupCalculators = new ICupCalculator[] {
-            new SizeChartCupCalculator(),
-            new KnixComCupCalculator(),
-            new ChateLaineCupCalculator()
-        };
 
         HorizontalMarker _markerHead;
         HorizontalMarker _markerChin;
@@ -146,224 +108,117 @@ namespace LFE
         HorizontalMarker _markerHeadRight;
         HorizontalMarker _markerFaceCenter;
 
-
-        public void InitStorables() {
-            // Cup algorithm choice
-            _cupAlgorithmStorable = new JSONStorableStringChooser(
-                "Cup Size Method",
-                _cupCalculators.Select(cc => cc.Name).ToList(),
-                _cupCalculators[0].Name,
-                "Cup Size Method"
-            );
-
-            // Float: How far apart markers are spread apart
-            _markerSpreadStorable = new JSONStorableFloat("Spread Markers", 0.02f, -1, 1);
-            RegisterFloat(_markerSpreadStorable);
-
-            // Float: Move markers forward or backward relative to center depth of the head
-            _markerFrontBackStorable = new JSONStorableFloat("Move Markers Forward/Backward", 0.15f, -5, 5);
-            RegisterFloat(_markerFrontBackStorable);
-
-            // Float: Move markers left or right 
-            _markerLeftRightStorable = new JSONStorableFloat("Move Markers Left/Right", 0, -5, 5);
-            RegisterFloat(_markerLeftRightStorable);
-
-            // Bool: Show the tape measures for circumference?
-            _showTapeMarkersStorable = new JSONStorableBool("Show Tape Measure Markers", false);
-            RegisterBool(_showTapeMarkersStorable);
-
-            // Bool: Show head hight markers (white ones)
-            _showHeadHeightMarkersStorable = new JSONStorableBool("Show Head Height Markers", true);
-            RegisterBool(_showHeadHeightMarkersStorable);
-
-            // Bool: Show the main feature markers for the figure
-            _showFeatureMarkersStorable = new JSONStorableBool("Show Figure Feature Markers", true);
-            RegisterBool(_showFeatureMarkersStorable);
-
-            // Bool: Show the feature marker labels
-            _showFeatureMarkerLabelsStorable = new JSONStorableBool("Show Feature Marker Labels", true);
-            RegisterBool(_showFeatureMarkerLabelsStorable);
-
-            // Bool: Show face markers
-            _showFaceMarkersStorable = new JSONStorableBool("Show Face Markers", true);
-            RegisterBool(_showFeatureMarkerLabelsStorable);
-
-            // Float: Line thickness
-            _lineThicknessStorable = new JSONStorableFloat("Line Thickness", 2, 1, 10, constrain: true);
-            RegisterFloat(_lineThicknessStorable);
-
-
-            // calculated positions and distances for other plugins to use if wanted
-            _fullHeightStorable = new JSONStorableFloat("figureHeight", 0, 0, 100);
-            RegisterFloat(_fullHeightStorable);
-
-            _heightInHeadsStorable = new JSONStorableFloat("figureHeightHeads", 0, 0, 100);
-            RegisterFloat(_heightInHeadsStorable);
-
-            _headSizeHeightStorable = new JSONStorableFloat("headSizeHeight", 0, 0, 100);
-            RegisterFloat(_headSizeHeightStorable);
-
-            _chinHeightStorable = new JSONStorableFloat("chinHeight", 0, 0, 100);
-            RegisterFloat(_chinHeightStorable);
-
-            _shoulderHeightStorable = new JSONStorableFloat("shoulderHeight", 0, 0, 100);
-            RegisterFloat(_shoulderHeightStorable);
-
-            _nippleHeightStorable = new JSONStorableFloat("nippleHeight", 0, 0, 100);
-            RegisterFloat(_nippleHeightStorable);
-
-            _underbustHeightStorable = new JSONStorableFloat("underbustHeight", 0, 0, 100);
-            RegisterFloat(_underbustHeightStorable);
-
-            _navelHeightStorable = new JSONStorableFloat("navelHeight", 0, 0, 100);
-            RegisterFloat(_navelHeightStorable);
-
-            _crotchHeightStorable = new JSONStorableFloat("crotchHeight", 0, 0, 100);
-            RegisterFloat(_crotchHeightStorable);
-
-            _kneeBottomHeightStorable = new JSONStorableFloat("kneeHeight", 0, 0, 100);
-            RegisterFloat(_kneeBottomHeightStorable);
-
-            _headSizeWidthStorable = new JSONStorableFloat("headSizeWidth", 0, 0, 100);
-            RegisterFloat(_headSizeWidthStorable);
-
-            _breastBustStorable = new JSONStorableFloat("breastBustSize", 0, 0, 100);
-            RegisterFloat(_breastBustStorable);
-
-            _breastUnderbustStorable = new JSONStorableFloat("breastUnderbustSize", 0, 0, 100);
-            RegisterFloat(_breastUnderbustStorable);
-
-            _breastBandStorable = new JSONStorableFloat("breastBandSize", 0, 0, 100);
-            RegisterFloat(_breastBandStorable);
-
-            _breastCupStorable = new JSONStorableString("breastCupSize", "");
-            RegisterString(_breastCupStorable);
-
-            _waistSizeStorable = new JSONStorableFloat("waistSize", 0, 0, 100);
-            RegisterFloat(_waistSizeStorable);
-
-            _hipSizeStorable = new JSONStorableFloat("hipSize", 0, 0, 100);
-            RegisterFloat(_hipSizeStorable);
-
-        }
+        private UI _ui;
 
         public override void Init()
         {
+            _ui = new UI(this);
+            _ui.Draw();
+
             _dazCharacter = containingAtom.GetComponentInChildren<DAZCharacter>();
             Skin = _dazCharacter.skin;
 
             // initialize the line markers
             InitLineMarkers();
 
-            // initialize storables
-            InitStorables();
-
-            // initialize the ui components
-            CreateScrollablePopup(_cupAlgorithmStorable);
-            CreateSlider(_lineThicknessStorable);
-            CreateSlider(_markerSpreadStorable, rightSide: true);
-            CreateSlider(_markerFrontBackStorable, rightSide: true);
-            CreateSlider(_markerLeftRightStorable, rightSide: true);
-            CreateToggle(_showTapeMarkersStorable);
-            CreateToggle(_showHeadHeightMarkersStorable);
-            CreateToggle(_showFeatureMarkersStorable);
-            CreateToggle(_showFeatureMarkerLabelsStorable);
-            CreateToggle(_showFaceMarkersStorable);
         }
 
         public void InitLineMarkers() {
+            var featureColor = HSVToColor(_ui.featureMarkerColor.val);
+            var faceColor = HSVToColor(_ui.faceMarkerColor.val);
+
             // this does not position them, just creates them
             _markerHead = gameObject.AddComponent<HorizontalMarker>();
             _markerHead.Name = "Head";
-            _markerHead.Color = Color.green;
+            _markerHead.Color = featureColor;
 
             _markerChin = gameObject.AddComponent<HorizontalMarker>();
             _markerChin.Name = "Chin";
-            _markerChin.Color = Color.green;
+            _markerChin.Color = featureColor;
 
             _markerShoulder = gameObject.AddComponent<HorizontalMarker>();
             _markerShoulder.Name = "Shoulder";
-            _markerShoulder.Color = Color.green;
+            _markerShoulder.Color = featureColor;
 
             _markerNipple = gameObject.AddComponent<HorizontalMarker>();
             _markerNipple.Name = "Nipple";
-            _markerNipple.Color = Color.green;
+            _markerNipple.Color = featureColor;
 
             _markerUnderbust = gameObject.AddComponent<HorizontalMarker>();
             _markerUnderbust.Name = "Underbust";
-            _markerUnderbust.Color = Color.green;
+            _markerUnderbust.Color = featureColor;
 
             _markerNavel = gameObject.AddComponent<HorizontalMarker>();
             _markerNavel.Name = "Navel";
-            _markerNavel.Color = Color.green;
+            _markerNavel.Color = featureColor;
 
             _markerGroin = gameObject.AddComponent<HorizontalMarker>();
             _markerGroin.Name = "Groin";
-            _markerGroin.Color = Color.green;
+            _markerGroin.Color = featureColor;
 
             _markerKnee = gameObject.AddComponent<HorizontalMarker>();
             _markerKnee.Name = "Knee";
-            _markerKnee.Color = Color.green;
+            _markerKnee.Color = featureColor;
 
             _markerHeel = gameObject.AddComponent<HorizontalMarker>();
             _markerHeel.Name = "Heel";
-            _markerHeel.Color = Color.green;
+            _markerHeel.Color = featureColor;
 
             _eyeLeft = containingAtom.GetStorableByID("lEye") as DAZBone;
 
             _markerEyeMidHeight = gameObject.AddComponent<HorizontalMarker>();
             _markerEyeMidHeight.Name = "Eye Height";
-            _markerEyeMidHeight.Color = FACE_MARKER_COLOR;
+            _markerEyeMidHeight.Color = faceColor;
 
             _markerEyeRightOuter = gameObject.AddComponent<HorizontalMarker>();
             _markerEyeRightOuter.Name = "Eye Right Outer";
-            _markerEyeRightOuter.Color = FACE_MARKER_COLOR;
+            _markerEyeRightOuter.Color = faceColor;
             _markerEyeRightOuter.LineDirection = Vector3.up;
 
             _markerEyeLeftOuter = gameObject.AddComponent<HorizontalMarker>();
             _markerEyeLeftOuter.Name = "Eye Left Outer";
-            _markerEyeLeftOuter.Color = FACE_MARKER_COLOR;
+            _markerEyeLeftOuter.Color = faceColor;
             _markerEyeLeftOuter.LineDirection = Vector3.up;
 
             _markerNoseBottomHeight = gameObject.AddComponent<HorizontalMarker>();
             _markerNoseBottomHeight.Name = "Nose Bottom Height";
-            _markerNoseBottomHeight.Color = FACE_MARKER_COLOR;
+            _markerNoseBottomHeight.Color = faceColor;
 
             _markerMouthMidHeight = gameObject.AddComponent<HorizontalMarker>();
             _markerMouthMidHeight.Name = "Mouth Height";
-            _markerMouthMidHeight.Color = FACE_MARKER_COLOR;
+            _markerMouthMidHeight.Color = faceColor;
 
             _markerMouthLeft = gameObject.AddComponent<HorizontalMarker>();
             _markerMouthLeft.Name = "Mouth Left";
-            _markerMouthLeft.Color = FACE_MARKER_COLOR;
+            _markerMouthLeft.Color = faceColor;
             _markerMouthLeft.LineDirection = Vector3.up;
 
             _markerMouthRight = gameObject.AddComponent<HorizontalMarker>();
             _markerMouthRight.Name = "Mouth Right";
-            _markerMouthRight.Color = FACE_MARKER_COLOR;
+            _markerMouthRight.Color = faceColor;
             _markerMouthRight.LineDirection = Vector3.up;
 
             _markerChinSmall = gameObject.AddComponent<HorizontalMarker>();
             _markerChinSmall.Name = "Chin Small";
-            _markerChinSmall.Color = FACE_MARKER_COLOR;
+            _markerChinSmall.Color = faceColor;
 
             _markerHeadSmall = gameObject.AddComponent<HorizontalMarker>();
             _markerHeadSmall.Name = "Head Small";
-            _markerHeadSmall.Color = FACE_MARKER_COLOR;
+            _markerHeadSmall.Color = faceColor;
 
             _markerHeadRight = gameObject.AddComponent<HorizontalMarker>();
             _markerHeadRight.Name = "Head Right";
-            _markerHeadRight.Color = FACE_MARKER_COLOR;
+            _markerHeadRight.Color = faceColor;
             _markerHeadRight.LineDirection = Vector2.up;
 
             _markerHeadLeft = gameObject.AddComponent<HorizontalMarker>();
             _markerHeadLeft.Name = "Head Left";
-            _markerHeadLeft.Color = FACE_MARKER_COLOR;
+            _markerHeadLeft.Color = faceColor;
             _markerHeadLeft.LineDirection = Vector3.up;
 
             _markerFaceCenter = gameObject.AddComponent<HorizontalMarker>();
             _markerFaceCenter.Name = "Face Center";
-            _markerFaceCenter.Color = FACE_MARKER_COLOR;
+            _markerFaceCenter.Color = faceColor;
             _markerFaceCenter.LineDirection = Vector3.up;
 
         }
@@ -401,6 +256,10 @@ namespace LFE
             _dazCharacter = containingAtom.GetComponentInChildren<DAZCharacter>();
             Skin = _dazCharacter.skin;
 
+            if(_ui == null) {
+                return;
+            }
+
             if(SuperController.singleton.freezeAnimation) {
                 return;
             }
@@ -424,78 +283,89 @@ namespace LFE
         }
 
         private void UpdateMarkerPositions() {
+
+            Color featureColor = HSVToColor(_ui.featureMarkerColor.val);
+
             Vector3 pos;
             // head
             pos = _vertexHead.Position(this);
-            pos.x -= _markerSpreadStorable.val + _markerLeftRightStorable.val;
-            pos.z += _markerFrontBackStorable.val;
+            pos.x -= _ui.markerSpreadStorable.val + _ui.markerLeftRightStorable.val;
+            pos.z += _ui.markerFrontBackStorable.val;
             _markerHead.Origin = pos;
-            _markerHead.Enabled = _showFeatureMarkersStorable.val;
-            _markerHead.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerHead.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerHead.Enabled = _ui.showFeatureMarkersStorable.val;
+            _markerHead.LabelEnabled = _ui.showFeatureMarkerLabelsStorable.val;
+            _markerHead.Thickness = _ui.lineThicknessFigureStorable.val * 0.001f;
+            _markerHead.Color = featureColor;
 
             // chin
             pos = _vertexChin.Position(this);
             pos.x = _markerHead.Origin.x;
             pos.z = _markerHead.Origin.z;
             _markerChin.Origin = pos;
-            _markerChin.Enabled = _showFeatureMarkersStorable.val;
-            _markerChin.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerChin.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerChin.Enabled = _ui.showFeatureMarkersStorable.val;
+            _markerChin.LabelEnabled = _ui.showFeatureMarkerLabelsStorable.val;
+            _markerChin.Thickness = _ui.lineThicknessFigureStorable.val * 0.001f;
+            _markerChin.Color = featureColor;
 
             // shoulder
             pos = _vertexShoulder.Position(this);
             pos.x = _markerHead.Origin.x;
             pos.z = _markerHead.Origin.z;
             _markerShoulder.Origin = pos;
-            _markerShoulder.Enabled = _showFeatureMarkersStorable.val;
-            _markerShoulder.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerShoulder.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerShoulder.Enabled = _ui.showFeatureMarkersStorable.val;
+            _markerShoulder.LabelEnabled = _ui.showFeatureMarkerLabelsStorable.val;
+            _markerShoulder.Thickness = _ui.lineThicknessFigureStorable.val * 0.001f;
+            _markerShoulder.Color = featureColor;
 
             // nipple
             pos = _vertexNipple.Position(this);
             pos.x = _markerHead.Origin.x;
             pos.z = _markerHead.Origin.z;
             _markerNipple.Origin = pos;
-            _markerNipple.Enabled = _dazCharacter.isMale ? false : _showFeatureMarkersStorable.val; // TODO: better male nipple detection
-            _markerNipple.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerNipple.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerNipple.Enabled = _dazCharacter.isMale ? false : _ui.showFeatureMarkersStorable.val; // TODO: better male nipple detection
+            _markerNipple.LabelEnabled = _ui.showFeatureMarkerLabelsStorable.val;
+            _markerNipple.Thickness = _ui.lineThicknessFigureStorable.val * 0.001f;
+            _markerNipple.Color = featureColor;
 
             // underbust
             pos = _vertexUnderbust.Position(this);
             pos.x = _markerHead.Origin.x;
             pos.z = _markerHead.Origin.z;
             _markerUnderbust.Origin = pos;
-            _markerUnderbust.Enabled = _dazCharacter.isMale ? false : _showFeatureMarkersStorable.val;
-            _markerUnderbust.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerUnderbust.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerUnderbust.Enabled = _dazCharacter.isMale ? false : _ui.showFeatureMarkersStorable.val;
+            _markerUnderbust.LabelEnabled = _ui.showFeatureMarkerLabelsStorable.val;
+            _markerUnderbust.Thickness = _ui.lineThicknessFigureStorable.val * 0.001f;
+            _markerUnderbust.Color = featureColor;
 
             // navel
             pos = _vertexNavel.Position(this);
             pos.x = _markerHead.Origin.x;
             pos.z = _markerHead.Origin.z;
             _markerNavel.Origin = pos;
-            _markerNavel.Enabled = _showFeatureMarkersStorable.val;
-            _markerNavel.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerNavel.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerNavel.Enabled = _ui.showFeatureMarkersStorable.val;
+            _markerNavel.LabelEnabled = _ui.showFeatureMarkerLabelsStorable.val;
+            _markerNavel.Thickness = _ui.lineThicknessFigureStorable.val * 0.001f;
+            _markerNavel.Color = featureColor;
 
             // groin
             pos = _vertexGroin.Position(this);
             pos.x = _markerHead.Origin.x;
             pos.z = _markerHead.Origin.z;
             _markerGroin.Origin = pos;
-            _markerGroin.Enabled = _showFeatureMarkersStorable.val;
-            _markerGroin.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerGroin.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerGroin.Enabled = _ui.showFeatureMarkersStorable.val;
+            _markerGroin.LabelEnabled = _ui.showFeatureMarkerLabelsStorable.val;
+            _markerGroin.Thickness = _ui.lineThicknessFigureStorable.val * 0.001f;
+            _markerGroin.Color = featureColor;
 
             // knee
             pos = _vertexKnee.Position(this);
             pos.x = _markerHead.Origin.x;
             pos.z = _markerHead.Origin.z;
             _markerKnee.Origin = pos;
-            _markerKnee.Enabled = _showFeatureMarkersStorable.val;
-            _markerKnee.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerKnee.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerKnee.Enabled = _ui.showFeatureMarkersStorable.val;
+            _markerKnee.LabelEnabled = _ui.showFeatureMarkerLabelsStorable.val;
+            _markerKnee.Thickness = _ui.lineThicknessFigureStorable.val * 0.001f;
+            _markerKnee.Color = featureColor;
 
             // heel - can not find vertex for heel - using colliders
             var rFoot = containingAtom.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("rFoot/_Collider1")); 
@@ -504,9 +374,10 @@ namespace LFE
                 pos.x = _markerHead.Origin.x;
                 pos.z = _markerHead.Origin.z;
                 _markerHeel.Origin = pos;
-                _markerHeel.Enabled = _showFeatureMarkersStorable.val;
-                _markerHeel.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-                _markerHeel.Thickness = _lineThicknessStorable.val * 0.001f;
+                _markerHeel.Enabled = _ui.showFeatureMarkersStorable.val;
+                _markerHeel.LabelEnabled = _ui.showFeatureMarkerLabelsStorable.val;
+                _markerHeel.Thickness = _ui.lineThicknessFigureStorable.val * 0.001f;
+                _markerHeel.Color = featureColor;
             }
             
             UpdateHeadHeightMarkers();
@@ -519,239 +390,254 @@ namespace LFE
             UpdateHipMarkersFromMorphVertex();
 
             var midpoint = _vertexHead.Position(this);
-            var midpointX = midpoint.x + (_headSizeWidthStorable.val / 2) - _markerLeftRightStorable.val;
+            var midpointX = midpoint.x + (_ui.headSizeWidthStorable.val / 2) - _ui.markerLeftRightStorable.val;
+
+            var faceColor = HSVToColor(_ui.faceMarkerColor.val);
+            var faceLineThickness = _ui.lineThicknessFaceStorable.val * 0.001f;
 
             // eye midline
             pos = _eyeLeft.transform.position; // comes from a daz bone not a vertex
             pos.x = midpointX;
             pos.z = _markerHead.Origin.z - 0.045f;
-            _markerEyeMidHeight.Length = _headSizeWidthStorable.val;
+            _markerEyeMidHeight.Length = _ui.headSizeWidthStorable.val;
             _markerEyeMidHeight.Origin = pos;
-            _markerEyeMidHeight.Enabled = _showFaceMarkersStorable.val;
-            _markerEyeMidHeight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerEyeMidHeight.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerEyeMidHeight.Enabled = _ui.showFaceMarkersStorable.val;
+            _markerEyeMidHeight.LabelEnabled = _ui.showFaceMarkersStorable.val;
+            _markerEyeMidHeight.Thickness = faceLineThickness;
+            _markerEyeMidHeight.Color = faceColor;
 
             // eye right outer
             pos = _vertexEyeRightOuter.Position(this);
-            pos.x = pos.x - _markerLeftRightStorable.val;
-            pos.y = _markerEyeMidHeight.Origin.y - _headSizeHeightStorable.val / 4 / 2;
+            pos.x = pos.x - _ui.markerLeftRightStorable.val;
+            pos.y = _markerEyeMidHeight.Origin.y - _ui.headSizeHeightStorable.val / 4 / 2;
             pos.z = _markerHead.Origin.z - 0.045f;
-            _markerEyeRightOuter.Length = _headSizeHeightStorable.val / 4;
+            _markerEyeRightOuter.Length = _ui.headSizeHeightStorable.val / 4;
             _markerEyeRightOuter.Origin = pos;
-            _markerEyeRightOuter.Enabled = _showFaceMarkersStorable.val;
-            _markerEyeRightOuter.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerEyeRightOuter.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerEyeRightOuter.Enabled = _ui.showFaceMarkersStorable.val;
+            _markerEyeRightOuter.LabelEnabled = _ui.showFaceMarkersStorable.val;
+            _markerEyeRightOuter.Thickness = faceLineThickness;
+            _markerEyeRightOuter.Color = faceColor;
 
             // eye left outer
             pos = _vertexEyeLeftOuterHeight.Position(this);
-            pos.x = pos.x - _markerLeftRightStorable.val;
-            pos.y = _markerEyeMidHeight.Origin.y - _headSizeHeightStorable.val / 4 / 2;
+            pos.x = pos.x - _ui.markerLeftRightStorable.val;
+            pos.y = _markerEyeMidHeight.Origin.y - _ui.headSizeHeightStorable.val / 4 / 2;
             pos.z = _markerHead.Origin.z - 0.045f;
-            _markerEyeLeftOuter.Length = _headSizeHeightStorable.val / 4;
+            _markerEyeLeftOuter.Length = _ui.headSizeHeightStorable.val / 4;
             _markerEyeLeftOuter.Origin = pos;
-            _markerEyeLeftOuter.Enabled = _showFaceMarkersStorable.val;
-            _markerEyeLeftOuter.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerEyeLeftOuter.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerEyeLeftOuter.Enabled = _ui.showFaceMarkersStorable.val;
+            _markerEyeLeftOuter.LabelEnabled = _ui.showFaceMarkersStorable.val;
+            _markerEyeLeftOuter.Thickness = faceLineThickness;
+            _markerEyeLeftOuter.Color = faceColor;
 
             // nose bottom
             pos = _vertexNoseBottom.Position(this);
             pos.x = midpointX;
             pos.z = _markerHead.Origin.z - 0.045f;
-            _markerNoseBottomHeight.Length = _headSizeWidthStorable.val;
+            _markerNoseBottomHeight.Length = _ui.headSizeWidthStorable.val;
             _markerNoseBottomHeight.Origin = pos;
-            _markerNoseBottomHeight.Enabled = _showFaceMarkersStorable.val;
-            _markerNoseBottomHeight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerNoseBottomHeight.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerNoseBottomHeight.Enabled = _ui.showFaceMarkersStorable.val;
+            _markerNoseBottomHeight.LabelEnabled = _ui.showFaceMarkersStorable.val;
+            _markerNoseBottomHeight.Thickness = faceLineThickness;
+            _markerNoseBottomHeight.Color = faceColor;
 
             // mouth middle
             pos = _vertexMouthMidHeight.Position(this);
             pos.x = midpointX;
             pos.z = _markerHead.Origin.z - 0.045f;
-            _markerMouthMidHeight.Length = _headSizeWidthStorable.val;
+            _markerMouthMidHeight.Length = _ui.headSizeWidthStorable.val;
             _markerMouthMidHeight.Origin = pos;
-            _markerMouthMidHeight.Enabled = _showFaceMarkersStorable.val;
-            _markerMouthMidHeight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerMouthMidHeight.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerMouthMidHeight.Enabled = _ui.showFaceMarkersStorable.val;
+            _markerMouthMidHeight.LabelEnabled = _ui.showFaceMarkersStorable.val;
+            _markerMouthMidHeight.Thickness = faceLineThickness;
+            _markerMouthMidHeight.Color = faceColor;
 
             // mouth left
             pos = _vertexMouthLeftSideMiddle.Position(this);
-            pos.x = pos.x - _markerLeftRightStorable.val;
-            pos.y = _markerMouthMidHeight.Origin.y - (_headSizeHeightStorable.val / 8 / 2);
+            pos.x = pos.x - _ui.markerLeftRightStorable.val;
+            pos.y = _markerMouthMidHeight.Origin.y - (_ui.headSizeHeightStorable.val / 8 / 2);
             pos.z = _markerHead.Origin.z - 0.045f;
-            _markerMouthLeft.Length = _headSizeHeightStorable.val / 8;
+            _markerMouthLeft.Length = _ui.headSizeHeightStorable.val / 8;
             _markerMouthLeft.Origin = pos;
-            _markerMouthLeft.Enabled = _showFaceMarkersStorable.val;
-            _markerMouthLeft.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerMouthLeft.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerMouthLeft.Enabled = _ui.showFaceMarkersStorable.val;
+            _markerMouthLeft.LabelEnabled = _ui.showFaceMarkersStorable.val;
+            _markerMouthLeft.Thickness = faceLineThickness;
+            _markerMouthLeft.Color = faceColor;
 
             // mouth right
             pos = _vertexMouthRightSideMiddle.Position(this);
-            pos.x = pos.x - _markerLeftRightStorable.val;
-            pos.y = _markerMouthMidHeight.Origin.y - (_headSizeHeightStorable.val / 8 / 2);
+            pos.x = pos.x - _ui.markerLeftRightStorable.val;
+            pos.y = _markerMouthMidHeight.Origin.y - (_ui.headSizeHeightStorable.val / 8 / 2);
             pos.z = _markerHead.Origin.z - 0.045f;
-            _markerMouthRight.Length = _headSizeHeightStorable.val / 8;
+            _markerMouthRight.Length = _ui.headSizeHeightStorable.val / 8;
             _markerMouthRight.Origin = pos;
-            _markerMouthRight.Enabled = _showFaceMarkersStorable.val;
-            _markerMouthRight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerMouthRight.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerMouthRight.Enabled = _ui.showFaceMarkersStorable.val;
+            _markerMouthRight.LabelEnabled = _ui.showFaceMarkersStorable.val;
+            _markerMouthRight.Thickness = faceLineThickness;
+            _markerMouthRight.Color = faceColor;
 
             // chin small and blue
             pos = _vertexHead.Position(this);
-            pos.x = pos.x - _markerLeftRightStorable.val + _headSizeWidthStorable.val / 2;
+            pos.x = pos.x - _ui.markerLeftRightStorable.val + _ui.headSizeWidthStorable.val / 2;
             pos.z = _markerHead.Origin.z - 0.045f;
-            _markerChinSmall.Length = _headSizeWidthStorable.val;
+            _markerChinSmall.Length = _ui.headSizeWidthStorable.val;
             _markerChinSmall.Origin = pos;
-            _markerChinSmall.Enabled = _showFaceMarkersStorable.val;
-            _markerChinSmall.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerChinSmall.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerChinSmall.Enabled = _ui.showFaceMarkersStorable.val;
+            _markerChinSmall.LabelEnabled = _ui.showFaceMarkersStorable.val;
+            _markerChinSmall.Thickness = faceLineThickness;
+            _markerChinSmall.Color = faceColor;
 
             // head small and blue
             pos = _vertexHead.Position(this);
-            pos.y = pos.y - _headSizeHeightStorable.val;
-            pos.x = pos.x - _markerLeftRightStorable.val + _headSizeWidthStorable.val / 2;
+            pos.y = pos.y - _ui.headSizeHeightStorable.val;
+            pos.x = pos.x - _ui.markerLeftRightStorable.val + _ui.headSizeWidthStorable.val / 2;
             pos.z = _markerHead.Origin.z - 0.045f;
-            _markerHeadSmall.Length = _headSizeWidthStorable.val;
+            _markerHeadSmall.Length = _ui.headSizeWidthStorable.val;
             _markerHeadSmall.Origin = pos;
-            _markerHeadSmall.Enabled = _showFaceMarkersStorable.val;
-            _markerHeadSmall.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerHeadSmall.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerHeadSmall.Enabled = _ui.showFaceMarkersStorable.val;
+            _markerHeadSmall.LabelEnabled = _ui.showFaceMarkersStorable.val;
+            _markerHeadSmall.Thickness = faceLineThickness;
+            _markerHeadSmall.Color = faceColor;
 
             // head left
             pos = _vertexHead.Position(this);
-            pos.y = pos.y - _headSizeHeightStorable.val;
-            pos.x = pos.x - _markerLeftRightStorable.val + _headSizeWidthStorable.val / 2;
+            pos.y = pos.y - _ui.headSizeHeightStorable.val;
+            pos.x = pos.x - _ui.markerLeftRightStorable.val + _ui.headSizeWidthStorable.val / 2;
             pos.z = _markerHead.Origin.z - 0.045f;
-            _markerHeadLeft.Length = _headSizeHeightStorable.val;
+            _markerHeadLeft.Length = _ui.headSizeHeightStorable.val;
             _markerHeadLeft.Origin = pos;
-            _markerHeadLeft.Enabled = _showFaceMarkersStorable.val;
-            _markerHeadLeft.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerHeadLeft.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerHeadLeft.Enabled = _ui.showFaceMarkersStorable.val;
+            _markerHeadLeft.LabelEnabled = _ui.showFaceMarkersStorable.val;
+            _markerHeadLeft.Thickness = faceLineThickness;
+            _markerHeadLeft.Color = faceColor;
 
             // head right
             pos = _vertexHead.Position(this);
-            pos.y = pos.y - _headSizeHeightStorable.val;
-            pos.x = pos.x - _markerLeftRightStorable.val - _headSizeWidthStorable.val / 2;
+            pos.y = pos.y - _ui.headSizeHeightStorable.val;
+            pos.x = pos.x - _ui.markerLeftRightStorable.val - _ui.headSizeWidthStorable.val / 2;
             pos.z = _markerHead.Origin.z - 0.045f;
-            _markerHeadRight.Length = _headSizeHeightStorable.val;
+            _markerHeadRight.Length = _ui.headSizeHeightStorable.val;
             _markerHeadRight.Origin = pos;
-            _markerHeadRight.Enabled = _showFaceMarkersStorable.val;
-            _markerHeadRight.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerHeadRight.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerHeadRight.Enabled = _ui.showFaceMarkersStorable.val;
+            _markerHeadRight.LabelEnabled = _ui.showFaceMarkersStorable.val;
+            _markerHeadRight.Thickness = faceLineThickness;
+            _markerHeadRight.Color = faceColor;
 
             // face center
             pos = _vertexNoseTip.Position(this);
             pos.y = pos.y - (pos.y - _markerChin.Origin.y);
-            pos.x = pos.x - _markerLeftRightStorable.val;
+            pos.x = pos.x - _ui.markerLeftRightStorable.val;
             pos.z = _markerHead.Origin.z - 0.045f;
-            _markerFaceCenter.Length = _headSizeHeightStorable.val;
+            _markerFaceCenter.Length = _ui.headSizeHeightStorable.val;
             _markerFaceCenter.Origin = pos;
-            _markerFaceCenter.Enabled = _showFaceMarkersStorable.val;
-            _markerFaceCenter.LabelEnabled = _showFeatureMarkerLabelsStorable.val;
-            _markerFaceCenter.Thickness = _lineThicknessStorable.val * 0.001f;
+            _markerFaceCenter.Enabled = _ui.showFaceMarkersStorable.val;
+            _markerFaceCenter.LabelEnabled = _ui.showFaceMarkersStorable.val;
+            _markerFaceCenter.Thickness = faceLineThickness;
+            _markerFaceCenter.Color = faceColor;
         }
 
 
 
         private void UpdateMeasurements() {
             // basic body heights
-            _headSizeHeightStorable.val = Vector3.Distance(_markerHead.Origin, _markerChin.Origin);
-            _headSizeWidthStorable.val = Vector3.Distance(_vertexEarLeft.Position(this), _vertexEarRight.Position(this));
+            _ui.headSizeHeightStorable.val = Vector3.Distance(_markerHead.Origin, _markerChin.Origin);
+            _ui.headSizeWidthStorable.val = Vector3.Distance(_vertexEarLeft.Position(this), _vertexEarRight.Position(this));
 
-            _fullHeightStorable.val = Vector3.Distance(_markerHead.Origin, _markerHeel.Origin);
-            _heightInHeadsStorable.val = _headSizeHeightStorable.val == 0 ? 0 : _fullHeightStorable.val / _headSizeHeightStorable.val;
+            _ui.fullHeightStorable.val = Vector3.Distance(_markerHead.Origin, _markerHeel.Origin);
+            _ui.heightInHeadsStorable.val = _ui.headSizeHeightStorable.val == 0 ? 0 : _ui.fullHeightStorable.val / _ui.headSizeHeightStorable.val;
 
-            _chinHeightStorable.val = Vector3.Distance(_markerChin.Origin, _markerHeel.Origin);
-            _shoulderHeightStorable.val = Vector3.Distance(_markerShoulder.Origin, _markerHeel.Origin);
-            _nippleHeightStorable.val = Vector3.Distance(_markerNipple.Origin, _markerHeel.Origin);
-            _underbustHeightStorable.val = Vector3.Distance(_markerUnderbust.Origin, _markerHeel.Origin);
-            _navelHeightStorable.val = Vector3.Distance(_markerNavel.Origin, _markerHeel.Origin);
-            _crotchHeightStorable.val = Vector3.Distance(_markerGroin.Origin, _markerHeel.Origin);
-            _kneeBottomHeightStorable.val = Vector3.Distance(_markerKnee.Origin, _markerHeel.Origin);
+            _ui.chinHeightStorable.val = Vector3.Distance(_markerChin.Origin, _markerHeel.Origin);
+            _ui.shoulderHeightStorable.val = Vector3.Distance(_markerShoulder.Origin, _markerHeel.Origin);
+            _ui.nippleHeightStorable.val = Vector3.Distance(_markerNipple.Origin, _markerHeel.Origin);
+            _ui.underbustHeightStorable.val = Vector3.Distance(_markerUnderbust.Origin, _markerHeel.Origin);
+            _ui.navelHeightStorable.val = Vector3.Distance(_markerNavel.Origin, _markerHeel.Origin);
+            _ui.crotchHeightStorable.val = Vector3.Distance(_markerGroin.Origin, _markerHeel.Origin);
+            _ui.kneeBottomHeightStorable.val = Vector3.Distance(_markerKnee.Origin, _markerHeel.Origin);
 
             // measure things around (breast, waist, hip)
-            _waistSizeStorable.val = _circumferenceWaist;
-            _hipSizeStorable.val = _circumferenceHip;
+            _ui.waistSizeStorable.val = _circumferenceWaist;
+            _ui.hipSizeStorable.val = _circumferenceHip;
 
             var cupInfo = GetCupInfo();
             if(cupInfo == null) {
-                _breastBustStorable.val = 0;
-                _breastUnderbustStorable.val = 0;
-                _breastBandStorable.val = 0;
-                _breastCupStorable.val = "";
+                _ui.breastBustStorable.val = 0;
+                _ui.breastUnderbustStorable.val = 0;
+                _ui.breastBandStorable.val = 0;
+                _ui.breastCupStorable.val = "";
             }
             else {
-                _breastBustStorable.val = cupInfo.Bust;
-                _breastUnderbustStorable.val = cupInfo.Underbust;
-                _breastBandStorable.val = cupInfo.Band;
-                _breastCupStorable.val = cupInfo.Cup;
+                _ui.breastBustStorable.val = cupInfo.Bust;
+                _ui.breastUnderbustStorable.val = cupInfo.Underbust;
+                _ui.breastBandStorable.val = cupInfo.Band;
+                _ui.breastCupStorable.val = cupInfo.Cup;
             }
         }
 
         private void UpdateMarkerLabels() {
 
-            if(!_showFeatureMarkerLabelsStorable.val) {
+            if(!_ui.showFeatureMarkerLabelsStorable.val) {
                 return;
             }
 
             // update marker labels
             _markerHead.Label = "Head (Head To Heel "
-                + $"{(int)(_fullHeightStorable.val * 100)} cm / "
-                + $"{UnitUtils.MetersToFeetString(_fullHeightStorable.val)} / "
-                + $"{_heightInHeadsStorable.val:0.0} heads)";
+                + $"{(int)(_ui.fullHeightStorable.val * 100)} cm / "
+                + $"{UnitUtils.MetersToFeetString(_ui.fullHeightStorable.val)} / "
+                + $"{_ui.heightInHeadsStorable.val:0.0} heads)";
 
-            var chinToShoulder = _chinHeightStorable.val - _shoulderHeightStorable.val;
+            var chinToShoulder = _ui.chinHeightStorable.val - _ui.shoulderHeightStorable.val;
             _markerChin.Label = "Chin (Head Height "
-                + $"{(int)(_headSizeHeightStorable.val * 100)} cm / "
-                + $"{UnitUtils.MetersToFeetString(_headSizeHeightStorable.val)}; "
-                + $"Width {(int)(_headSizeWidthStorable.val * 100)} cm / {UnitUtils.MetersToFeetString(_headSizeWidthStorable.val)})\n"
+                + $"{(int)(_ui.headSizeHeightStorable.val * 100)} cm / "
+                + $"{UnitUtils.MetersToFeetString(_ui.headSizeHeightStorable.val)}; "
+                + $"Width {(int)(_ui.headSizeWidthStorable.val * 100)} cm / {UnitUtils.MetersToFeetString(_ui.headSizeWidthStorable.val)})\n"
                 + $"Chin To Shoulder "
                 + $"{(int)(chinToShoulder * 100)} cm / "
                 + $"{UnitUtils.MetersToFeetString(chinToShoulder)} / "
-                + $"{chinToShoulder / _headSizeHeightStorable.val:0.0} heads";
+                + $"{chinToShoulder / _ui.headSizeHeightStorable.val:0.0} heads";
 
-            if(_breastBustStorable.val == 0) {
+            if(_ui.breastBustStorable.val == 0) {
                 _markerNipple.Label = "Nipple";
                 _markerUnderbust.Label = "Underbust";
             }
             else {
                 _markerNipple.Label = $"Nipple "
-                + $"(Cup {_breastBandStorable.val}{_breastCupStorable.val}; "
-                + $"Around {(int)(_breastBustStorable.val * 100)} cm / "
-                + $"{(int)UnitUtils.UnityToInches(_breastBustStorable.val)} in)";
+                + $"(Cup {_ui.breastBandStorable.val}{_ui.breastCupStorable.val}; "
+                + $"Around {(int)(_ui.breastBustStorable.val * 100)} cm / "
+                + $"{(int)UnitUtils.UnityToInches(_ui.breastBustStorable.val)} in)";
 
                 _markerUnderbust.Label = "Underbust (Around "
-                    + $"{(int)(_breastUnderbustStorable.val * 100)} cm / "
-                    + $"{(int)UnitUtils.UnityToInches(_breastUnderbustStorable.val)} in)";
+                    + $"{(int)(_ui.breastUnderbustStorable.val * 100)} cm / "
+                    + $"{(int)UnitUtils.UnityToInches(_ui.breastUnderbustStorable.val)} in)";
             }
 
-            var shoulderToNavel = _shoulderHeightStorable.val - _navelHeightStorable.val;
+            var shoulderToNavel = _ui.shoulderHeightStorable.val - _ui.navelHeightStorable.val;
             _markerNavel.Label = "Navel (Waist "
-                + $"{(int)(_waistSizeStorable.val * 100)} cm / "
-                + $"{Mathf.RoundToInt(UnitUtils.UnityToInches(_waistSizeStorable.val))} in)\n"
+                + $"{(int)(_ui.waistSizeStorable.val * 100)} cm / "
+                + $"{Mathf.RoundToInt(UnitUtils.UnityToInches(_ui.waistSizeStorable.val))} in)\n"
                 + $"Shoulder to Navel "
                 + $"{(int)(shoulderToNavel * 100)} cm / "
                 + $"{UnitUtils.MetersToFeetString(shoulderToNavel)} / "
-                + $"{shoulderToNavel / _headSizeHeightStorable.val:0.0} heads";
+                + $"{shoulderToNavel / _ui.headSizeHeightStorable.val:0.0} heads";
 
-            var shoulderToCrotch = _shoulderHeightStorable.val - _crotchHeightStorable.val;
+            var shoulderToCrotch = _ui.shoulderHeightStorable.val - _ui.crotchHeightStorable.val;
             _markerGroin.Label = "Crotch (Hip "
-                + $"{(int)(_hipSizeStorable.val * 100)} cm / "
-                + $"{Mathf.RoundToInt(UnitUtils.UnityToInches(_hipSizeStorable.val))} in)\n"
+                + $"{(int)(_ui.hipSizeStorable.val * 100)} cm / "
+                + $"{Mathf.RoundToInt(UnitUtils.UnityToInches(_ui.hipSizeStorable.val))} in)\n"
                 + $"Shoulder to Crotch "
                 + $"{(int)(shoulderToCrotch * 100)} cm / "
                 + $"{UnitUtils.MetersToFeetString(shoulderToCrotch)} / "
-                + $"{shoulderToCrotch / _headSizeHeightStorable.val:0.0} heads";
+                + $"{shoulderToCrotch / _ui.headSizeHeightStorable.val:0.0} heads";
 
-            var crotchToKnee = _crotchHeightStorable.val - _kneeBottomHeightStorable.val;
+            var crotchToKnee = _ui.crotchHeightStorable.val - _ui.kneeBottomHeightStorable.val;
             _markerKnee.Label = $"Knee Bottom (Crotch to Knee "
                 + $"{(int)(crotchToKnee * 100)} cm / "
                 + $"{UnitUtils.MetersToFeetString(crotchToKnee)} / "
-                + $"{crotchToKnee / _headSizeHeightStorable.val:0.0} heads)";
+                + $"{crotchToKnee / _ui.headSizeHeightStorable.val:0.0} heads)";
 
             _markerHeel.Label = $"Heel (Knee to Heel "
-                + $"{(int)(_kneeBottomHeightStorable.val * 100)} cm / "
-                + $"{UnitUtils.MetersToFeetString(_kneeBottomHeightStorable.val)} / "
-                + $"{_kneeBottomHeightStorable.val / _headSizeHeightStorable.val:0.0} heads)";
+                + $"{(int)(_ui.kneeBottomHeightStorable.val * 100)} cm / "
+                + $"{UnitUtils.MetersToFeetString(_ui.kneeBottomHeightStorable.val)} / "
+                + $"{_ui.kneeBottomHeightStorable.val / _ui.headSizeHeightStorable.val:0.0} heads)";
 
         }
 
@@ -771,7 +657,7 @@ namespace LFE
                 return;
             }
 
-            if(_showTapeMarkersStorable.val) {
+            if(_ui.showTapeMarkersStorable.val) {
                 if(_bustMarkersFromMorph.Count != _verticesBust.Length)
                 {
                     foreach(var m in _bustMarkersFromMorph) {
@@ -779,8 +665,10 @@ namespace LFE
                     }
                     _bustMarkersFromMorph.Clear();
                     foreach(var m in _verticesBust){
-                        _bustMarkersFromMorph.Add(CreateMarker(Color.red));
+                        var marker = CreateMarker(Color.red);
+                        _bustMarkersFromMorph.Add(marker);
                     }
+                    var a = SuperController.singleton.GetAtomByUid("Person");
                 }
 
                 for(var i = 0; i < _verticesBust.Length; i++) {
@@ -804,7 +692,7 @@ namespace LFE
                 return;
             }
 
-            if(_showTapeMarkersStorable.val){
+            if(_ui.showTapeMarkersStorable.val){
                 if(_underbustMarkersFromMorph.Count != _verticesUnderbust.Length) {
                     foreach(var m in _underbustMarkersFromMorph) {
                         Destroy(m);
@@ -836,7 +724,7 @@ namespace LFE
                 return;
             }
 
-            if(_showTapeMarkersStorable.val){
+            if(_ui.showTapeMarkersStorable.val){
                 if(_waistMarkersFromMorph.Count != _verticesWaist.Length) {
                     foreach(var m in _waistMarkersFromMorph) {
                         Destroy(m);
@@ -868,7 +756,7 @@ namespace LFE
                 return;
             }
 
-            if(_showTapeMarkersStorable.val){
+            if(_ui.showTapeMarkersStorable.val){
                 if(_hipMarkersFromMorph.Count != _verticesHip.Length) {
                     foreach(var m in _hipMarkersFromMorph) {
                         Destroy(m);
@@ -895,16 +783,19 @@ namespace LFE
 
         readonly List<HorizontalMarker> _extraHeadMarkers = new List<HorizontalMarker>();
         private void UpdateHeadHeightMarkers() {
-            var height = _fullHeightStorable.val;
-            var headHeight = _headSizeHeightStorable.val;
-            var heightInHeadsRoundedUp = (int)Mathf.Ceil(_heightInHeadsStorable.val);
+            Color headColor = HSVToColor(_ui.headMarkerColor.val);
+
+            var height = _ui.fullHeightStorable.val;
+            var headHeight = _ui.headSizeHeightStorable.val;
+            var heightInHeadsRoundedUp = (int)Mathf.Ceil(_ui.heightInHeadsStorable.val);
 
             if(heightInHeadsRoundedUp != _extraHeadMarkers.Count) {
                 if(heightInHeadsRoundedUp > _extraHeadMarkers.Count) {
                     for(var i = _extraHeadMarkers.Count; i < heightInHeadsRoundedUp; i++) {
                         var hm = gameObject.AddComponent<HorizontalMarker>();
                         hm.Name = $"Head{i}";
-                        hm.Color = Color.white;
+                        hm.Color = headColor;
+                        hm.Thickness = _ui.lineThicknessHeadStorable.val;
                         hm.LineDirection = Vector3.right;
                         _extraHeadMarkers.Add(hm);
                     }
@@ -918,14 +809,15 @@ namespace LFE
             if(height > 0 && headHeight > 0) {
                 for(var i = 0; i < heightInHeadsRoundedUp; i++) {
                     var pos = _vertexHead.Position(this);
-                    pos.x += _markerSpreadStorable.val - _markerLeftRightStorable.val;
-                    pos.z += _markerFrontBackStorable.val;
+                    pos.x += _ui.markerSpreadStorable.val - _ui.markerLeftRightStorable.val;
+                    pos.z += _ui.markerFrontBackStorable.val;
                     pos.y -= headHeight * i;
 
                     _extraHeadMarkers[i].Origin = pos;
-                    _extraHeadMarkers[i].Enabled = _showHeadHeightMarkersStorable.val;
+                    _extraHeadMarkers[i].Enabled = _ui.showHeadHeightMarkersStorable.val;
                     _extraHeadMarkers[i].Label = $"{i}";
-                    _extraHeadMarkers[i].Thickness = _lineThicknessStorable.val * 0.001f;
+                    _extraHeadMarkers[i].Thickness = _ui.lineThicknessHeadStorable.val * 0.001f;
+                    _extraHeadMarkers[i].Color = headColor;
                 }
             }
         }
@@ -934,7 +826,7 @@ namespace LFE
             if(_dazCharacter.isMale) {
                 return null;
             }
-            var cupCalculator = _cupCalculators.FirstOrDefault(cc => cc.Name.Equals(_cupAlgorithmStorable.val));
+            var cupCalculator = cupCalculators.FirstOrDefault(cc => cc.Name.Equals(_ui.cupAlgorithmStorable.val));
             if(cupCalculator == null) {
                 return null;
             }
@@ -943,7 +835,7 @@ namespace LFE
 
         private GameObject CreateMarker(Color color) {
             var gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        
+
             // random position to help avoid physics problems.
             gameObject.transform.position = new Vector3 ((UnityEngine.Random.value*461)+10, (UnityEngine.Random.value*300)+10, 0F);
 
@@ -969,6 +861,16 @@ namespace LFE
             var label = parent == collider.name ? collider.name : $"{parent}/{collider.name}";
 
             return label;
+        }
+
+        public HSVColor ColorToHSV(Color color) {
+            float H, S, V;
+            Color.RGBToHSV(color, out H, out S, out V);
+            return new HSVColor { H = H, S = S, V = V };
+        }
+
+        public Color HSVToColor(HSVColor hsv) {
+            return Color.HSVToRGB(hsv.H, hsv.S, hsv.V);
         }
     }
 }

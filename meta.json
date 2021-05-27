@@ -9,7 +9,20 @@
    "promotionalLink" : "https://github.com/lfe999/VamHeightPlugin",
    "programVersion" : "1.20.77.9", 
    "contentList" : [ 
-      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\HeightMeasurePlugin.cs"
+      "Custom\\Scripts\\LFE\\HeightMeasure\\HeightMeasurePlugin.cslist",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\HeightMeasurePlugin.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\ChateLaineCupCalculator.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\CupSize.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\HeightMeasurePlugin.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\HorizontalMarker.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\ICupCalculator.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\IVertexPosition.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\KnixComCupCalculator.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\SizeChartCupCalculator.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\UnitUtils.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\VertexPositionExact.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\VertexPositionMiddle.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\UI.cs"
    ], 
    "dependencies" : { 
    }

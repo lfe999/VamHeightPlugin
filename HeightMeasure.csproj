@@ -83,6 +83,7 @@
     <Compile Include="src/UnitUtils.cs" />
     <Compile Include="src/VertexPositionExact.cs" />
     <Compile Include="src/VertexPositionMiddle.cs" />
+    <Compile Include="src/UI.cs" />
   </ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
