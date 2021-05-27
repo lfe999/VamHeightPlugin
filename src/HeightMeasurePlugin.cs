@@ -9,8 +9,8 @@ namespace LFE
     {
         public DAZSkinV2 Skin;
         public readonly ICupCalculator[] cupCalculators = new ICupCalculator[] {
-            new SizeChartCupCalculator(),
             new KnixComCupCalculator(),
+            new SizeChartCupCalculator(),
             new ChateLaineCupCalculator()
         };
 
