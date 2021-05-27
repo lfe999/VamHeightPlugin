@@ -31,6 +31,7 @@ namespace LFE {
         }
 
         public void Update() {
+            _canvas.enabled = SuperController.singleton.mainHUD.gameObject.activeSelf;
             transform.position = Origin;
             _lineRenderer.material.color = Color;
             _lineRenderer.startColor = Color;
@@ -90,6 +91,7 @@ namespace LFE {
                         // test text input
             GameObject canvasObject = new GameObject();
             _canvas = canvasObject.AddComponent<Canvas>();
+            _canvas.sortingOrder = -100;
             _canvas.renderMode = RenderMode.WorldSpace;
             _canvas.pixelPerfect = false;
             SuperController.singleton.AddCanvas(_canvas);
@@ -127,6 +129,10 @@ namespace LFE {
             rt.anchoredPosition = new Vector2(260, 0);
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 500);
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 500);
+        }
+
+        private bool ShouldShowCanvas() {
+            return SuperController.singleton.mainHUD.gameObject.activeSelf;
         }
     }
 }
