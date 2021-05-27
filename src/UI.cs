@@ -102,6 +102,7 @@ namespace LFE {
                 headMarkerColor.valNoCallback = new HSVColor { H = h, S = s, V = v };
                 _headMarkerColorButton.buttonColor = _plugin.HSVToColor(headMarkerColor.valNoCallback);
             });
+            _plugin.RegisterColor(headMarkerColor);
 
             //////////////////
 
@@ -117,6 +118,7 @@ namespace LFE {
                 faceMarkerColor.valNoCallback = new HSVColor { H = h, S = s, V = v };
                 _faceMarkerColorButton.buttonColor = _plugin.HSVToColor(faceMarkerColor.valNoCallback);
             });
+            _plugin.RegisterColor(faceMarkerColor);
 
             //////////////////
 
@@ -135,6 +137,7 @@ namespace LFE {
                 _plugin.cupCalculators[0].Name,
                 "Cup Size Method"
             );
+            _plugin.RegisterStringChooser(cupAlgorithmStorable);
 
             // Float: How far apart markers are spread apart
             markerSpreadStorable = new JSONStorableFloat("Spread Guides", 0.02f, -1, 1);
