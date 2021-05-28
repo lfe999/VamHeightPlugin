@@ -9,6 +9,7 @@ namespace LFE
     {
         public DAZSkinV2 Skin;
         public readonly ICupCalculator[] cupCalculators = new ICupCalculator[] {
+            new EvasIntimatesCupCalculator(),
             new KnixComCupCalculator(),
             new SizeChartCupCalculator(),
             new ChateLaineCupCalculator(),
@@ -20,19 +21,22 @@ namespace LFE
             new VertexPositionExact(17920), // bust -- right nipple just to the left
             new VertexPositionExact(10939), // bust -- right nipple just to the right
             new VertexPositionExact(19588),
-            new VertexPositionExact(19617),
-            new VertexPositionExact(13233),
+            new VertexPositionExact(19617), // outside bust curve 1
+            new VertexPositionExact(13233), // outside bust curve 2
             new VertexPositionExact(11022), // bust -- right back
-            new VertexPositionExact(10495), // bust -- back center
+            new VertexPositionMiddle(10495, 10895), // bust -- back center
         };
 
         readonly IVertexPosition[] _verticesUnderbust = new IVertexPosition[] {
-            new VertexPositionMiddle(10822, 10820), // mid chest
+            new VertexPositionMiddle(10822, 10820, 0.7f), // mid chest
+            new VertexPositionMiddle(21466, 21207, 0.40f),
             new VertexPositionExact(21469), // right breast under nipple
             new VertexPositionExact(21470), // right breast under nipple
+            new VertexPositionMiddle(21471, 21307, 0.12f),
+            new VertexPositionMiddle(21370, 21424, 0.45f),
             new VertexPositionExact(21394), // right side 
             new VertexPositionMiddle(11022, 21508, 0.4f),
-            new VertexPositionExact(2100), // back
+            new VertexPositionMiddle(10859, 2100), // back
         };
 
         readonly IVertexPosition[] _verticesWaistFemale = new IVertexPosition[] {
@@ -212,17 +216,15 @@ namespace LFE
             _markerMouthMidHeight.Name = "Mouth Height";
             _markerMouthMidHeight.Color = faceColor;
 
-            if(!_dazCharacter.isMale) {
-                _markerMouthLeft = gameObject.AddComponent<HorizontalMarker>();
-                _markerMouthLeft.Name = "Mouth Left";
-                _markerMouthLeft.Color = faceColor;
-                _markerMouthLeft.LineDirection = Vector3.up;
+            _markerMouthLeft = gameObject.AddComponent<HorizontalMarker>();
+            _markerMouthLeft.Name = "Mouth Left";
+            _markerMouthLeft.Color = faceColor;
+            _markerMouthLeft.LineDirection = Vector3.up;
 
-                _markerMouthRight = gameObject.AddComponent<HorizontalMarker>();
-                _markerMouthRight.Name = "Mouth Right";
-                _markerMouthRight.Color = faceColor;
-                _markerMouthRight.LineDirection = Vector3.up;
-            }
+            _markerMouthRight = gameObject.AddComponent<HorizontalMarker>();
+            _markerMouthRight.Name = "Mouth Right";
+            _markerMouthRight.Color = faceColor;
+            _markerMouthRight.LineDirection = Vector3.up;
 
             _markerChinSmall = gameObject.AddComponent<HorizontalMarker>();
             _markerChinSmall.Name = "Chin Small";
@@ -250,6 +252,26 @@ namespace LFE
         }
 
         public void OnDestroy() {
+            if(_bustLine != null) {
+                Destroy(_bustLine);
+                _bustLine = null;
+            }
+
+            if(_underbustLine != null) {
+                Destroy(_underbustLine);
+                _underbustLine = null;
+            }
+
+            if(_waistLine != null) {
+                Destroy(_waistLine);
+                _waistLine = null;
+            }
+
+            if(_hipLine != null) {
+                Destroy(_hipLine);
+                _hipLine = null;
+            }
+
             // destroy the markers
             foreach(var m in gameObject.GetComponentsInChildren<HorizontalMarker>()) {
                 Destroy(m);
@@ -506,6 +528,10 @@ namespace LFE
                 _markerMouthRight.Thickness = faceLineThickness;
                 _markerMouthRight.Color = faceColor;
             }
+            else {
+                _markerMouthRight.Enabled = false;
+                _markerMouthLeft.Enabled = false;
+            }
 
             // chin small and blue
             pos = _vertexHead.Position(this);
@@ -640,17 +666,17 @@ namespace LFE
                 _markerNipple.Label = $"Nipple "
                 + $"(Cup {_ui.breastBandStorable.val}{_ui.breastCupStorable.val}; "
                 + $"Around {(int)(_ui.breastBustStorable.val * 100)} cm / "
-                + $"{(int)UnitUtils.UnityToInches(_ui.breastBustStorable.val)} in)";
+                + $"{UnitUtils.UnityToInchesRounded(_ui.breastBustStorable.val)} in)";
 
                 _markerUnderbust.Label = "Underbust (Around "
                     + $"{(int)(_ui.breastUnderbustStorable.val * 100)} cm / "
-                    + $"{(int)UnitUtils.UnityToInches(_ui.breastUnderbustStorable.val)} in)";
+                    + $"{UnitUtils.UnityToInchesRounded(_ui.breastUnderbustStorable.val)} in)";
             }
 
             var shoulderToNavel = _ui.shoulderHeightStorable.val - _ui.navelHeightStorable.val;
             _markerNavel.Label = "Navel (Waist "
                 + $"{(int)(_ui.waistSizeStorable.val * 100)} cm / "
-                + $"{Mathf.RoundToInt(UnitUtils.UnityToInches(_ui.waistSizeStorable.val))} in)\n"
+                + $"{UnitUtils.UnityToInchesRounded(_ui.waistSizeStorable.val)} in)\n"
                 + $"Shoulder to Navel "
                 + $"{(int)(shoulderToNavel * 100)} cm / "
                 + $"{UnitUtils.MetersToFeetString(shoulderToNavel)} / "
@@ -659,7 +685,7 @@ namespace LFE
             var shoulderToCrotch = _ui.shoulderHeightStorable.val - _ui.crotchHeightStorable.val;
             _markerGroin.Label = "Crotch (Hip "
                 + $"{(int)(_ui.hipSizeStorable.val * 100)} cm / "
-                + $"{Mathf.RoundToInt(UnitUtils.UnityToInches(_ui.hipSizeStorable.val))} in)\n";
+                + $"{UnitUtils.UnityToInchesRounded(_ui.hipSizeStorable.val)} in)\n";
             if(_dazCharacter.isMale) {
                 _markerGroin.Label = _markerGroin.Label + $"Penis "
                     + $"Length {(int)(_ui.penisLength.val * 100)} cm / {UnitUtils.UnityToInches(_ui.penisLength.val):0.0} in, "
@@ -695,6 +721,7 @@ namespace LFE
 
         List<GameObject> _bustMarkersFromMorph = new List<GameObject>();
         float _circumferenceBust = 0;
+        LineRenderer _bustLine;
         private void UpdateBustMarkersFromMorphVertex() {
             if(Skin == null) {
                 return;
@@ -704,10 +731,14 @@ namespace LFE
                     Destroy(m);
                 }
                 _bustMarkersFromMorph.Clear();
+                if(_bustLine != null) {
+                    Destroy(_bustLine);
+                    _bustLine = null;
+                }
                 return;
             }
 
-            if(_ui.showTapeMarkersStorable.val) {
+            if(_ui.showCircumferenceMarkersStorable.val) {
                 var color = Color.red;
                 if(_bustMarkersFromMorph.Count != _verticesBust.Length)
                 {
@@ -729,19 +760,37 @@ namespace LFE
                         r.material.color = _colorWheel[i % _colorWheel.Length];
                     }
                 }
+                if(!_bustLine){
+                    var gameObject = new GameObject();
+                    var lr = gameObject.AddComponent<LineRenderer>();
+                    _bustLine = lr;
+                }
+                _bustLine.startWidth = _ui.lineThicknessCircumferenceStorable.val * 0.001f;
+                _bustLine.endWidth = _ui.lineThicknessCircumferenceStorable.val * 0.001f;
+                _bustLine.material.color = HSVToColor(_ui.circumferenceMarkerColor.val);
+                _bustLine.positionCount = _verticesBust.Length;
+                for(var i = 0; i < _verticesBust.Length; i++) {
+                    _bustLine.SetPosition(i, _verticesBust[i].Position(this));
+                }
             }
             else {
                 foreach(var m in _bustMarkersFromMorph) {
                     Destroy(m);
                 }
                 _bustMarkersFromMorph.Clear();
+                if(_bustLine != null) {
+                    Destroy(_bustLine);
+                    _bustLine = null;
+                }
             }
+
 
             _circumferenceBust = LineLength(_verticesBust.Select(v => v.Position(this)).ToArray()) * 2;
         }
 
         List<GameObject> _underbustMarkersFromMorph = new List<GameObject>();
         float _circumferenceUnderbust = 0;
+        LineRenderer _underbustLine;
 
         readonly Color[] _colorWheel = new Color[] {
             Color.red,
@@ -760,10 +809,14 @@ namespace LFE
                     Destroy(m);
                 }
                 _underbustMarkersFromMorph.Clear();
+                if(_underbustLine != null) {
+                    Destroy(_underbustLine);
+                    _underbustLine = null;
+                }
                 return;
             }
 
-            if(_ui.showTapeMarkersStorable.val){
+            if(_ui.showCircumferenceMarkersStorable.val){
                 var color = Color.white;
                 if(_underbustMarkersFromMorph.Count != _verticesUnderbust.Length) {
                     foreach(var m in _underbustMarkersFromMorph) {
@@ -782,12 +835,28 @@ namespace LFE
                         r.material.color = _colorWheel[i % _colorWheel.Length];
                     }
                 }
+                if(!_underbustLine){
+                    var gameObject = new GameObject();
+                    var lr = gameObject.AddComponent<LineRenderer>();
+                    _underbustLine = lr;
+                }
+                _underbustLine.startWidth = _ui.lineThicknessCircumferenceStorable.val * 0.001f;
+                _underbustLine.endWidth = _ui.lineThicknessCircumferenceStorable.val * 0.001f;
+                _underbustLine.material.color = HSVToColor(_ui.circumferenceMarkerColor.val);
+                _underbustLine.positionCount = _verticesUnderbust.Length;
+                for(var i = 0; i < _verticesUnderbust.Length; i++) {
+                    _underbustLine.SetPosition(i, _verticesUnderbust[i].Position(this));
+                }
             }
             else {
                 foreach(var m in _underbustMarkersFromMorph) {
                     Destroy(m);
                 }
                 _underbustMarkersFromMorph.Clear();
+                if(_underbustLine != null) {
+                    Destroy(_underbustLine);
+                    _underbustLine = null;
+                }
             }
 
             _circumferenceUnderbust = LineLength(_verticesUnderbust.Select(v => v.Position(this)).ToArray()) * 2;
@@ -795,6 +864,7 @@ namespace LFE
 
         List<GameObject> _waistMarkersFromMorph = new List<GameObject>();
         float _circumferenceWaist = 0;
+        LineRenderer _waistLine;
         private void UpdateWaistMarkersFromMorphVertex() {
             if(Skin == null) {
                 return;
@@ -802,7 +872,7 @@ namespace LFE
 
             IVertexPosition[] _verticesWaist = _dazCharacter.isMale ? _verticesWaistMale : _verticesWaistFemale;
 
-            if(_ui.showTapeMarkersStorable.val){
+            if(_ui.showCircumferenceMarkersStorable.val){
                 if(_waistMarkersFromMorph.Count != _verticesWaist.Length) {
                     foreach(var m in _waistMarkersFromMorph) {
                         Destroy(m);
@@ -820,12 +890,28 @@ namespace LFE
                         r.material.color = _colorWheel[i % _colorWheel.Length];
                     }
                 }
+                if(!_waistLine){
+                    var gameObject = new GameObject();
+                    var lr = gameObject.AddComponent<LineRenderer>();
+                    _waistLine = lr;
+                }
+                _waistLine.startWidth = _ui.lineThicknessCircumferenceStorable.val * 0.001f;
+                _waistLine.endWidth = _ui.lineThicknessCircumferenceStorable.val * 0.001f;
+                _waistLine.material.color = HSVToColor(_ui.circumferenceMarkerColor.val);
+                _waistLine.positionCount = _verticesWaist.Length;
+                for(var i = 0; i < _verticesWaist.Length; i++) {
+                    _waistLine.SetPosition(i, _verticesWaist[i].Position(this));
+                }
             }
             else {
                 foreach(var m in _waistMarkersFromMorph) {
                     Destroy(m);
                 }
                 _waistMarkersFromMorph.Clear();
+                if(_waistLine != null) {
+                    Destroy(_waistLine);
+                    _waistLine = null;
+                }
             }
 
             _circumferenceWaist = LineLength(_verticesWaist.Select(v => v.Position(this)).ToArray()) * 2;
@@ -833,6 +919,7 @@ namespace LFE
 
         List<GameObject> _hipMarkersFromMorph = new List<GameObject>();
         float _circumferenceHip = 0;
+        LineRenderer _hipLine;
         private void UpdateHipMarkersFromMorphVertex() {
             if(Skin == null) {
                 return;
@@ -840,7 +927,7 @@ namespace LFE
 
             IVertexPosition[] _verticesHip = _dazCharacter.isMale ? _verticesHipMale : _verticesHipFemale;
 
-            if(_ui.showTapeMarkersStorable.val){
+            if(_ui.showCircumferenceMarkersStorable.val){
                 if(_hipMarkersFromMorph.Count != _verticesHip.Length) {
                     foreach(var m in _hipMarkersFromMorph) {
                         Destroy(m);
@@ -858,12 +945,28 @@ namespace LFE
                         r.material.color = _colorWheel[i % _colorWheel.Length];
                     }
                 }
+                if(!_hipLine){
+                    var gameObject = new GameObject();
+                    var lr = gameObject.AddComponent<LineRenderer>();
+                    _hipLine = lr;
+                }
+                _hipLine.startWidth = _ui.lineThicknessCircumferenceStorable.val * 0.001f;
+                _hipLine.endWidth = _ui.lineThicknessCircumferenceStorable.val * 0.001f;
+                _hipLine.material.color = HSVToColor(_ui.circumferenceMarkerColor.val);
+                _hipLine.positionCount = _verticesHip.Length;
+                for(var i = 0; i < _verticesHip.Length; i++) {
+                    _hipLine.SetPosition(i, _verticesHip[i].Position(this));
+                }
             }
             else {
                 foreach(var m in _hipMarkersFromMorph) {
                     Destroy(m);
                 }
                 _hipMarkersFromMorph.Clear();
+                if(_hipLine != null) {
+                    Destroy(_hipLine);
+                    _hipLine = null;
+                }
             }
 
             _circumferenceHip = LineLength(_verticesHip.Select(v => v.Position(this)).ToArray()) * 2;
@@ -894,7 +997,7 @@ namespace LFE
             var penisShaftLeftPos = _vertexPenisShaftLeft.Position(this);
             var penisShaftRightPos = _vertexPenisShaftRight.Position(this);
 
-            if(_ui.showTapeMarkersStorable.val){
+            if(_ui.showCircumferenceMarkersStorable.val){
                 if(_penisMarkersFromMorph.Count != 4) {
                     _penisMarkersFromMorph.Add(CreateMarker(Color.red));
                     _penisMarkersFromMorph.Add(CreateMarker(Color.red));
@@ -967,7 +1070,10 @@ namespace LFE
             if(cupCalculator == null) {
                 return null;
             }
-            return cupCalculator.Calculate(_circumferenceBust, _circumferenceUnderbust);
+            var cupInfo = cupCalculator.Calculate(_circumferenceBust, _circumferenceUnderbust);
+            // SuperController.singleton.ClearMessages();
+            // SuperController.LogMessage($"{UnitUtils.UnityToInches(cupInfo.Bust)} ({cupInfo.BustToInches}) {UnitUtils.UnityToInches(cupInfo.Underbust)} ({cupInfo.UnderbustToInches})");
+            return cupInfo;
         }
 
         private GameObject CreateMarker(Color color) {

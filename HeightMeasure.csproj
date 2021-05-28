@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="src/ChateLaineCupCalculator.cs" />
     <Compile Include="src/CupSize.cs" />
+    <Compile Include="src/EvasIntimatesCupCalculator.cs" />
     <Compile Include="src/HeightMeasurePlugin.cs" />
     <Compile Include="src/HorizontalMarker.cs" />
     <Compile Include="src/ICupCalculator.cs" />

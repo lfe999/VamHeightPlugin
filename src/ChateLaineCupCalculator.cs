@@ -4,11 +4,11 @@ namespace LFE {
     public class ChateLaineCupCalculator : ICupCalculator {
 
         // https://www.chatelaine.com/style/fashion/bra-size-calculator/ 
-        public string Name => "https://www.chatelaine.com/";
+        public string Name => "Chate Laine (US)";
 
         public CupSize Calculate(float bust, float underbust) {
-            var bustIn = Mathf.RoundToInt(UnitUtils.UnityToInches(bust));
-            var underbustIn = Mathf.RoundToInt(UnitUtils.UnityToInches(underbust));
+            var bustIn = UnitUtils.UnityToInchesRounded(bust);
+            var underbustIn = UnitUtils.UnityToInchesRounded(underbust);
 
             // if you measure an even number, add 2, if you measure odd, add 1
             var band = underbustIn % 2 == 0 ? underbustIn + 2 : underbustIn + 1;

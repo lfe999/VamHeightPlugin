@@ -49,7 +49,9 @@ namespace LFE {
         public JSONStorableColor faceMarkerColor;
         public JSONStorableFloat lineThicknessFaceStorable;
 
-        public JSONStorableBool showTapeMarkersStorable;
+        public JSONStorableBool showCircumferenceMarkersStorable;
+        public JSONStorableColor circumferenceMarkerColor;
+        public JSONStorableFloat lineThicknessCircumferenceStorable;
 
         public JSONStorableStringChooser cupAlgorithmStorable;
         public JSONStorableFloat markerSpreadStorable;
@@ -65,6 +67,7 @@ namespace LFE {
         private bool _choosingFeatureColor = false;
         private bool _choosingHeadColor = false;
         private bool _choosingFaceColor = false;
+        private bool _choosingCircumferenceColor = false;
         private void InitStorables() {
 
             //////////////////////////////////////
@@ -125,11 +128,20 @@ namespace LFE {
 
             //////////////////
 
-            showTapeMarkersStorable = new JSONStorableBool("Circumference Guides", false, (bool value) => {
-                showTapeMarkersStorable.valNoCallback = value;
+            showCircumferenceMarkersStorable = new JSONStorableBool("Circumference Guides", false, (bool value) => {
+                showCircumferenceMarkersStorable.valNoCallback = value;
                 Draw();
             });
-            _plugin.RegisterBool(showTapeMarkersStorable);
+            _plugin.RegisterBool(showCircumferenceMarkersStorable);
+
+            lineThicknessCircumferenceStorable = new JSONStorableFloat("Circumference Guide Line Width", 2, 1, 10, constrain: true);
+            _plugin.RegisterFloat(lineThicknessCircumferenceStorable);
+
+            circumferenceMarkerColor = new JSONStorableColor("Circumference Guide Color", _plugin.ColorToHSV(Color.green), (float h, float s, float v) => {
+                circumferenceMarkerColor.valNoCallback = new HSVColor { H = h, S = s, V = v };
+                _circumferenceMarkerColorButton.buttonColor = _plugin.HSVToColor(circumferenceMarkerColor.valNoCallback);
+            });
+            _plugin.RegisterColor(circumferenceMarkerColor);
 
             //////////////////
 
@@ -236,6 +248,9 @@ namespace LFE {
         private UIDynamicSlider _faceMarkerLineThickness;
 
         private UIDynamicToggle _circumferenceMarkerToggle;
+        private UIDynamicButton _circumferenceMarkerColorButton;
+        private UIDynamicColorPicker _circumferenceMarkerColorPicker;
+        private UIDynamicSlider _circumferenceMarkerLineThickness;
 
         private UIDynamicPopup _cupAlgorithm;
         private UIDynamicSlider _markerSpread;
@@ -325,11 +340,19 @@ namespace LFE {
 
             // Circumference Guides
             CreateStandardDivider(rightSide: true);
-            _circumferenceMarkerToggle = _plugin.CreateToggle(showTapeMarkersStorable, rightSide: true);
+            _circumferenceMarkerToggle = _plugin.CreateToggle(showCircumferenceMarkersStorable, rightSide: true);
             _circumferenceMarkerToggle.backgroundColor = HEADER_COLOR;
-            if(showTapeMarkersStorable.val) {
-                CreateStandardSpacer(defaultButtonHeight, rightSide: true);
-                CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+            if(showCircumferenceMarkersStorable.val) {
+                _circumferenceMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: true);
+                _circumferenceMarkerColorButton.buttonColor = _plugin.HSVToColor(circumferenceMarkerColor.val);
+                _circumferenceMarkerColorButton.button.onClick.AddListener(() => {
+                    _choosingCircumferenceColor = !_choosingCircumferenceColor;
+                    Draw();
+                });
+                if(_choosingCircumferenceColor) {
+                    _circumferenceMarkerColorPicker = _plugin.CreateColorPicker(circumferenceMarkerColor, rightSide: true);
+                }
+                _circumferenceMarkerLineThickness = _plugin.CreateSlider(lineThicknessCircumferenceStorable, rightSide: true);
                 CreateStandardSpacer(defaultButtonHeight, rightSide: true);
             }
             else {
@@ -402,6 +425,16 @@ namespace LFE {
             if(_circumferenceMarkerToggle) {
                 _plugin.RemoveToggle(_circumferenceMarkerToggle);
             }
+            if(_circumferenceMarkerColorButton) {
+                _plugin.RemoveButton(_circumferenceMarkerColorButton);
+            }
+            if(_circumferenceMarkerColorPicker) {
+                _plugin.RemoveColorPicker(_circumferenceMarkerColorPicker);
+            }
+            if(_circumferenceMarkerLineThickness) {
+                _plugin.RemoveSlider(_circumferenceMarkerLineThickness);
+            }
+
             if(_cupAlgorithm) {
                 _plugin.RemovePopup(_cupAlgorithm);
             }

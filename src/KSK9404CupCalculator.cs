@@ -8,8 +8,8 @@ namespace LFE {
         public string Name => "KS K 9404:2019-0161";
 
         public CupSize Calculate(float bust, float underbust) {
-            var bustCm = Mathf.RoundToInt(bust * 100);
-            var underbustCm = Mathf.RoundToInt(underbust * 100);
+            var bustCm = UnitUtils.RoundToInt(bust * 100);
+            var underbustCm = UnitUtils.RoundToInt(underbust * 100);
 
             // bust size + 2 inches - if it is odd, add one more
 			var band = underbustCm;

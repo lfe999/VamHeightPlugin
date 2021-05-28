@@ -3,11 +3,12 @@ using UnityEngine;
 namespace LFE {
     public class SizeChartCupCalculator : ICupCalculator {
 
-        public string Name => "sizechart.com/brasize/us/index.html";
+        // sizechart.com/brasize/us/index.html
+        public string Name => "sizechart.com (US)";
 
         public CupSize Calculate(float bust, float underbust) {
-            var bustIn = Mathf.RoundToInt(UnitUtils.UnityToInches(bust));
-            var underbustIn = Mathf.RoundToInt(UnitUtils.UnityToInches(underbust));
+            var bustIn = UnitUtils.UnityToInchesRounded(bust);
+            var underbustIn = UnitUtils.UnityToInchesRounded(underbust);
 
             // their underbust to band algorithm seems to be:
             // if odd underbust, add one - then add 4

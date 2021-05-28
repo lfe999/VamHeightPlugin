@@ -10,9 +10,9 @@ namespace LFE
         public string Units;
 
         public int BustToCentimeters => Mathf.RoundToInt(Bust * 100);
-        public int BustToInches => Mathf.RoundToInt(UnitUtils.UnityToFeet(Bust) * 12);
+        public int BustToInches => UnitUtils.UnityToInchesRounded(Bust);
         public int UnderbustToCentimeters => Mathf.RoundToInt(Underbust * 100);
-        public int UnderbustToInches => Mathf.RoundToInt(UnitUtils.UnityToFeet(Underbust) * 12);
+        public int UnderbustToInches => UnitUtils.UnityToInchesRounded(Underbust);
 
         public override string ToString() {
             return $"{Band}{Cup}";

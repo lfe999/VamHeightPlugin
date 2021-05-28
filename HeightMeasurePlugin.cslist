@@ -1,6 +1,7 @@
 src/HeightMeasurePlugin.cs
 src/ChateLaineCupCalculator.cs
 src/CupSize.cs
+src/EvasIntimatesCupCalculator.cs
 src/HorizontalMarker.cs
 src/ICupCalculator.cs
 src/IVertexPosition.cs
