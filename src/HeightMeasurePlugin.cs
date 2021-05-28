@@ -34,7 +34,7 @@ namespace LFE
             new VertexPositionExact(2100), // back
         };
 
-        readonly IVertexPosition[] _verticesWaist = new IVertexPosition[] {
+        readonly IVertexPosition[] _verticesWaistFemale = new IVertexPosition[] {
             new VertexPositionExact(8152), // front and center
             new VertexPositionExact(19663), // front right 1
             new VertexPositionExact(13675), // front right 2
@@ -44,7 +44,16 @@ namespace LFE
             new VertexPositionExact(2921), // back
         };
 
-        readonly IVertexPosition[] _verticesHip = new IVertexPosition[] {
+        readonly IVertexPosition[] _verticesWaistMale = new IVertexPosition[] {
+            new VertexPositionExact(10812),
+            new VertexPositionExact(21460),
+            new VertexPositionExact(21518),
+            new VertexPositionMiddle(21064,13727,0.2f),
+            new VertexPositionExact(14855),
+            new VertexPositionExact(2921)
+        };
+
+        readonly IVertexPosition[] _verticesHipFemale = new IVertexPosition[] {
             new VertexPositionExact(22843), // front and center
             new VertexPositionExact(13750), // front right 1
             new VertexPositionExact(18460), // front right 2
@@ -53,6 +62,15 @@ namespace LFE
             new VertexPositionExact(18529), // glute curve 1
             new VertexPositionExact(18562), // glute curve 2
             new VertexPositionMiddle(18562, 7878), // glute middle
+        };
+
+        readonly IVertexPosition[] _verticesHipMale = new IVertexPosition[] {
+            new VertexPositionMiddle(22710, 22700), // front and center
+            new VertexPositionExact(13750), // front right 1
+            new VertexPositionExact(18460), // front right 2
+            new VertexPositionMiddle(11234, 18491, 0.8f), // front right 3
+            new VertexPositionExact(18529), // glute curve 1
+            new VertexPositionMiddle(18555, 7875) // glute middle
         };
 
         readonly IVertexPosition _vertexHead = new VertexPositionExact(2087);
@@ -193,15 +211,17 @@ namespace LFE
             _markerMouthMidHeight.Name = "Mouth Height";
             _markerMouthMidHeight.Color = faceColor;
 
-            _markerMouthLeft = gameObject.AddComponent<HorizontalMarker>();
-            _markerMouthLeft.Name = "Mouth Left";
-            _markerMouthLeft.Color = faceColor;
-            _markerMouthLeft.LineDirection = Vector3.up;
+            if(!_dazCharacter.isMale) {
+                _markerMouthLeft = gameObject.AddComponent<HorizontalMarker>();
+                _markerMouthLeft.Name = "Mouth Left";
+                _markerMouthLeft.Color = faceColor;
+                _markerMouthLeft.LineDirection = Vector3.up;
 
-            _markerMouthRight = gameObject.AddComponent<HorizontalMarker>();
-            _markerMouthRight.Name = "Mouth Right";
-            _markerMouthRight.Color = faceColor;
-            _markerMouthRight.LineDirection = Vector3.up;
+                _markerMouthRight = gameObject.AddComponent<HorizontalMarker>();
+                _markerMouthRight.Name = "Mouth Right";
+                _markerMouthRight.Color = faceColor;
+                _markerMouthRight.LineDirection = Vector3.up;
+            }
 
             _markerChinSmall = gameObject.AddComponent<HorizontalMarker>();
             _markerChinSmall.Name = "Chin Small";
@@ -253,6 +273,10 @@ namespace LFE
                 Destroy(h);
             }
             _hipMarkersFromMorph = new List<GameObject>();
+
+            foreach(var h in _penisMarkersFromMorph) {
+                Destroy(h);
+            }
         }
 
         private readonly float _updateEverySeconds = 0.05f;
@@ -387,13 +411,9 @@ namespace LFE
             
             UpdateHeadHeightMarkers();
 
-            if(_dazCharacter.isMale) {
-                UpdatePenisMarkers();
-            }
-            else {
-                UpdateBustMarkersFromMorphVertex();
-                UpdateUnderbustMarkersFromMorphVertex();
-            }
+            UpdatePenisMarkers();
+            UpdateBustMarkersFromMorphVertex();
+            UpdateUnderbustMarkersFromMorphVertex();
             UpdateWaistMarkersFromMorphVertex();
             UpdateHipMarkersFromMorphVertex();
 
@@ -460,29 +480,31 @@ namespace LFE
             _markerMouthMidHeight.Thickness = faceLineThickness;
             _markerMouthMidHeight.Color = faceColor;
 
-            // mouth left
-            pos = _vertexMouthLeftSideMiddle.Position(this);
-            pos.x = pos.x - _ui.markerLeftRightStorable.val;
-            pos.y = _markerMouthMidHeight.Origin.y - (_ui.headSizeHeightStorable.val / 8 / 2);
-            pos.z = _markerHead.Origin.z - 0.045f;
-            _markerMouthLeft.Length = _ui.headSizeHeightStorable.val / 8;
-            _markerMouthLeft.Origin = pos;
-            _markerMouthLeft.Enabled = _ui.showFaceMarkersStorable.val;
-            _markerMouthLeft.LabelEnabled = _ui.showFaceMarkersStorable.val;
-            _markerMouthLeft.Thickness = faceLineThickness;
-            _markerMouthLeft.Color = faceColor;
+            if(!_dazCharacter.isMale) {
+                // mouth left
+                pos = _vertexMouthLeftSideMiddle.Position(this);
+                pos.x = pos.x - _ui.markerLeftRightStorable.val;
+                pos.y = _markerMouthMidHeight.Origin.y - (_ui.headSizeHeightStorable.val / 8 / 2);
+                pos.z = _markerHead.Origin.z - 0.045f;
+                _markerMouthLeft.Length = _ui.headSizeHeightStorable.val / 8;
+                _markerMouthLeft.Origin = pos;
+                _markerMouthLeft.Enabled = _ui.showFaceMarkersStorable.val;
+                _markerMouthLeft.LabelEnabled = _ui.showFaceMarkersStorable.val;
+                _markerMouthLeft.Thickness = faceLineThickness;
+                _markerMouthLeft.Color = faceColor;
 
-            // mouth right
-            pos = _vertexMouthRightSideMiddle.Position(this);
-            pos.x = pos.x - _ui.markerLeftRightStorable.val;
-            pos.y = _markerMouthMidHeight.Origin.y - (_ui.headSizeHeightStorable.val / 8 / 2);
-            pos.z = _markerHead.Origin.z - 0.045f;
-            _markerMouthRight.Length = _ui.headSizeHeightStorable.val / 8;
-            _markerMouthRight.Origin = pos;
-            _markerMouthRight.Enabled = _ui.showFaceMarkersStorable.val;
-            _markerMouthRight.LabelEnabled = _ui.showFaceMarkersStorable.val;
-            _markerMouthRight.Thickness = faceLineThickness;
-            _markerMouthRight.Color = faceColor;
+                // mouth right
+                pos = _vertexMouthRightSideMiddle.Position(this);
+                pos.x = pos.x - _ui.markerLeftRightStorable.val;
+                pos.y = _markerMouthMidHeight.Origin.y - (_ui.headSizeHeightStorable.val / 8 / 2);
+                pos.z = _markerHead.Origin.z - 0.045f;
+                _markerMouthRight.Length = _ui.headSizeHeightStorable.val / 8;
+                _markerMouthRight.Origin = pos;
+                _markerMouthRight.Enabled = _ui.showFaceMarkersStorable.val;
+                _markerMouthRight.LabelEnabled = _ui.showFaceMarkersStorable.val;
+                _markerMouthRight.Thickness = faceLineThickness;
+                _markerMouthRight.Color = faceColor;
+            }
 
             // chin small and blue
             pos = _vertexHead.Position(this);
@@ -676,6 +698,13 @@ namespace LFE
             if(Skin == null) {
                 return;
             }
+            if(_dazCharacter.isMale) {
+                foreach(var m in _bustMarkersFromMorph) {
+                    Destroy(m);
+                }
+                _bustMarkersFromMorph.Clear();
+                return;
+            }
 
             if(_ui.showTapeMarkersStorable.val) {
                 var color = Color.red;
@@ -725,6 +754,13 @@ namespace LFE
             if(Skin == null) {
                 return;
             }
+            if(_dazCharacter.isMale) {
+                foreach(var m in _underbustMarkersFromMorph) {
+                    Destroy(m);
+                }
+                _underbustMarkersFromMorph.Clear();
+                return;
+            }
 
             if(_ui.showTapeMarkersStorable.val){
                 var color = Color.white;
@@ -763,6 +799,8 @@ namespace LFE
                 return;
             }
 
+            IVertexPosition[] _verticesWaist = _dazCharacter.isMale ? _verticesWaistMale : _verticesWaistFemale;
+
             if(_ui.showTapeMarkersStorable.val){
                 if(_waistMarkersFromMorph.Count != _verticesWaist.Length) {
                     foreach(var m in _waistMarkersFromMorph) {
@@ -799,6 +837,8 @@ namespace LFE
                 return;
             }
 
+            IVertexPosition[] _verticesHip = _dazCharacter.isMale ? _verticesHipMale : _verticesHipFemale;
+
             if(_ui.showTapeMarkersStorable.val){
                 if(_hipMarkersFromMorph.Count != _verticesHip.Length) {
                     foreach(var m in _hipMarkersFromMorph) {
@@ -828,7 +868,7 @@ namespace LFE
             _circumferenceHip = LineLength(_verticesHip.Select(v => v.Position(this)).ToArray()) * 2;
         }
 
-        List<GameObject> _penisMarkersFromMorph = new List<GameObject>();
+        readonly List<GameObject> _penisMarkersFromMorph = new List<GameObject>();
         float _penisLength = 0;
         float _penisGirth = 0;
         float _penisWidth = 0;
