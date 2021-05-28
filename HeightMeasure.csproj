@@ -79,6 +79,7 @@
     <Compile Include="src/ICupCalculator.cs" />
     <Compile Include="src/IVertexPosition.cs" />
     <Compile Include="src/KnixComCupCalculator.cs" />
+    <Compile Include="src/KSK9404CupCalculator.cs" />
     <Compile Include="src/SizeChartCupCalculator.cs" />
     <Compile Include="src/UnitUtils.cs" />
     <Compile Include="src/VertexPositionExact.cs" />

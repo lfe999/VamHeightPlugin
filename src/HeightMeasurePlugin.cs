@@ -11,7 +11,8 @@ namespace LFE
         public readonly ICupCalculator[] cupCalculators = new ICupCalculator[] {
             new KnixComCupCalculator(),
             new SizeChartCupCalculator(),
-            new ChateLaineCupCalculator()
+            new ChateLaineCupCalculator(),
+            new KSK9404CupCalculator()
         };
 
         readonly IVertexPosition[] _verticesBust = new IVertexPosition[] {

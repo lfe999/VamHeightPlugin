@@ -18,6 +18,7 @@
       "Custom\\Scripts\\LFE\\HeightMeasure\\src\\ICupCalculator.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\src\\IVertexPosition.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\src\\KnixComCupCalculator.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\src\\KSK9404CupCalculator.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\src\\SizeChartCupCalculator.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\src\\UnitUtils.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\src\\VertexPositionExact.cs",

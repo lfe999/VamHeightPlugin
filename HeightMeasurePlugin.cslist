@@ -5,6 +5,7 @@ src/HorizontalMarker.cs
 src/ICupCalculator.cs
 src/IVertexPosition.cs
 src/KnixComCupCalculator.cs
+src/KSK9404CupCalculator.cs
 src/SizeChartCupCalculator.cs
 src/UnitUtils.cs
 src/VertexPositionExact.cs
