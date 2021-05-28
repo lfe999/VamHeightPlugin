@@ -658,6 +658,7 @@ namespace LFE
             }
 
             if(_ui.showTapeMarkersStorable.val) {
+                var color = Color.red;
                 if(_bustMarkersFromMorph.Count != _verticesBust.Length)
                 {
                     foreach(var m in _bustMarkersFromMorph) {
@@ -665,7 +666,7 @@ namespace LFE
                     }
                     _bustMarkersFromMorph.Clear();
                     foreach(var m in _verticesBust){
-                        var marker = CreateMarker(Color.red);
+                        var marker = CreateMarker(color);
                         _bustMarkersFromMorph.Add(marker);
                     }
                     var a = SuperController.singleton.GetAtomByUid("Person");
@@ -673,6 +674,10 @@ namespace LFE
 
                 for(var i = 0; i < _verticesBust.Length; i++) {
                     _bustMarkersFromMorph[i].transform.position = _verticesBust[i].Position(this);
+                    var r = _bustMarkersFromMorph[i].GetComponent<Renderer>();
+                    if(r) {
+                        r.material.color = _colorWheel[i % _colorWheel.Length];
+                    }
                 }
             }
             else {
@@ -687,24 +692,38 @@ namespace LFE
 
         List<GameObject> _underbustMarkersFromMorph = new List<GameObject>();
         float _circumferenceUnderbust = 0;
+
+        readonly Color[] _colorWheel = new Color[] {
+            Color.red,
+            new Color(1, 0.5f, 0),
+            Color.yellow,
+            Color.green,
+            Color.blue,
+            new Color(0.5f, 0, 0.5f)
+        };
         private void UpdateUnderbustMarkersFromMorphVertex() {
             if(Skin == null) {
                 return;
             }
 
             if(_ui.showTapeMarkersStorable.val){
+                var color = Color.white;
                 if(_underbustMarkersFromMorph.Count != _verticesUnderbust.Length) {
                     foreach(var m in _underbustMarkersFromMorph) {
                         Destroy(m);
                     }
                     _underbustMarkersFromMorph.Clear();
                     foreach(var m in _verticesUnderbust){
-                        _underbustMarkersFromMorph.Add(CreateMarker(Color.white));
+                        _underbustMarkersFromMorph.Add(CreateMarker(color));
                     }
                 }
 
                 for(var i = 0; i < _verticesUnderbust.Length; i++) {
                     _underbustMarkersFromMorph[i].transform.position = _verticesUnderbust[i].Position(this);
+                    var r = _underbustMarkersFromMorph[i].GetComponent<Renderer>();
+                    if(r) {
+                        r.material.color = _colorWheel[i % _colorWheel.Length];
+                    }
                 }
             }
             else {
@@ -737,6 +756,10 @@ namespace LFE
 
                 for(var i = 0; i < _verticesWaist.Length; i++) {
                     _waistMarkersFromMorph[i].transform.position = _verticesWaist[i].Position(this);
+                    var r = _waistMarkersFromMorph[i].GetComponent<Renderer>();
+                    if(r) {
+                        r.material.color = _colorWheel[i % _colorWheel.Length];
+                    }
                 }
             }
             else {
@@ -767,8 +790,14 @@ namespace LFE
                     }
                 }
 
+                var a = AudioRolloffMode.Custom;
+
                 for(var i = 0; i < _verticesHip.Length; i++) {
                     _hipMarkersFromMorph[i].transform.position = _verticesHip[i].Position(this);
+                    var r = _hipMarkersFromMorph[i].GetComponent<Renderer>();
+                    if(r) {
+                        r.material.color = _colorWheel[i % _colorWheel.Length];
+                    }
                 }
             }
             else {
