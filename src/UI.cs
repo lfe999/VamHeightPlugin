@@ -29,6 +29,9 @@ namespace LFE {
         public JSONStorableString breastCupStorable;
         public JSONStorableFloat waistSizeStorable;
         public JSONStorableFloat hipSizeStorable;
+        public JSONStorableFloat penisLength;
+        public JSONStorableFloat penisWidth;
+        public JSONStorableFloat penisGirth;
 
         // TOOD: shoulder width
 
@@ -205,6 +208,15 @@ namespace LFE {
 
             hipSizeStorable = new JSONStorableFloat("hipSize", 0, 0, 100);
             _plugin.RegisterFloat(hipSizeStorable);
+
+            penisLength = new JSONStorableFloat("penisLength", 0, 0, 100);
+            _plugin.RegisterFloat(penisLength);
+
+            penisWidth = new JSONStorableFloat("penisWidth", 0, 0, 100);
+            _plugin.RegisterFloat(penisWidth);
+
+            penisGirth = new JSONStorableFloat("penisGirth", 0, 0, 100);
+            _plugin.RegisterFloat(penisGirth);
         }
 
         private UIDynamicToggle _featureMarkerToggle;

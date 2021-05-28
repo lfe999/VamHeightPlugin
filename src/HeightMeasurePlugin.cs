@@ -81,6 +81,11 @@ namespace LFE
         readonly IVertexPosition _vertexMouthLeftSideMiddle = new VertexPositionExact(1655);
         readonly IVertexPosition _vertexMouthRightSideMiddle = new VertexPositionExact(12319);
         readonly IVertexPosition _vertexMouthMidHeight = new VertexPositionMiddle(2136, 2145);
+        readonly IVertexPosition _vertexPenisTip = new VertexPositionExact(21627); // not the exact tip - it is a little off to the left
+        // readonly IVertexPosition _vertexPenisBase = new VertexPositionMiddle(22825, 22269);
+        readonly IVertexPosition _vertexPenisBase = new VertexPositionMiddle(22270, 22865);
+        readonly IVertexPosition _vertexPenisShaftLeft = new VertexPositionExact(22608);
+        readonly IVertexPosition _vertexPenisShaftRight = new VertexPositionExact(22616);
 
         DAZBone _eyeLeft;
         DAZCharacter _dazCharacter;
@@ -382,7 +387,10 @@ namespace LFE
             
             UpdateHeadHeightMarkers();
 
-            if(!_dazCharacter.isMale) {
+            if(_dazCharacter.isMale) {
+                UpdatePenisMarkers();
+            }
+            else {
                 UpdateBustMarkersFromMorphVertex();
                 UpdateUnderbustMarkersFromMorphVertex();
             }
@@ -571,6 +579,12 @@ namespace LFE
                 _ui.breastBandStorable.val = cupInfo.Band;
                 _ui.breastCupStorable.val = cupInfo.Cup;
             }
+
+            if(_dazCharacter.isMale) {
+                _ui.penisLength.val = _penisLength;
+                _ui.penisWidth.val = _penisWidth;
+                _ui.penisGirth.val = _penisGirth;
+            }
         }
 
         private void UpdateMarkerLabels() {
@@ -622,8 +636,14 @@ namespace LFE
             var shoulderToCrotch = _ui.shoulderHeightStorable.val - _ui.crotchHeightStorable.val;
             _markerGroin.Label = "Crotch (Hip "
                 + $"{(int)(_ui.hipSizeStorable.val * 100)} cm / "
-                + $"{Mathf.RoundToInt(UnitUtils.UnityToInches(_ui.hipSizeStorable.val))} in)\n"
-                + $"Shoulder to Crotch "
+                + $"{Mathf.RoundToInt(UnitUtils.UnityToInches(_ui.hipSizeStorable.val))} in)\n";
+            if(_dazCharacter.isMale) {
+                _markerGroin.Label = _markerGroin.Label + $"Penis "
+                    + $"Length {(int)(_ui.penisLength.val * 100)} cm / {UnitUtils.UnityToInches(_ui.penisLength.val):0.0} in, "
+                    + $"Width {(int)(_ui.penisWidth.val * 100)} cm / {UnitUtils.UnityToInches(_ui.penisWidth.val):0.0} in, "
+                    + $"Girth {(int)(_ui.penisGirth.val * 100)} cm / {UnitUtils.UnityToInches(_ui.penisGirth.val):0.0} in\n";
+            }
+            _markerGroin.Label = _markerGroin.Label + $"Shoulder to Crotch "
                 + $"{(int)(shoulderToCrotch * 100)} cm / "
                 + $"{UnitUtils.MetersToFeetString(shoulderToCrotch)} / "
                 + $"{shoulderToCrotch / _ui.headSizeHeightStorable.val:0.0} heads";
@@ -790,8 +810,6 @@ namespace LFE
                     }
                 }
 
-                var a = AudioRolloffMode.Custom;
-
                 for(var i = 0; i < _verticesHip.Length; i++) {
                     _hipMarkersFromMorph[i].transform.position = _verticesHip[i].Position(this);
                     var r = _hipMarkersFromMorph[i].GetComponent<Renderer>();
@@ -808,6 +826,55 @@ namespace LFE
             }
 
             _circumferenceHip = LineLength(_verticesHip.Select(v => v.Position(this)).ToArray()) * 2;
+        }
+
+        List<GameObject> _penisMarkersFromMorph = new List<GameObject>();
+        float _penisLength = 0;
+        float _penisGirth = 0;
+        float _penisWidth = 0;
+        private void UpdatePenisMarkers() {
+            if(Skin == null) {
+                return;
+            }
+            if(_dazCharacter == null){
+                return;
+            }
+
+            if(!_dazCharacter.isMale) {
+                foreach(var m in _penisMarkersFromMorph) {
+                    Destroy(m);
+                }
+                _penisMarkersFromMorph.Clear();
+                return;
+            }
+
+            var penisTipPos = _vertexPenisTip.Position(this);
+            var penisBasePos = _vertexPenisBase.Position(this);
+            var penisShaftLeftPos = _vertexPenisShaftLeft.Position(this);
+            var penisShaftRightPos = _vertexPenisShaftRight.Position(this);
+
+            if(_ui.showTapeMarkersStorable.val){
+                if(_penisMarkersFromMorph.Count != 4) {
+                    _penisMarkersFromMorph.Add(CreateMarker(Color.red));
+                    _penisMarkersFromMorph.Add(CreateMarker(Color.red));
+                    _penisMarkersFromMorph.Add(CreateMarker(Color.red));
+                    _penisMarkersFromMorph.Add(CreateMarker(Color.red));
+                }
+                _penisMarkersFromMorph[0].transform.position = penisTipPos;
+                _penisMarkersFromMorph[1].transform.position = penisBasePos;
+                _penisMarkersFromMorph[2].transform.position = penisShaftLeftPos;
+                _penisMarkersFromMorph[3].transform.position = penisShaftRightPos;
+            }
+            else {
+                foreach(var m in _penisMarkersFromMorph) {
+                    Destroy(m);
+                }
+                _penisMarkersFromMorph.Clear();
+            }
+
+            _penisLength = Vector3.Distance(penisTipPos, penisBasePos);
+            _penisWidth = Vector3.Distance(penisShaftLeftPos, penisShaftRightPos);
+            _penisGirth = Mathf.PI * _penisWidth;
         }
 
         readonly List<HorizontalMarker> _extraHeadMarkers = new List<HorizontalMarker>();
