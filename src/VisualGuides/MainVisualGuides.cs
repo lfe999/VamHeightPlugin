@@ -101,7 +101,14 @@ namespace LFE {
 
             var hip = UnitUtils.ToUnit(Measurements.HipSize ?? 0, UnitDisplay);
             var shoulderToCrotch = UnitUtils.ToUnit((Measurements.ShoulderHeight ?? 0) - (Measurements.CrotchHeight ?? 0), UnitDisplay);
-            _markerGroin.Label = $"Crotch - Hip {hip:0} {UnitDisplay}\nShoulder to Crotch - {shoulderToCrotch:0.0} {UnitDisplay}";
+            _markerGroin.Label = $"Crotch - Hip {hip:0} {UnitDisplay}\n";
+            if(Measurements.POI?.IsMale ?? false) {
+                _markerGroin.Label = _markerGroin.Label + $"Penis "
+                    + $"Length {UnitUtils.ToUnit(Measurements.PenisLength ?? 0, UnitDisplay):0.0} {UnitDisplay}, "
+                    + $"Width {UnitUtils.ToUnit(Measurements.PenisWidth ?? 0, UnitDisplay):0.0} {UnitDisplay}, "
+                    + $"Girth {UnitUtils.ToUnit(Measurements.PenisGirth ?? 0, UnitDisplay):0.0} {UnitDisplay}\n";
+            }
+            _markerGroin.Label = _markerGroin.Label + $"Shoulder to Crotch - {shoulderToCrotch:0.0} {UnitDisplay}";
             SetMainMarkerProperties(_markerGroin, Measurements.CrotchHeight);
             _markerGroin.transform.position = parentRotEuler * (new Vector3(0, Measurements.CrotchHeight ?? 0, 0) + Offset) + parentPos;
 
