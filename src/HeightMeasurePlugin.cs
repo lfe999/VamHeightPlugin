@@ -324,66 +324,60 @@ namespace LFE
             return Color.HSVToRGB(hsv.H, hsv.S, hsv.V);
         }
 
+
+        // LineRenderer _debugLine;
         public CharacterMeasurements AutoMeasurements(UI ui, Atom person) {
             var measurements = new CharacterMeasurements();
             var poi = new CharacterPointsOfInterest(person);
 
+            var rootTransform = person.mainController.transform;
+            var rootPos = rootTransform.position;
+
+            var floor = Vector3.ProjectOnPlane(rootPos, rootTransform.up);
+            var floorDistanceOffset = Vector3.Distance(rootPos, floor) * (Vector3.Dot(rootPos - floor, rootTransform.up) < 0 ? -1 : 1);
+
             var headPos = poi.CraniumHeight;
-            var headPosEulered = Quaternion.Euler(person.mainController.transform.rotation.eulerAngles) * headPos;
-
             var footPos = poi.HeelHeight;
-            // TODO: figire out how to get the X/Z centering-on-the head stuff to work with rotation
-            footPos.x = headPos.x;
-            footPos.z = headPos.z;
-
             var chinPos = poi.ChinHeight;
-            chinPos.x = headPos.x;
-            chinPos.z = headPos.z;
-
             var shoulderPos = poi.ShoulderHeight;
-            shoulderPos.x = headPos.x;
-            shoulderPos.z = headPos.z;
-
             var nipplePos = poi.BustHeight;
-            nipplePos.x = headPos.x;
-            nipplePos.z = headPos.z;
-
             var underbustPos = poi.UnderbustHeight;
-            underbustPos.x = headPos.x;
-            underbustPos.z = headPos.z;
-
             var navelPos = poi.NavelHeight;
-            navelPos.x = headPos.x;
-            navelPos.z = headPos.z;
-
             var crotchPos = poi.CrotchHeight;
-            crotchPos.x = headPos.x;
-            crotchPos.z = headPos.z;
-
             var kneePos = poi.KneeUnderHeight;
-            kneePos.x = headPos.x;
-            kneePos.z = headPos.z;
-
             var eyeHeightPos = poi.EyeLeftCenter;
-            eyeHeightPos.x = headPos.x;
-            eyeHeightPos.z = headPos.z;
-
             var mouthHeightPos = poi.MouthCenterHeight;
-            mouthHeightPos.x = headPos.x;
-            mouthHeightPos.z = headPos.z;
+
+            // if(_debugLine == null) {
+            //     var go = new GameObject();
+            //     go.transform.SetParent(transform);
+            //     var lr = go.AddComponent<LineRenderer>();
+            //     lr.transform.SetParent(go.transform);
+            //     lr.gameObject.SetActive(true);
+            //     lr.startWidth = 0.01f;
+            //     lr.endWidth = 0.01f;
+            //     _debugLine = lr;
+            // }
+            // _debugLine.SetPositions(new Vector3[] {
+            //     // footPos,
+            //     Vector3.ProjectOnPlane(footPos, rootTransform.up),
+            //     Vector3.ProjectOnPlane(rootPos, rootTransform.up)
+            // });
+
+            var footOffset = Vector3.Distance(footPos, Vector3.ProjectOnPlane(footPos, rootTransform.up)) - floorDistanceOffset;
 
             // set measurements
-            measurements.Height = Vector3.Distance(headPos, footPos);
-            measurements.ChinHeight = Vector3.Distance(chinPos, footPos);
+            measurements.HeelToFloorOffset = Vector3.up * footOffset;
+            measurements.Height = Vector3.Distance(headPos, Vector3.ProjectOnPlane(headPos, rootTransform.up)) - floorDistanceOffset - footOffset;
+            measurements.ChinHeight = Vector3.Distance(chinPos, Vector3.ProjectOnPlane(chinPos, rootTransform.up)) - floorDistanceOffset - footOffset;
             measurements.HeadWidth = Vector3.Distance(poi.CraniumLeftSide, poi.CraniumRightSide);
-            measurements.ShoulderHeight = Vector3.Distance(shoulderPos, footPos);
-            measurements.NippleHeight = poi.IsMale ? (float?)null : Vector3.Distance(nipplePos, footPos);
-            measurements.UnderbustHeight = poi.IsMale ? (float?)null : Vector3.Distance(underbustPos, footPos);
-            measurements.NavelHeight = Vector3.Distance(navelPos, footPos);
-            measurements.CrotchHeight = Vector3.Distance(crotchPos, footPos);
-            measurements.KneeHeight = Vector3.Distance(kneePos, footPos);
+            measurements.ShoulderHeight = Vector3.Distance(shoulderPos, Vector3.ProjectOnPlane(shoulderPos, rootTransform.up)) - floorDistanceOffset - footOffset;
+            measurements.NippleHeight = poi.IsMale ? (float?)null : Vector3.Distance(nipplePos, Vector3.ProjectOnPlane(nipplePos, rootTransform.up)) - floorDistanceOffset - footOffset;
+            measurements.UnderbustHeight = poi.IsMale ? (float?)null : Vector3.Distance(underbustPos, Vector3.ProjectOnPlane(underbustPos, rootTransform.up)) - floorDistanceOffset - footOffset;
+            measurements.NavelHeight = Vector3.Distance(navelPos, Vector3.ProjectOnPlane(navelPos, rootTransform.up)) - floorDistanceOffset - footOffset;
+            measurements.CrotchHeight = Vector3.Distance(crotchPos, Vector3.ProjectOnPlane(crotchPos, rootTransform.up)) - floorDistanceOffset - footOffset;
+            measurements.KneeHeight = Vector3.Distance(kneePos, Vector3.ProjectOnPlane(kneePos, rootTransform.up)) - floorDistanceOffset - footOffset;
             measurements.HeelHeight = 0;
-            measurements.HeelToFloorOffset = footPos - person.mainController.transform.position;
 
             measurements.WaistSize = LineLength(poi.WaistPoints);
             measurements.HipSize = LineLength(poi.HipPoints);
