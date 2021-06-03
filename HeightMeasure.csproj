@@ -72,20 +72,25 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="src/ChateLaineCupCalculator.cs" />
-    <Compile Include="src/CupSize.cs" />
-    <Compile Include="src/EvasIntimatesCupCalculator.cs" />
-    <Compile Include="src/HeightMeasurePlugin.cs" />
-    <Compile Include="src/HorizontalMarker.cs" />
-    <Compile Include="src/ICupCalculator.cs" />
-    <Compile Include="src/IVertexPosition.cs" />
-    <Compile Include="src/KnixComCupCalculator.cs" />
-    <Compile Include="src/KSK9404CupCalculator.cs" />
-    <Compile Include="src/SizeChartCupCalculator.cs" />
-    <Compile Include="src/UnitUtils.cs" />
-    <Compile Include="src/VertexPositionExact.cs" />
-    <Compile Include="src/VertexPositionMiddle.cs" />
+    <Compile Include="src/BustCalculator/ChateLaineCupCalculator.cs" />
+    <Compile Include="src/BustCalculator/CupSize.cs" />
+    <Compile Include="src/BustCalculator/EvasIntimatesCupCalculator.cs" />
+    <Compile Include="src/BustCalculator/KnixComCupCalculator.cs" />
+    <Compile Include="src/BustCalculator/KSK9404CupCalculator.cs" />
+    <Compile Include="src/BustCalculator/SizeChartCupCalculator.cs" />
+    <Compile Include="src/BustCalculator/ICupCalculator.cs" />
+    <Compile Include="src/VisualGuides/LabeledLine.cs" />
+    <Compile Include="src/VisualGuides/BaseVisualGuides.cs" />
+    <Compile Include="src/VisualGuides/MainVisualGuides.cs" />
+    <Compile Include="src/VisualGuides/HeadVisualGuides.cs" />
+    <Compile Include="src/VisualGuides/FaceVisualGuides.cs" />
+    <Compile Include="src/VisualGuides/ArcVisualGuides.cs" />
+    <Compile Include="src/Model/CharacterMeasurements.cs" />
+    <Compile Include="src/Model/CharacterPointsOfInterest.cs" />
+    <Compile Include="src/Model/UnitUtils.cs" />
     <Compile Include="src/UI.cs" />
+    <Compile Include="src/CharacterMeasurementsUI.cs" />
+    <Compile Include="src/HeightMeasurePlugin.cs" />
   </ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -6,6 +6,15 @@ using System.Linq;
 namespace LFE {
     public class UI {
 
+        private readonly ICupCalculator[] _cupCalculators = new ICupCalculator[] {
+            new EvasIntimatesCupCalculator(),
+            new KnixComCupCalculator(),
+            new SizeChartCupCalculator(),
+            new ChateLaineCupCalculator(),
+            new KSK9404CupCalculator()
+        };
+
+
         private static Color HEADER_COLOR = new Color(0, 0, 0, 0.25f);
         private static Color SPACER_COLOR = new Color(0, 0, 0, 0.5f);
 
@@ -54,14 +63,17 @@ namespace LFE {
         public JSONStorableFloat lineThicknessCircumferenceStorable;
 
         public JSONStorableStringChooser cupAlgorithmStorable;
+        public JSONStorableStringChooser unitsStorable;
         public JSONStorableFloat markerSpreadStorable;
         public JSONStorableFloat markerLeftRightStorable;
         public JSONStorableFloat markerFrontBackStorable;
 
+        public ICupCalculator CupCalculator => _cupCalculators.FirstOrDefault(c => c.Name.Equals(cupAlgorithmStorable.val));
 
         public UI(HeightMeasurePlugin plugin) {
             _plugin = plugin;
             InitStorables();
+            Draw();
         }
 
         private bool _choosingFeatureColor = false;
@@ -74,7 +86,7 @@ namespace LFE {
             // UI related
             // Cup algorithm choice
 
-            showFeatureMarkersStorable = new JSONStorableBool("Feature Guides", true, (bool value) => {
+            showFeatureMarkersStorable = new JSONStorableBool("Auto Feature Guides", true, (bool value) => {
                 showFeatureMarkersStorable.valNoCallback = value;
                 Draw();
             });
@@ -95,7 +107,7 @@ namespace LFE {
 
             //////////////////
 
-            showHeadHeightMarkersStorable = new JSONStorableBool("Head Heights Guides", true, (bool value) => {
+            showHeadHeightMarkersStorable = new JSONStorableBool("Auto Head Heights Guides", true, (bool value) => {
                 showHeadHeightMarkersStorable.valNoCallback = value;
                 Draw();
             });
@@ -112,7 +124,7 @@ namespace LFE {
 
             //////////////////
 
-            showFaceMarkersStorable = new JSONStorableBool("Face Guides", true, (bool value) => {
+            showFaceMarkersStorable = new JSONStorableBool("Auto Face Guides", true, (bool value) => {
                 Draw();
             });
             _plugin.RegisterBool(showFaceMarkersStorable);
@@ -128,7 +140,7 @@ namespace LFE {
 
             //////////////////
 
-            showCircumferenceMarkersStorable = new JSONStorableBool("Circumference Guides", false, (bool value) => {
+            showCircumferenceMarkersStorable = new JSONStorableBool("Auto Circumference Guides", false, (bool value) => {
                 showCircumferenceMarkersStorable.valNoCallback = value;
                 Draw();
             });
@@ -148,11 +160,20 @@ namespace LFE {
             // Choose
             cupAlgorithmStorable = new JSONStorableStringChooser(
                 "Cup Size Method",
-                _plugin.cupCalculators.Select(cc => cc.Name).ToList(),
-                _plugin.cupCalculators[0].Name,
+                _cupCalculators.Select(cc => cc.Name).ToList(),
+                _cupCalculators[0].Name,
                 "Cup Size Method"
             );
             _plugin.RegisterStringChooser(cupAlgorithmStorable);
+
+            unitsStorable = new JSONStorableStringChooser(
+                "Units",
+                new List<string> { "m", "cm", "in", "ft" },
+                new List<string> { "Meters", "Centimeters", "Inches", "Feet"},
+                "cm",
+                "Units"
+            );
+            _plugin.RegisterStringChooser(unitsStorable);
 
             // Float: How far apart markers are spread apart
             markerSpreadStorable = new JSONStorableFloat("Spread Guides", 0.02f, -1, 1);
@@ -253,6 +274,7 @@ namespace LFE {
         private UIDynamicSlider _circumferenceMarkerLineThickness;
 
         private UIDynamicPopup _cupAlgorithm;
+        private UIDynamicPopup _units;
         private UIDynamicSlider _markerSpread;
         private UIDynamicSlider _markerFrontBack;
         private UIDynamicSlider _markerLeftRight;
@@ -264,46 +286,46 @@ namespace LFE {
             int defaultSliderHeight = 120;
             int defaultSectionSpacerHeight = 0;
 
-            // Feature Guides
-            CreateStandardDivider();
-            _featureMarkerToggle = _plugin.CreateToggle(showFeatureMarkersStorable);
-            _featureMarkerToggle.backgroundColor = HEADER_COLOR;
-            if(showFeatureMarkersStorable.val) {
-                _featureMarkerColorButton = _plugin.CreateButton("Set Line Color");
-                _featureMarkerColorButton.buttonColor = _plugin.HSVToColor(featureMarkerColor.val);
-                _featureMarkerColorButton.button.onClick.AddListener(() => {
-                    _choosingFeatureColor = !_choosingFeatureColor;
-                    Draw();
-                });
-                if(_choosingFeatureColor) {
-                    _featureMarkerColorPicker = _plugin.CreateColorPicker(featureMarkerColor);
-                }
-                _featureMarkerLineThickness = _plugin.CreateSlider(lineThicknessFigureStorable);
-                _featureMarkerToggleLabels = _plugin.CreateToggle(showFeatureMarkerLabelsStorable);
-            }
-            else {
-                CreateStandardSpacer(defaultButtonHeight);
-                CreateStandardSpacer(defaultSliderHeight);
-                CreateStandardSpacer(defaultButtonHeight);
-            }
-            CreateStandardSpacer(defaultSectionSpacerHeight);
-
             // Head Height Guides
-            CreateStandardDivider(rightSide: true);
-            _headMarkerToggle = _plugin.CreateToggle(showHeadHeightMarkersStorable, rightSide: true);
+            CreateStandardDivider(rightSide: false);
+            _headMarkerToggle = _plugin.CreateToggle(showHeadHeightMarkersStorable, rightSide: false);
             _headMarkerToggle.backgroundColor = HEADER_COLOR;
             if(showHeadHeightMarkersStorable.val) {
-                _headMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: true);
+                _headMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: false);
                 _headMarkerColorButton.buttonColor = _plugin.HSVToColor(headMarkerColor.val);
                 _headMarkerColorButton.button.onClick.AddListener(() => {
                     _choosingHeadColor = !_choosingHeadColor;
                     Draw();
                 });
                 if(_choosingHeadColor) {
-                    _headMarkerColorPicker = _plugin.CreateColorPicker(headMarkerColor, rightSide: true);
+                    _headMarkerColorPicker = _plugin.CreateColorPicker(headMarkerColor, rightSide: false);
                 }
-                _headMarkerLineThickness = _plugin.CreateSlider(lineThicknessHeadStorable, rightSide: true);
-                CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                _headMarkerLineThickness = _plugin.CreateSlider(lineThicknessHeadStorable, rightSide: false);
+                CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+            }
+            else {
+                CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                CreateStandardSpacer(defaultSliderHeight, rightSide: false);
+                CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+            }
+            CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
+
+            // Feature Guides
+            CreateStandardDivider(rightSide: true);
+            _featureMarkerToggle = _plugin.CreateToggle(showFeatureMarkersStorable, rightSide: true);
+            _featureMarkerToggle.backgroundColor = HEADER_COLOR;
+            if(showFeatureMarkersStorable.val) {
+                _featureMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: true);
+                _featureMarkerColorButton.buttonColor = _plugin.HSVToColor(featureMarkerColor.val);
+                _featureMarkerColorButton.button.onClick.AddListener(() => {
+                    _choosingFeatureColor = !_choosingFeatureColor;
+                    Draw();
+                });
+                if(_choosingFeatureColor) {
+                    _featureMarkerColorPicker = _plugin.CreateColorPicker(featureMarkerColor, rightSide: true);
+                }
+                _featureMarkerLineThickness = _plugin.CreateSlider(lineThicknessFigureStorable, rightSide: true);
+                _featureMarkerToggleLabels = _plugin.CreateToggle(showFeatureMarkerLabelsStorable, rightSide: true);
             }
             else {
                 CreateStandardSpacer(defaultButtonHeight, rightSide: true);
@@ -313,8 +335,8 @@ namespace LFE {
             CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
 
             // Face Guides
-            CreateStandardDivider();
-            _faceMarkerToggle = _plugin.CreateToggle(showFaceMarkersStorable);
+            CreateStandardDivider(rightSide: false);
+            _faceMarkerToggle = _plugin.CreateToggle(showFaceMarkersStorable, rightSide: false);
             _faceMarkerToggle.backgroundColor = HEADER_COLOR;
             if(showFaceMarkersStorable.val) {
                 _faceMarkerColorButton = _plugin.CreateButton("Set Line Color");
@@ -324,19 +346,17 @@ namespace LFE {
                     Draw();
                 });
                 if(_choosingFaceColor) {
-                    _faceMarkerColorPicker = _plugin.CreateColorPicker(faceMarkerColor);
+                    _faceMarkerColorPicker = _plugin.CreateColorPicker(faceMarkerColor, rightSide: false);
                 }
-                _faceMarkerLineThickness = _plugin.CreateSlider(lineThicknessFaceStorable);
-                CreateStandardSpacer(defaultButtonHeight);
+                _faceMarkerLineThickness = _plugin.CreateSlider(lineThicknessFaceStorable, rightSide: false);
+                CreateStandardSpacer(defaultButtonHeight, rightSide: false);
             }
             else {
-                CreateStandardSpacer(defaultButtonHeight);
-                CreateStandardSpacer(defaultSliderHeight);
-                CreateStandardSpacer(defaultButtonHeight);
+                CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                CreateStandardSpacer(defaultSliderHeight, rightSide: false);
+                CreateStandardSpacer(defaultButtonHeight, rightSide: false);
             }
-            CreateStandardSpacer(defaultSectionSpacerHeight);
-
-            CreateStandardDivider();
+            CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
 
             // Circumference Guides
             CreateStandardDivider(rightSide: true);
@@ -362,9 +382,11 @@ namespace LFE {
             }
             CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
 
-            // right side
+            CreateStandardDivider(rightSide: false);
+            _cupAlgorithm = _plugin.CreateScrollablePopup(cupAlgorithmStorable, rightSide: false);
+            _units = _plugin.CreateScrollablePopup(unitsStorable, rightSide: false);
+
             CreateStandardDivider(rightSide: true);
-            _cupAlgorithm = _plugin.CreateScrollablePopup(cupAlgorithmStorable);
             _markerSpread = _plugin.CreateSlider(markerSpreadStorable, rightSide: true);
             _markerFrontBack = _plugin.CreateSlider(markerFrontBackStorable, rightSide: true);
             _markerLeftRight = _plugin.CreateSlider(markerLeftRightStorable, rightSide: true);
@@ -437,6 +459,9 @@ namespace LFE {
 
             if(_cupAlgorithm) {
                 _plugin.RemovePopup(_cupAlgorithm);
+            }
+            if(_units) {
+                _plugin.RemovePopup(_units);
             }
             if(_markerSpread) {
                 _plugin.RemoveSlider(_markerSpread);
