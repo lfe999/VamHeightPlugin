@@ -71,7 +71,7 @@ namespace LFE
         public void OnDisable() {
             _mainGuides.Enabled = false;
             _headGuides.Enabled = false;
-            _headGuides.Enabled = false;
+            _faceGuides.Enabled = false;
             _bustGuides.Enabled = false;
             _underbustGuides.Enabled = false;
             _waistGuides.Enabled = false;

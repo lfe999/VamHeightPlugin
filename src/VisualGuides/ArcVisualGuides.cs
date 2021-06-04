@@ -24,7 +24,16 @@ namespace LFE {
         }
 
 
+        bool _enabledPrev = false; // allows for performant disabling
         public void Update()  {
+            // allows for performant disabling with OnEnable/Disable
+            // if disabling, the Update should still try and shut off
+            // components one last time
+            if(_enabledPrev == false && !Enabled) {
+                return;
+            }
+            _enabledPrev = Enabled;
+
             // make sure markers buffer is at least as long as the points known about
             if(Points.Length > _markers.Count) {
                 for(var i = _markers.Count; i < Points.Length; i++) {
