@@ -47,6 +47,9 @@ namespace LFE {
         // manual heights
         public JSONStorableBool showManualMarkersStorable;
         public JSONStorableBool manualMarkersCopy;
+        public JSONStorableColor manualMarkerColor;
+        public JSONStorableFloat lineThicknessManualStorable;
+
         public JSONStorableFloat manualHeightStorable;
         public JSONStorableFloat manualChinHeightStorable;
         public JSONStorableFloat manualShoulderHeightStorable;
@@ -80,6 +83,7 @@ namespace LFE {
         public JSONStorableFloat markerSpreadStorable;
         public JSONStorableFloat markerLeftRightStorable;
         public JSONStorableFloat markerFrontBackStorable;
+        public JSONStorableFloat markerUpDownStorable;
 
         public ICupCalculator CupCalculator => _cupCalculators.FirstOrDefault(c => c.Name.Equals(cupAlgorithmStorable.val));
 
@@ -93,6 +97,7 @@ namespace LFE {
         private bool _choosingHeadColor = false;
         private bool _choosingFaceColor = false;
         private bool _choosingCircumferenceColor = false;
+        private bool _choosingManualColor = false;
         private void InitStorables() {
 
             //////////////////////////////////////
@@ -200,6 +205,10 @@ namespace LFE {
             markerLeftRightStorable = new JSONStorableFloat("Move Guides Left/Right", 0, -5, 5);
             _plugin.RegisterFloat(markerLeftRightStorable);
 
+            // Float: Move markers forward or backward relative to center depth of the head
+            markerUpDownStorable = new JSONStorableFloat("Move Guides Up/Down", 0, -5, 5);
+            _plugin.RegisterFloat(markerUpDownStorable);
+
 
             //////////////////////////////////////
 
@@ -274,6 +283,14 @@ namespace LFE {
             manualMarkersCopy = new JSONStorableBool("Copy Markers From Person", false);
             _plugin.RegisterBool(manualMarkersCopy);
 
+            lineThicknessManualStorable = new JSONStorableFloat("Manual Guide Line Width", 2, 1, 10, constrain: true);
+            _plugin.RegisterFloat(lineThicknessManualStorable);
+
+            manualMarkerColor = new JSONStorableColor("Manual Guide Color", _plugin.ColorToHSV(Color.yellow), (float h, float s, float v) => {
+                manualMarkerColor.valNoCallback = new HSVColor { H = h, S = s, V = v };
+                _manualMarkerColorButton.buttonColor = _plugin.HSVToColor(manualMarkerColor.valNoCallback);
+            });
+
             manualHeightStorable = new JSONStorableFloat("Height", 0, 0, 300);
             _plugin.RegisterFloat(manualHeightStorable);
 
@@ -325,9 +342,13 @@ namespace LFE {
         private UIDynamicSlider _markerSpread;
         private UIDynamicSlider _markerFrontBack;
         private UIDynamicSlider _markerLeftRight;
+        private UIDynamicSlider _markerUpDown;
 
         private UIDynamicToggle _manualMarkerToggle;
         private UIDynamicToggle _copyManualMarkers;
+        private UIDynamicButton _manualMarkerColorButton;
+        private UIDynamicColorPicker _manualMarkerColorPicker;
+        private UIDynamicSlider _manualMarkerLineThickness;
         private List<UIDynamicSlider> _manualSliders = new List<UIDynamicSlider>();
 
         public void Draw() {
@@ -453,6 +474,7 @@ namespace LFE {
             _markerSpread = _plugin.CreateSlider(markerSpreadStorable, rightSide: false);
             _markerFrontBack = _plugin.CreateSlider(markerFrontBackStorable, rightSide: false);
             _markerLeftRight = _plugin.CreateSlider(markerLeftRightStorable, rightSide: false);
+            _markerUpDown = _plugin.CreateSlider(markerUpDownStorable, rightSide: false);
 
             CreateStandardDivider(rightSide: true);
             _manualMarkerToggle = _plugin.CreateToggle(showManualMarkersStorable, rightSide: true);
@@ -460,6 +482,16 @@ namespace LFE {
                 if(_plugin.containingAtom.type == "Person") {
                     _copyManualMarkers = _plugin.CreateToggle(manualMarkersCopy, rightSide: true);
                 }
+                _manualMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: true);
+                _manualMarkerColorButton.buttonColor = _plugin.HSVToColor(manualMarkerColor.val);
+                _manualMarkerColorButton.button.onClick.AddListener(() => {
+                    _choosingManualColor = !_choosingManualColor;
+                    Draw();
+                });
+                if(_choosingManualColor) {
+                    _manualMarkerColorPicker = _plugin.CreateColorPicker(manualMarkerColor, rightSide: true);
+                }
+                _manualMarkerLineThickness = _plugin.CreateSlider(lineThicknessManualStorable, rightSide: true);
                 _manualSliders.Add(_plugin.CreateSlider(manualHeightStorable, rightSide: true));
                 _manualSliders.Add(_plugin.CreateSlider(manualChinHeightStorable, rightSide: true));
                 _manualSliders.Add(_plugin.CreateSlider(manualShoulderHeightStorable, rightSide: true));
@@ -483,6 +515,15 @@ namespace LFE {
             }
             if(_copyManualMarkers) {
                 _plugin.RemoveToggle(_copyManualMarkers);
+            }
+            if(_manualMarkerColorButton) {
+                _plugin.RemoveButton(_manualMarkerColorButton);
+            }
+            if(_manualMarkerColorPicker) {
+                _plugin.RemoveColorPicker(_manualMarkerColorPicker);
+            }
+            if(_manualMarkerLineThickness) {
+                _plugin.RemoveSlider(_manualMarkerLineThickness);
             }
             foreach(var s in _manualSliders) {
                 _plugin.RemoveSlider(s);
@@ -557,6 +598,9 @@ namespace LFE {
             }
             if(_markerLeftRight) {
                 _plugin.RemoveSlider(_markerLeftRight);
+            }
+            if(_markerUpDown) {
+                _plugin.RemoveSlider(_markerUpDown);
             }
         }
 

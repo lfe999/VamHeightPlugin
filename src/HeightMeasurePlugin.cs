@@ -200,9 +200,10 @@ namespace LFE
             var spreadVector = new Vector3(_ui.markerSpreadStorable.val, 0, 0);
             var frontBackVector = new Vector3(0, 0, _ui.markerFrontBackStorable.val);
             var leftRightVector = new Vector3(_ui.markerLeftRightStorable.val, 0, 0);
+            var upDownVector = new Vector3(0, _ui.markerUpDownStorable.val, 0);
 
             // raise markers based on foot height
-            var pos = frontBackVector - leftRightVector + _autoMeasurements.HeelToFloorOffset;
+            var pos = frontBackVector - leftRightVector + upDownVector + _autoMeasurements.HeelToFloorOffset;
 
             if(containingAtom.type == "Person") {
                 var isMale = _autoMeasurements.POI?.IsMale ?? false;
@@ -271,20 +272,18 @@ namespace LFE
             // manual feature guide
             _mainGuidesManual.Enabled = _ui.showManualMarkersStorable.val;
             _mainGuidesManual.LabelsEnabled = _ui.showManualMarkersStorable.val && _mainGuidesManual.Measurements.Height > 0;
-            _mainGuidesManual.LineColor = Color.yellow;
-            _mainGuidesManual.LineThickness = _ui.lineThicknessFigureStorable.val;
+            _mainGuidesManual.LineColor = HSVToColor(_ui.manualMarkerColor.val);
+            _mainGuidesManual.LineThickness = _ui.lineThicknessManualStorable.val;
             _mainGuidesManual.UnitDisplay = _ui.unitsStorable.val;
-            _mainGuidesManual.Offset = _mainGuides.Offset - new Vector3(0, 0, 0.002f); // put these just a bit behind the auto guides
+            _mainGuidesManual.Offset = pos - spreadVector - new Vector3(0, 0, 0.002f); // put these just a bit behind the auto guides
 
             // manual head height guide
             _headGuidesManual.Enabled = _ui.showManualMarkersStorable.val && _headGuidesManual.Measurements.Height > 0;
             _headGuidesManual.LabelsEnabled = true;
-            _headGuidesManual.LineColor = Color.yellow;
-            _headGuidesManual.LineThickness = _ui.lineThicknessHeadStorable.val;
+            _headGuidesManual.LineColor = HSVToColor(_ui.manualMarkerColor.val);
+            _headGuidesManual.LineThickness = _ui.lineThicknessManualStorable.val;
             _headGuidesManual.UnitDisplay = _ui.unitsStorable.val;
-            _headGuidesManual.Offset = _headGuides.Offset - new Vector3(0, 0, 0.002f); // put these just a bit behind the auto guides
-
-
+            _headGuidesManual.Offset = pos + spreadVector - new Vector3(0, 0, 0.002f); // put these just a bit behind the auto guides
         }
 
         private float LineLength(Vector3[] vertices) {
