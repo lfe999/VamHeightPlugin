@@ -7,6 +7,7 @@ namespace LFE
     public class HeightMeasurePlugin : MVRScript
     {
         private UI _ui;
+        private bool _enabled = false;
         CharacterMeasurements _measurements;
 
         List<BaseVisualGuides> _visualGuides = new List<BaseVisualGuides>();
@@ -59,6 +60,7 @@ namespace LFE
         }
 
         public void OnEnable() {
+            _enabled = true;
             _mainGuides.Enabled = _ui.showFeatureMarkersStorable.val;
             _headGuides.Enabled = _ui.showHeadHeightMarkersStorable.val; 
             _faceGuides.Enabled = _ui.showFaceMarkersStorable.val;
@@ -69,6 +71,7 @@ namespace LFE
         }
 
         public void OnDisable() {
+            _enabled = false;
             _mainGuides.Enabled = false;
             _headGuides.Enabled = false;
             _faceGuides.Enabled = false;
@@ -102,10 +105,19 @@ namespace LFE
             }
         }
 
+        bool _enabledPrev = false; // allows for performant disabling
         public void Update() {
             if(SuperController.singleton.freezeAnimation) {
                 return;
             }
+
+            // allows for performant disabling with OnEnable/Disable
+            // if disabling, the Update should still try and shut off
+            // components one last time
+            if(_enabledPrev == false && !_enabled) {
+                return;
+            }
+            _enabledPrev = _enabled;
 
             if(_ui == null) {
                 return;
