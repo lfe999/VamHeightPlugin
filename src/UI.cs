@@ -44,6 +44,19 @@ namespace LFE {
 
         // TOOD: shoulder width
 
+        // manual heights
+        public JSONStorableBool showManualMarkersStorable;
+        public JSONStorableBool manualMarkersCopy;
+        public JSONStorableFloat manualHeightStorable;
+        public JSONStorableFloat manualChinHeightStorable;
+        public JSONStorableFloat manualShoulderHeightStorable;
+        public JSONStorableFloat manualNippleHeightStorable;
+        public JSONStorableFloat manualUnderbustHeightStorable;
+        public JSONStorableFloat manualNavelHeightStorable;
+        public JSONStorableFloat manualCrotchHeightStorable;
+        public JSONStorableFloat manualKneeBottomHeightStorable;
+
+
         // other storables
         public JSONStorableBool showFeatureMarkersStorable;
         public JSONStorableColor featureMarkerColor;
@@ -250,6 +263,40 @@ namespace LFE {
 
             penisGirth = new JSONStorableFloat("penisGirth", 0, 0, 100);
             _plugin.RegisterFloat(penisGirth);
+
+            // manual heights
+            showManualMarkersStorable = new JSONStorableBool("Manual Markers", false, (bool value) => {
+                showManualMarkersStorable.valNoCallback = value;
+                Draw();
+            });
+            _plugin.RegisterBool(showManualMarkersStorable);
+
+            manualMarkersCopy = new JSONStorableBool("Copy Markers From Person", false);
+            _plugin.RegisterBool(manualMarkersCopy);
+
+            manualHeightStorable = new JSONStorableFloat("Height", 0, 0, 300);
+            _plugin.RegisterFloat(manualHeightStorable);
+
+            manualChinHeightStorable = new JSONStorableFloat("Chin Height", 0, 0, 300);
+            _plugin.RegisterFloat(manualChinHeightStorable);
+
+            manualShoulderHeightStorable = new JSONStorableFloat("Shoulder Height", 0, 0, 300);
+            _plugin.RegisterFloat(manualShoulderHeightStorable);
+
+            manualNippleHeightStorable = new JSONStorableFloat("Bust Height", 0, 0, 300);
+            _plugin.RegisterFloat(manualNippleHeightStorable);
+
+            manualUnderbustHeightStorable = new JSONStorableFloat("Underbust Height", 0, 0, 300);
+            _plugin.RegisterFloat(manualUnderbustHeightStorable);
+
+            manualNavelHeightStorable = new JSONStorableFloat("Navel Height", 0, 0, 300);
+            _plugin.RegisterFloat(manualNavelHeightStorable);
+
+            manualCrotchHeightStorable = new JSONStorableFloat("Crotch Height", 0, 0, 300);
+            _plugin.RegisterFloat(manualCrotchHeightStorable);
+
+            manualKneeBottomHeightStorable = new JSONStorableFloat("Knee Height", 0, 0, 300);
+            _plugin.RegisterFloat(manualKneeBottomHeightStorable);
         }
 
         private UIDynamicToggle _featureMarkerToggle;
@@ -279,6 +326,10 @@ namespace LFE {
         private UIDynamicSlider _markerFrontBack;
         private UIDynamicSlider _markerLeftRight;
 
+        private UIDynamicToggle _manualMarkerToggle;
+        private UIDynamicToggle _copyManualMarkers;
+        private List<UIDynamicSlider> _manualSliders = new List<UIDynamicSlider>();
+
         public void Draw() {
             Clear();
 
@@ -286,111 +337,138 @@ namespace LFE {
             int defaultSliderHeight = 120;
             int defaultSectionSpacerHeight = 0;
 
-            // Head Height Guides
-            CreateStandardDivider(rightSide: false);
-            _headMarkerToggle = _plugin.CreateToggle(showHeadHeightMarkersStorable, rightSide: false);
-            _headMarkerToggle.backgroundColor = HEADER_COLOR;
-            if(showHeadHeightMarkersStorable.val) {
-                _headMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: false);
-                _headMarkerColorButton.buttonColor = _plugin.HSVToColor(headMarkerColor.val);
-                _headMarkerColorButton.button.onClick.AddListener(() => {
-                    _choosingHeadColor = !_choosingHeadColor;
-                    Draw();
-                });
-                if(_choosingHeadColor) {
-                    _headMarkerColorPicker = _plugin.CreateColorPicker(headMarkerColor, rightSide: false);
+            if(_plugin.containingAtom.type == "Person") {
+                // Head Height Guides
+                CreateStandardDivider(rightSide: false);
+                _headMarkerToggle = _plugin.CreateToggle(showHeadHeightMarkersStorable, rightSide: false);
+                _headMarkerToggle.backgroundColor = HEADER_COLOR;
+                if(showHeadHeightMarkersStorable.val) {
+                    _headMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: false);
+                    _headMarkerColorButton.buttonColor = _plugin.HSVToColor(headMarkerColor.val);
+                    _headMarkerColorButton.button.onClick.AddListener(() => {
+                        _choosingHeadColor = !_choosingHeadColor;
+                        Draw();
+                    });
+                    if(_choosingHeadColor) {
+                        _headMarkerColorPicker = _plugin.CreateColorPicker(headMarkerColor, rightSide: false);
+                    }
+                    _headMarkerLineThickness = _plugin.CreateSlider(lineThicknessHeadStorable, rightSide: false);
+                    CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                 }
-                _headMarkerLineThickness = _plugin.CreateSlider(lineThicknessHeadStorable, rightSide: false);
-                CreateStandardSpacer(defaultButtonHeight, rightSide: false);
-            }
-            else {
-                CreateStandardSpacer(defaultButtonHeight, rightSide: false);
-                CreateStandardSpacer(defaultSliderHeight, rightSide: false);
-                CreateStandardSpacer(defaultButtonHeight, rightSide: false);
-            }
-            CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
+                else {
+                    // if the right side is expanded, add some height padding
+                    if(showFeatureMarkersStorable.val) {
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                        CreateStandardSpacer(defaultSliderHeight, rightSide: false);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                    }
+                }
+                CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
 
-            // Feature Guides
-            CreateStandardDivider(rightSide: true);
-            _featureMarkerToggle = _plugin.CreateToggle(showFeatureMarkersStorable, rightSide: true);
-            _featureMarkerToggle.backgroundColor = HEADER_COLOR;
-            if(showFeatureMarkersStorable.val) {
-                _featureMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: true);
-                _featureMarkerColorButton.buttonColor = _plugin.HSVToColor(featureMarkerColor.val);
-                _featureMarkerColorButton.button.onClick.AddListener(() => {
-                    _choosingFeatureColor = !_choosingFeatureColor;
-                    Draw();
-                });
-                if(_choosingFeatureColor) {
-                    _featureMarkerColorPicker = _plugin.CreateColorPicker(featureMarkerColor, rightSide: true);
+                // Feature Guides
+                CreateStandardDivider(rightSide: true);
+                _featureMarkerToggle = _plugin.CreateToggle(showFeatureMarkersStorable, rightSide: true);
+                _featureMarkerToggle.backgroundColor = HEADER_COLOR;
+                if(showFeatureMarkersStorable.val) {
+                    _featureMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: true);
+                    _featureMarkerColorButton.buttonColor = _plugin.HSVToColor(featureMarkerColor.val);
+                    _featureMarkerColorButton.button.onClick.AddListener(() => {
+                        _choosingFeatureColor = !_choosingFeatureColor;
+                        Draw();
+                    });
+                    if(_choosingFeatureColor) {
+                        _featureMarkerColorPicker = _plugin.CreateColorPicker(featureMarkerColor, rightSide: true);
+                    }
+                    _featureMarkerLineThickness = _plugin.CreateSlider(lineThicknessFigureStorable, rightSide: true);
+                    _featureMarkerToggleLabels = _plugin.CreateToggle(showFeatureMarkerLabelsStorable, rightSide: true);
                 }
-                _featureMarkerLineThickness = _plugin.CreateSlider(lineThicknessFigureStorable, rightSide: true);
-                _featureMarkerToggleLabels = _plugin.CreateToggle(showFeatureMarkerLabelsStorable, rightSide: true);
-            }
-            else {
-                CreateStandardSpacer(defaultButtonHeight, rightSide: true);
-                CreateStandardSpacer(defaultSliderHeight, rightSide: true);
-                CreateStandardSpacer(defaultButtonHeight, rightSide: true);
-            }
-            CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
+                else {
+                    // if the left side is expanded, add some height padding
+                    if(showHeadHeightMarkersStorable.val) {
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                        CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                    }
+                }
+                CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
 
-            // Face Guides
-            CreateStandardDivider(rightSide: false);
-            _faceMarkerToggle = _plugin.CreateToggle(showFaceMarkersStorable, rightSide: false);
-            _faceMarkerToggle.backgroundColor = HEADER_COLOR;
-            if(showFaceMarkersStorable.val) {
-                _faceMarkerColorButton = _plugin.CreateButton("Set Line Color");
-                _faceMarkerColorButton.buttonColor = _plugin.HSVToColor(faceMarkerColor.val);
-                _faceMarkerColorButton.button.onClick.AddListener(() => {
-                    _choosingFaceColor = !_choosingFaceColor;
-                    Draw();
-                });
-                if(_choosingFaceColor) {
-                    _faceMarkerColorPicker = _plugin.CreateColorPicker(faceMarkerColor, rightSide: false);
+                // Face Guides
+                CreateStandardDivider(rightSide: false);
+                _faceMarkerToggle = _plugin.CreateToggle(showFaceMarkersStorable, rightSide: false);
+                _faceMarkerToggle.backgroundColor = HEADER_COLOR;
+                if(showFaceMarkersStorable.val) {
+                    _faceMarkerColorButton = _plugin.CreateButton("Set Line Color");
+                    _faceMarkerColorButton.buttonColor = _plugin.HSVToColor(faceMarkerColor.val);
+                    _faceMarkerColorButton.button.onClick.AddListener(() => {
+                        _choosingFaceColor = !_choosingFaceColor;
+                        Draw();
+                    });
+                    if(_choosingFaceColor) {
+                        _faceMarkerColorPicker = _plugin.CreateColorPicker(faceMarkerColor, rightSide: false);
+                    }
+                    _faceMarkerLineThickness = _plugin.CreateSlider(lineThicknessFaceStorable, rightSide: false);
+                    CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                 }
-                _faceMarkerLineThickness = _plugin.CreateSlider(lineThicknessFaceStorable, rightSide: false);
-                CreateStandardSpacer(defaultButtonHeight, rightSide: false);
-            }
-            else {
-                CreateStandardSpacer(defaultButtonHeight, rightSide: false);
-                CreateStandardSpacer(defaultSliderHeight, rightSide: false);
-                CreateStandardSpacer(defaultButtonHeight, rightSide: false);
-            }
-            CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
+                else {
+                    // if right side is expanded
+                    if(showCircumferenceMarkersStorable.val) {
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                        CreateStandardSpacer(defaultSliderHeight, rightSide: false);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                    }
+                }
+                CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
 
-            // Circumference Guides
-            CreateStandardDivider(rightSide: true);
-            _circumferenceMarkerToggle = _plugin.CreateToggle(showCircumferenceMarkersStorable, rightSide: true);
-            _circumferenceMarkerToggle.backgroundColor = HEADER_COLOR;
-            if(showCircumferenceMarkersStorable.val) {
-                _circumferenceMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: true);
-                _circumferenceMarkerColorButton.buttonColor = _plugin.HSVToColor(circumferenceMarkerColor.val);
-                _circumferenceMarkerColorButton.button.onClick.AddListener(() => {
-                    _choosingCircumferenceColor = !_choosingCircumferenceColor;
-                    Draw();
-                });
-                if(_choosingCircumferenceColor) {
-                    _circumferenceMarkerColorPicker = _plugin.CreateColorPicker(circumferenceMarkerColor, rightSide: true);
+                // Circumference Guides
+                CreateStandardDivider(rightSide: true);
+                _circumferenceMarkerToggle = _plugin.CreateToggle(showCircumferenceMarkersStorable, rightSide: true);
+                _circumferenceMarkerToggle.backgroundColor = HEADER_COLOR;
+                if(showCircumferenceMarkersStorable.val) {
+                    _circumferenceMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: true);
+                    _circumferenceMarkerColorButton.buttonColor = _plugin.HSVToColor(circumferenceMarkerColor.val);
+                    _circumferenceMarkerColorButton.button.onClick.AddListener(() => {
+                        _choosingCircumferenceColor = !_choosingCircumferenceColor;
+                        Draw();
+                    });
+                    if(_choosingCircumferenceColor) {
+                        _circumferenceMarkerColorPicker = _plugin.CreateColorPicker(circumferenceMarkerColor, rightSide: true);
+                    }
+                    _circumferenceMarkerLineThickness = _plugin.CreateSlider(lineThicknessCircumferenceStorable, rightSide: true);
+                    CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                 }
-                _circumferenceMarkerLineThickness = _plugin.CreateSlider(lineThicknessCircumferenceStorable, rightSide: true);
-                CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                else {
+                    // if the left side is expanded, add some height padding
+                    if(showFaceMarkersStorable.val) {
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                        CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                    }
+                }
+                CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
             }
-            else {
-                CreateStandardSpacer(defaultButtonHeight, rightSide: true);
-                CreateStandardSpacer(defaultSliderHeight, rightSide: true);
-                CreateStandardSpacer(defaultButtonHeight, rightSide: true);
-            }
-            CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
 
             CreateStandardDivider(rightSide: false);
             _cupAlgorithm = _plugin.CreateScrollablePopup(cupAlgorithmStorable, rightSide: false);
             _units = _plugin.CreateScrollablePopup(unitsStorable, rightSide: false);
+            _markerSpread = _plugin.CreateSlider(markerSpreadStorable, rightSide: false);
+            _markerFrontBack = _plugin.CreateSlider(markerFrontBackStorable, rightSide: false);
+            _markerLeftRight = _plugin.CreateSlider(markerLeftRightStorable, rightSide: false);
 
             CreateStandardDivider(rightSide: true);
-            _markerSpread = _plugin.CreateSlider(markerSpreadStorable, rightSide: true);
-            _markerFrontBack = _plugin.CreateSlider(markerFrontBackStorable, rightSide: true);
-            _markerLeftRight = _plugin.CreateSlider(markerLeftRightStorable, rightSide: true);
-
+            _manualMarkerToggle = _plugin.CreateToggle(showManualMarkersStorable, rightSide: true);
+            if(showManualMarkersStorable.val) {
+                if(_plugin.containingAtom.type == "Person") {
+                    _copyManualMarkers = _plugin.CreateToggle(manualMarkersCopy, rightSide: true);
+                }
+                _manualSliders.Add(_plugin.CreateSlider(manualHeightStorable, rightSide: true));
+                _manualSliders.Add(_plugin.CreateSlider(manualChinHeightStorable, rightSide: true));
+                _manualSliders.Add(_plugin.CreateSlider(manualShoulderHeightStorable, rightSide: true));
+                _manualSliders.Add(_plugin.CreateSlider(manualNippleHeightStorable, rightSide: true));
+                _manualSliders.Add(_plugin.CreateSlider(manualUnderbustHeightStorable, rightSide: true));
+                _manualSliders.Add(_plugin.CreateSlider(manualNavelHeightStorable, rightSide: true));
+                _manualSliders.Add(_plugin.CreateSlider(manualCrotchHeightStorable, rightSide: true));
+                _manualSliders.Add(_plugin.CreateSlider(manualKneeBottomHeightStorable, rightSide: true));
+            }
         }
 
         public void Clear() {
@@ -400,8 +478,16 @@ namespace LFE {
             foreach(var spacer in _spacerLinesList) {
                 _plugin.RemoveTextField(spacer);
             }
-
-
+            if(_manualMarkerToggle) {
+                _plugin.RemoveToggle(_manualMarkerToggle);
+            }
+            if(_copyManualMarkers) {
+                _plugin.RemoveToggle(_copyManualMarkers);
+            }
+            foreach(var s in _manualSliders) {
+                _plugin.RemoveSlider(s);
+            }
+            _manualSliders = new List<UIDynamicSlider>();
             if(_featureMarkerToggle) {
                 _plugin.RemoveToggle(_featureMarkerToggle);
             }

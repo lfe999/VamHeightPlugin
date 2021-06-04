@@ -8,7 +8,8 @@ namespace LFE
     {
         private UI _ui;
         private bool _enabled = false;
-        CharacterMeasurements _measurements;
+        CharacterMeasurements _autoMeasurements;
+        CharacterMeasurements _manualMeasurements;
 
         List<BaseVisualGuides> _visualGuides = new List<BaseVisualGuides>();
         MainVisualGuides _mainGuides;
@@ -19,50 +20,56 @@ namespace LFE
         ArcVisualGuides _waistGuides;
         ArcVisualGuides _hipGuides;
 
+        MainVisualGuides _mainGuidesManual;
+        HeadVisualGuides _headGuidesManual;
+
         public override void Init()
         {
             _ui = new UI(this);
 
             _mainGuides = gameObject.AddComponent<MainVisualGuides>();
             _mainGuides.transform.SetParent(containingAtom.mainController.transform);
-            _mainGuides.Measurements = _measurements;
             _visualGuides.Add(_mainGuides);
+
+            _mainGuidesManual = gameObject.AddComponent<MainVisualGuides>();
+            _mainGuidesManual.transform.SetParent(containingAtom.mainController.transform);
+            _visualGuides.Add(_mainGuidesManual);
 
             _headGuides = gameObject.AddComponent<HeadVisualGuides>();
             _headGuides.transform.SetParent(containingAtom.mainController.transform);
-            _headGuides.Measurements = _measurements;
             _visualGuides.Add(_headGuides);
+
+            _headGuidesManual = gameObject.AddComponent<HeadVisualGuides>();
+            _headGuidesManual.transform.SetParent(containingAtom.mainController.transform);
+            _visualGuides.Add(_headGuidesManual);
 
             _faceGuides = gameObject.AddComponent<FaceVisualGuides>();
             _faceGuides.transform.SetParent(containingAtom.mainController.transform);
-            _faceGuides.Measurements = _measurements;
             _visualGuides.Add(_faceGuides);
 
             _bustGuides = gameObject.AddComponent<ArcVisualGuides>();
             _bustGuides.transform.SetParent(containingAtom.mainController.transform);
-            _bustGuides.Measurements = _measurements;
             _visualGuides.Add(_bustGuides);
 
             _underbustGuides = gameObject.AddComponent<ArcVisualGuides>();
             _underbustGuides.transform.SetParent(containingAtom.mainController.transform);
-            _underbustGuides.Measurements = _measurements;
             _visualGuides.Add(_underbustGuides);
 
             _waistGuides = gameObject.AddComponent<ArcVisualGuides>();
             _waistGuides.transform.SetParent(containingAtom.mainController.transform);
-            _waistGuides.Measurements = _measurements;
             _visualGuides.Add(_waistGuides);
 
             _hipGuides = gameObject.AddComponent<ArcVisualGuides>();
             _hipGuides.transform.SetParent(containingAtom.mainController.transform);
-            _hipGuides.Measurements = _measurements;
             _visualGuides.Add(_hipGuides);
         }
 
         public void OnEnable() {
             _enabled = true;
             _mainGuides.Enabled = _ui.showFeatureMarkersStorable.val;
+            _mainGuidesManual.Enabled = false;
             _headGuides.Enabled = _ui.showHeadHeightMarkersStorable.val; 
+            _headGuidesManual.Enabled = false;
             _faceGuides.Enabled = _ui.showFaceMarkersStorable.val;
             _bustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
             _underbustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
@@ -73,7 +80,9 @@ namespace LFE
         public void OnDisable() {
             _enabled = false;
             _mainGuides.Enabled = false;
+            _mainGuidesManual.Enabled = false;
             _headGuides.Enabled = false;
+            _headGuidesManual.Enabled = false;
             _faceGuides.Enabled = false;
             _bustGuides.Enabled = false;
             _underbustGuides.Enabled = false;
@@ -82,23 +91,22 @@ namespace LFE
         }
 
         public void OnDestroy() {
+            _enabled = false;
             foreach(var g in _visualGuides) {
                 Destroy(g);
             }
             _visualGuides = new List<BaseVisualGuides>(); 
+
             _mainGuides = null;
+            _mainGuidesManual = null;
             _headGuides = null;
+            _headGuidesManual = null;
             _faceGuides = null;
             _bustGuides = null;
             _underbustGuides = null;
             _waistGuides = null;
             _hipGuides = null;
-            _measurements = null;
-
-            // destroy the markers
-            foreach(var m in gameObject.GetComponentsInChildren<LabeledLine>()) {
-                Destroy(m);
-            }
+            _autoMeasurements = null;
 
             foreach(var h in _penisMarkersFromMorph) {
                 Destroy(h);
@@ -124,31 +132,45 @@ namespace LFE
             }
 
             try {
-                _measurements = AutoMeasurements(_ui, containingAtom);
+                _autoMeasurements = AutoMeasurements(_ui, containingAtom);
 
-                _ui.headSizeHeightStorable.val = _measurements.HeadHeight ?? 0;
-                _ui.headSizeWidthStorable.val = _measurements.HeadWidth ?? 0;
-                _ui.fullHeightStorable.val = _measurements.Height ?? 0;
+                _manualMeasurements = StaticMeasurements(_ui);
+                _manualMeasurements.HeelToFloorOffset = _autoMeasurements.HeelToFloorOffset;
+
+                if(containingAtom.type == "Person" && _ui.manualMarkersCopy.val) {
+                    _ui.manualHeightStorable.val = (_autoMeasurements.Height ?? 0) * 100;
+                    _ui.manualChinHeightStorable.val = (_autoMeasurements.ChinHeight ?? 0) * 100;
+                    _ui.manualShoulderHeightStorable.val = (_autoMeasurements.ShoulderHeight ?? 0) * 100;
+                    _ui.manualNippleHeightStorable.val = (_autoMeasurements.NippleHeight ?? 0) * 100;
+                    _ui.manualUnderbustHeightStorable.val = (_autoMeasurements.UnderbustHeight ?? 0) * 100;
+                    _ui.manualNavelHeightStorable.val = (_autoMeasurements.NavelHeight ?? 0) * 100;
+                    _ui.manualCrotchHeightStorable.val = (_autoMeasurements.CrotchHeight ?? 0) * 100;
+                    _ui.manualKneeBottomHeightStorable.val = (_autoMeasurements.KneeHeight ?? 0) * 100;
+                }
+
+                _ui.headSizeHeightStorable.val = _autoMeasurements.HeadHeight ?? 0;
+                _ui.headSizeWidthStorable.val = _autoMeasurements.HeadWidth ?? 0;
+                _ui.fullHeightStorable.val = _autoMeasurements.Height ?? 0;
                 _ui.heightInHeadsStorable.val = _ui.headSizeHeightStorable.val == 0 ? 0 : _ui.fullHeightStorable.val / _ui.headSizeHeightStorable.val;
-                _ui.chinHeightStorable.val = _measurements.ChinHeight ?? 0;
-                _ui.shoulderHeightStorable.val = _measurements.ShoulderHeight ?? 0;
-                _ui.nippleHeightStorable.val = _measurements.NippleHeight ?? 0;
-                _ui.underbustHeightStorable.val = _measurements.UnderbustHeight ?? 0;
-                _ui.navelHeightStorable.val = _measurements.NavelHeight ?? 0;
-                _ui.crotchHeightStorable.val = _measurements.CrotchHeight ?? 0;
-                _ui.kneeBottomHeightStorable.val = _measurements.KneeHeight ?? 0;
+                _ui.chinHeightStorable.val = _autoMeasurements.ChinHeight ?? 0;
+                _ui.shoulderHeightStorable.val = _autoMeasurements.ShoulderHeight ?? 0;
+                _ui.nippleHeightStorable.val = _autoMeasurements.NippleHeight ?? 0;
+                _ui.underbustHeightStorable.val = _autoMeasurements.UnderbustHeight ?? 0;
+                _ui.navelHeightStorable.val = _autoMeasurements.NavelHeight ?? 0;
+                _ui.crotchHeightStorable.val = _autoMeasurements.CrotchHeight ?? 0;
+                _ui.kneeBottomHeightStorable.val = _autoMeasurements.KneeHeight ?? 0;
 
-                _ui.waistSizeStorable.val = _measurements.WaistSize ?? 0;
-                _ui.hipSizeStorable.val = _measurements.HipSize ?? 0;
+                _ui.waistSizeStorable.val = _autoMeasurements.WaistSize ?? 0;
+                _ui.hipSizeStorable.val = _autoMeasurements.HipSize ?? 0;
 
-                _ui.breastBustStorable.val = _measurements.BustSize ?? 0;
-                _ui.breastUnderbustStorable.val = _measurements.UnderbustSize ?? 0;
-                _ui.breastBandStorable.val = _measurements.BandSize ?? 0;
-                _ui.breastCupStorable.val = _measurements.CupSize ?? "";
+                _ui.breastBustStorable.val = _autoMeasurements.BustSize ?? 0;
+                _ui.breastUnderbustStorable.val = _autoMeasurements.UnderbustSize ?? 0;
+                _ui.breastBandStorable.val = _autoMeasurements.BandSize ?? 0;
+                _ui.breastCupStorable.val = _autoMeasurements.CupSize ?? "";
 
-                _ui.penisLength.val = _measurements.PenisLength ?? 0;
-                _ui.penisWidth.val = _measurements.PenisWidth ?? 0;
-                _ui.penisGirth.val = _measurements.PenisGirth ?? 0;
+                _ui.penisLength.val = _autoMeasurements.PenisLength ?? 0;
+                _ui.penisWidth.val = _autoMeasurements.PenisWidth ?? 0;
+                _ui.penisGirth.val = _autoMeasurements.PenisGirth ?? 0;
 
                 UpdateVisuals();
                 UpdatePenisMarkers();
@@ -161,14 +183,17 @@ namespace LFE
 
 
         private void UpdateVisuals() {
-            if(_measurements == null || _ui == null) {
+            if(_autoMeasurements == null || _ui == null || _manualMeasurements == null) {
                 return;
             }
 
             // tell all the display elements about the measurements
             foreach(var g in _visualGuides) {
-                g.Measurements = _measurements;
+                g.Measurements = _autoMeasurements;
             }
+            _mainGuidesManual.Measurements = _manualMeasurements;
+            _headGuidesManual.Measurements = _manualMeasurements;
+
 
             var euler = Quaternion.Euler(containingAtom.mainController.transform.rotation.eulerAngles);
 
@@ -177,69 +202,88 @@ namespace LFE
             var leftRightVector = new Vector3(_ui.markerLeftRightStorable.val, 0, 0);
 
             // raise markers based on foot height
-            var pos = frontBackVector - leftRightVector + _measurements.HeelToFloorOffset;
+            var pos = frontBackVector - leftRightVector + _autoMeasurements.HeelToFloorOffset;
 
-            var isMale = _measurements.POI?.IsMale ?? false;
+            if(containingAtom.type == "Person") {
+                var isMale = _autoMeasurements.POI?.IsMale ?? false;
 
-            // feature guide
-            _mainGuides.Enabled = _ui.showFeatureMarkersStorable.val;
-            _mainGuides.LabelsEnabled = _ui.showFeatureMarkerLabelsStorable.val;
-            _mainGuides.LineColor = HSVToColor(_ui.featureMarkerColor.val);
-            _mainGuides.LineThickness = _ui.lineThicknessFigureStorable.val;
-            _mainGuides.UnitDisplay = _ui.unitsStorable.val;
-            _mainGuides.Offset = pos - spreadVector;
+                // auto feature guide
+                _mainGuides.Enabled = _ui.showFeatureMarkersStorable.val;
+                _mainGuides.LabelsEnabled = _ui.showFeatureMarkerLabelsStorable.val;
+                _mainGuides.LineColor = HSVToColor(_ui.featureMarkerColor.val);
+                _mainGuides.LineThickness = _ui.lineThicknessFigureStorable.val;
+                _mainGuides.UnitDisplay = _ui.unitsStorable.val;
+                _mainGuides.Offset = pos - spreadVector;
 
-            // head height guide
-            _headGuides.Enabled = _ui.showHeadHeightMarkersStorable.val;
-            _headGuides.LabelsEnabled = true;
-            _headGuides.LineColor = HSVToColor(_ui.headMarkerColor.val);
-            _headGuides.LineThickness = _ui.lineThicknessHeadStorable.val;
-            _headGuides.UnitDisplay = _ui.unitsStorable.val;
-            _headGuides.Offset = pos + spreadVector;
+                // auto head height guide
+                _headGuides.Enabled = _ui.showHeadHeightMarkersStorable.val;
+                _headGuides.LabelsEnabled = true;
+                _headGuides.LineColor = HSVToColor(_ui.headMarkerColor.val);
+                _headGuides.LineThickness = _ui.lineThicknessHeadStorable.val;
+                _headGuides.UnitDisplay = _ui.unitsStorable.val;
+                _headGuides.Offset = pos + spreadVector;
 
-            // face guide
-            _faceGuides.Enabled = _ui.showFaceMarkersStorable.val;
-            _faceGuides.LabelsEnabled = true;
-            _faceGuides.LineColor = HSVToColor(_ui.faceMarkerColor.val);
-            _faceGuides.LineThickness = _ui.lineThicknessFaceStorable.val;
-            _faceGuides.UnitDisplay = _ui.unitsStorable.val;
-            _faceGuides.Offset = pos + new Vector3(0, 0, -0.03f);
+                // auto face guide
+                _faceGuides.Enabled = _ui.showFaceMarkersStorable.val;
+                _faceGuides.LabelsEnabled = true;
+                _faceGuides.LineColor = HSVToColor(_ui.faceMarkerColor.val);
+                _faceGuides.LineThickness = _ui.lineThicknessFaceStorable.val;
+                _faceGuides.UnitDisplay = _ui.unitsStorable.val;
+                _faceGuides.Offset = pos + new Vector3(0, 0, -0.03f);
 
-            // bust guide
-            _bustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
-            _bustGuides.LabelsEnabled = false;
-            _bustGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
-            _bustGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
-            _bustGuides.UnitDisplay = _ui.unitsStorable.val;
-            _bustGuides.Offset = pos;
-            _bustGuides.Points = _measurements.POI?.BustPoints ?? new Vector3[0];
+                // bust guide
+                _bustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
+                _bustGuides.LabelsEnabled = false;
+                _bustGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
+                _bustGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
+                _bustGuides.UnitDisplay = _ui.unitsStorable.val;
+                _bustGuides.Offset = pos;
+                _bustGuides.Points = _autoMeasurements.POI?.BustPoints ?? new Vector3[0];
 
-            // underbust guide
-            _underbustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
-            _underbustGuides.LabelsEnabled = false;
-            _underbustGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
-            _underbustGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
-            _underbustGuides.UnitDisplay = _ui.unitsStorable.val;
-            _underbustGuides.Offset = pos;
-            _underbustGuides.Points = _measurements.POI?.UnderbustPoints ?? new Vector3[0];
+                // underbust guide
+                _underbustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
+                _underbustGuides.LabelsEnabled = false;
+                _underbustGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
+                _underbustGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
+                _underbustGuides.UnitDisplay = _ui.unitsStorable.val;
+                _underbustGuides.Offset = pos;
+                _underbustGuides.Points = _autoMeasurements.POI?.UnderbustPoints ?? new Vector3[0];
 
-            // waist guide
-            _waistGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
-            _waistGuides.LabelsEnabled = false;
-            _waistGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
-            _waistGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
-            _waistGuides.UnitDisplay = _ui.unitsStorable.val;
-            _waistGuides.Offset = pos;
-            _waistGuides.Points = _measurements.POI?.WaistPoints ?? new Vector3[0];
+                // waist guide
+                _waistGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
+                _waistGuides.LabelsEnabled = false;
+                _waistGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
+                _waistGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
+                _waistGuides.UnitDisplay = _ui.unitsStorable.val;
+                _waistGuides.Offset = pos;
+                _waistGuides.Points = _autoMeasurements.POI?.WaistPoints ?? new Vector3[0];
 
-            // hip guide
-            _hipGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
-            _hipGuides.LabelsEnabled = false;
-            _hipGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
-            _hipGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
-            _hipGuides.UnitDisplay = _ui.unitsStorable.val;
-            _hipGuides.Offset = pos;
-            _hipGuides.Points = _measurements.POI?.HipPoints ?? new Vector3[0];
+                // hip guide
+                _hipGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
+                _hipGuides.LabelsEnabled = false;
+                _hipGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
+                _hipGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
+                _hipGuides.UnitDisplay = _ui.unitsStorable.val;
+                _hipGuides.Offset = pos;
+                _hipGuides.Points = _autoMeasurements.POI?.HipPoints ?? new Vector3[0];
+            }
+
+            // manual feature guide
+            _mainGuidesManual.Enabled = _ui.showManualMarkersStorable.val;
+            _mainGuidesManual.LabelsEnabled = _ui.showManualMarkersStorable.val && _mainGuidesManual.Measurements.Height > 0;
+            _mainGuidesManual.LineColor = Color.yellow;
+            _mainGuidesManual.LineThickness = _ui.lineThicknessFigureStorable.val;
+            _mainGuidesManual.UnitDisplay = _ui.unitsStorable.val;
+            _mainGuidesManual.Offset = _mainGuides.Offset - new Vector3(0, 0, 0.002f); // put these just a bit behind the auto guides
+
+            // manual head height guide
+            _headGuidesManual.Enabled = _ui.showManualMarkersStorable.val && _headGuidesManual.Measurements.Height > 0;
+            _headGuidesManual.LabelsEnabled = true;
+            _headGuidesManual.LineColor = Color.yellow;
+            _headGuidesManual.LineThickness = _ui.lineThicknessHeadStorable.val;
+            _headGuidesManual.UnitDisplay = _ui.unitsStorable.val;
+            _headGuidesManual.Offset = _headGuides.Offset - new Vector3(0, 0, 0.002f); // put these just a bit behind the auto guides
+
 
         }
 
@@ -257,11 +301,11 @@ namespace LFE
         float _penisGirth = 0;
         float _penisWidth = 0;
         private void UpdatePenisMarkers() {
-            if(_measurements == null) {
+            if(_autoMeasurements == null) {
                 return;
             }
 
-            if(!(_measurements.POI?.IsMale ?? false)) {
+            if(!(_autoMeasurements.POI?.IsMale ?? false)) {
                 foreach(var m in _penisMarkersFromMorph) {
                     Destroy(m);
                 }
@@ -269,10 +313,10 @@ namespace LFE
                 return;
             }
 
-            var penisTipPos = _measurements.POI?.PenisTip ?? Vector3.zero;
-            var penisBasePos = _measurements.POI?.PenisBase ?? Vector3.zero;
-            var penisShaftLeftPos = _measurements?.POI.PenisShaftLeft ?? Vector3.zero;
-            var penisShaftRightPos = _measurements?.POI.PenisShaftRight ?? Vector3.zero;
+            var penisTipPos = _autoMeasurements.POI?.PenisTip ?? Vector3.zero;
+            var penisBasePos = _autoMeasurements.POI?.PenisBase ?? Vector3.zero;
+            var penisShaftLeftPos = _autoMeasurements?.POI.PenisShaftLeft ?? Vector3.zero;
+            var penisShaftRightPos = _autoMeasurements?.POI.PenisShaftRight ?? Vector3.zero;
 
             if(_ui.showCircumferenceMarkersStorable.val){
                 if(_penisMarkersFromMorph.Count != 4) {
@@ -337,11 +381,14 @@ namespace LFE
 
 
         // LineRenderer _debugLine;
-        public CharacterMeasurements AutoMeasurements(UI ui, Atom person) {
+        public CharacterMeasurements AutoMeasurements(UI ui, Atom atom) {
             var measurements = new CharacterMeasurements();
-            var poi = new CharacterPointsOfInterest(person);
+            if(atom.type != "Person") {
+                return measurements;
+            }
+            var poi = new CharacterPointsOfInterest(atom);
 
-            var rootTransform = person.mainController.transform;
+            var rootTransform = atom.mainController.transform;
             var rootPos = rootTransform.position;
 
             var floor = Vector3.ProjectOnPlane(rootPos, rootTransform.up);
@@ -439,9 +486,21 @@ namespace LFE
             return measurements;
         }
 
-        // public static CharacterMeasurements StaticMeasurements(UI ui) {
-
-        // }
+        public static CharacterMeasurements StaticMeasurements(UI ui) {
+            var measurements = new CharacterMeasurements {
+                Height = ui.manualHeightStorable.val / 100,
+                ChinHeight = ui.manualChinHeightStorable.val / 100,
+                ShoulderHeight = ui.manualShoulderHeightStorable.val / 100,
+                NippleHeight = ui.manualNippleHeightStorable.val / 100,
+                UnderbustHeight = ui.manualUnderbustHeightStorable.val / 100,
+                NavelHeight = ui.manualNavelHeightStorable.val / 100,
+                CrotchHeight = ui.manualCrotchHeightStorable.val / 100,
+                KneeHeight = ui.manualKneeBottomHeightStorable.val / 100,
+                HeelHeight = 0,
+                HeelToFloorOffset = Vector3.zero
+            };
+            return measurements;
+        }
 
     }
 }
