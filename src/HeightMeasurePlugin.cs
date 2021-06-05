@@ -461,11 +461,11 @@ namespace LFE
                 }
             }
 
-            measurements.EyesHeight = Vector3.Distance(eyeHeightPos, footPos);
+            measurements.EyesHeight = Vector3.Distance(eyeHeightPos, Vector3.ProjectOnPlane(eyeHeightPos, rootTransform.up)) - floorDistanceOffset - footOffset;
             measurements.EyesWidth = Vector3.Distance(poi.EyeLeftOuterSide, poi.EyeRightOuterSide);
             measurements.EyesOffsetLeftRight = 0;
-            measurements.NoseHeight = poi.IsMale ? (float?)null : Vector3.Distance(poi.NoseBottomHeight, footPos);
-            measurements.MouthHeight = poi.IsMale ? (float?)null : Vector3.Distance(mouthHeightPos, footPos);
+            measurements.NoseHeight = poi.IsMale ? (float?)null : Vector3.Distance(poi.NoseBottomHeight, Vector3.ProjectOnPlane(poi.NoseBottomHeight, rootTransform.up)) - floorDistanceOffset - footOffset;
+            measurements.MouthHeight = poi.IsMale ? (float?)null : Vector3.Distance(mouthHeightPos, Vector3.ProjectOnPlane(mouthHeightPos, rootTransform.up)) - floorDistanceOffset - footOffset;
             measurements.MouthWidth = poi.IsMale ? (float?)null : Vector3.Distance(poi.MouthLeftSide, poi.MouthRightSide);
             measurements.MouthOffsetLeftRight = 0;
 
