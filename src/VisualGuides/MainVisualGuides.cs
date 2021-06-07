@@ -57,22 +57,20 @@ namespace LFE {
             var parentRot = transform.parent.transform.rotation;
             var parentRotEuler = Quaternion.Euler(parentRot.eulerAngles);
 
-            var height = UnitUtils.ToUnit(Measurements.Height ?? 0, UnitDisplay);
-            _markerHead.Label = $"Height - {height:0.0} {UnitDisplay}";
+            _markerHead.Label = $"Height - {UnitUtils.ToUnitString(Measurements.Height ?? 0, UnitDisplay)}";
             SetMainMarkerProperties(_markerHead, Measurements.Height);
             _markerHead.transform.position = parentRotEuler * (new Vector3(0, Measurements.Height ?? 0, 0) + Offset) + parentPos;
 
-            var headHeight = UnitUtils.ToUnit(Measurements.HeadHeight ?? 0, UnitDisplay);
-            var headWidth = UnitUtils.ToUnit(Measurements.HeadWidth ?? 0, UnitDisplay);
-            _markerChin.Label = $"Head - Height {headHeight:0.0} {UnitDisplay}";
+            var headWidth = Measurements.HeadWidth ?? 0;
+            _markerChin.Label = $"Head - Height {UnitUtils.ToUnitString(Measurements.HeadHeight ?? 0, UnitDisplay)}";
             if(headWidth != 0) {
-                _markerChin.Label += $" Width {headWidth:0.0} {UnitDisplay}";
+                _markerChin.Label += $" Width {UnitUtils.ToUnitString(headWidth, UnitDisplay)}";
             }
             SetMainMarkerProperties(_markerChin, Measurements.ChinHeight);
             _markerChin.transform.position = parentRotEuler * (new Vector3(0, Measurements.ChinHeight ?? 0, 0) + Offset) + parentPos;
 
-            var chinToShoulder = UnitUtils.ToUnit((Measurements.ChinHeight ?? 0) - (Measurements.ShoulderHeight ?? 0), UnitDisplay);
-            _markerShoulder.Label = $"Chin To Shoulder - {chinToShoulder:0.0} {UnitDisplay}";
+            var chinToShoulder = (Measurements.ChinHeight ?? 0) - (Measurements.ShoulderHeight ?? 0);
+            _markerShoulder.Label = $"Chin To Shoulder - {UnitUtils.ToUnitString(chinToShoulder, UnitDisplay)}";
             SetMainMarkerProperties(_markerShoulder, Measurements.ShoulderHeight);
             _markerShoulder.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + Offset) + parentPos;
 
@@ -80,8 +78,7 @@ namespace LFE {
                 _markerNipple.Label = $"Bust";
             }
             else {
-                var bust = UnitUtils.ToUnit(Measurements.BustSize ?? 0, UnitDisplay);
-                _markerNipple.Label = $"Bust - {bust:0} {UnitDisplay} - ({Measurements.BandSize}{Measurements.CupSize})";
+                _markerNipple.Label = $"Bust - {UnitUtils.ToUnitString(Measurements.BustSize ?? 0, UnitDisplay)} - ({Measurements.BandSize}{Measurements.CupSize})";
             }
             SetMainMarkerProperties(_markerNipple, Measurements.NippleHeight);
             _markerNipple.transform.position = parentRotEuler * (new Vector3(0, Measurements.NippleHeight ?? 0, 0) + Offset) + parentPos;
@@ -90,46 +87,45 @@ namespace LFE {
                 _markerUnderbust.Label = "Underbust";
             }
             else {
-                var underbust = UnitUtils.ToUnit(Measurements.UnderbustSize ?? 0, UnitDisplay);
-                _markerUnderbust.Label = $"Underbust - {underbust:0} {UnitDisplay}";
+                _markerUnderbust.Label = $"Underbust - {UnitUtils.ToUnitString(Measurements.UnderbustSize ?? 0, UnitDisplay)}";
             }
             SetMainMarkerProperties(_markerUnderbust, Measurements.UnderbustHeight);
             _markerUnderbust.transform.position = parentRotEuler * (new Vector3(0, Measurements.UnderbustHeight ?? 0, 0) + Offset) + parentPos;
 
-            var waist = UnitUtils.ToUnit(Measurements.WaistSize ?? 0, UnitDisplay);
-            var shoulderToNavel = UnitUtils.ToUnit((Measurements.ShoulderHeight?? 0) - (Measurements.NavelHeight ?? 0), UnitDisplay);
+            var waist = Measurements.WaistSize ?? 0;
+            var shoulderToNavel = (Measurements.ShoulderHeight?? 0) - (Measurements.NavelHeight ?? 0);
             _markerNavel.Label = "Navel";
             if(waist != 0) {
-                _markerNavel.Label += $" - Waist {waist:0} {UnitDisplay}";
+                _markerNavel.Label += $" - Waist {UnitUtils.ToUnitString(waist, UnitDisplay)}";
             }
-            _markerNavel.Label += $"\nShoulder to Navel - {shoulderToNavel:0.0} {UnitDisplay}";
+            _markerNavel.Label += $"\nShoulder to Navel - {UnitUtils.ToUnitString(shoulderToNavel, UnitDisplay)}";
             SetMainMarkerProperties(_markerNavel, Measurements.NavelHeight);
             _markerNavel.transform.position = parentRotEuler * (new Vector3(0, Measurements.NavelHeight ?? 0, 0) + Offset) + parentPos;
 
-            var hip = UnitUtils.ToUnit(Measurements.HipSize ?? 0, UnitDisplay);
-            var shoulderToCrotch = UnitUtils.ToUnit((Measurements.ShoulderHeight ?? 0) - (Measurements.CrotchHeight ?? 0), UnitDisplay);
+            var hip = Measurements.HipSize ?? 0;
+            var shoulderToCrotch = (Measurements.ShoulderHeight ?? 0) - (Measurements.CrotchHeight ?? 0);
             _markerGroin.Label = $"Crotch";
             if(hip != 0) {
-                _markerGroin.Label += $" - Hip {hip:0} {UnitDisplay}";
+                _markerGroin.Label += $" - Hip {UnitUtils.ToUnitString(hip, UnitDisplay)}";
             }
             _markerGroin.Label += "\n";
             if(Measurements.POI?.IsMale ?? false) {
                 _markerGroin.Label = _markerGroin.Label + $"Penis "
-                    + $"Length {UnitUtils.ToUnit(Measurements.PenisLength ?? 0, UnitDisplay):0.0} {UnitDisplay}, "
-                    + $"Width {UnitUtils.ToUnit(Measurements.PenisWidth ?? 0, UnitDisplay):0.0} {UnitDisplay}, "
-                    + $"Girth {UnitUtils.ToUnit(Measurements.PenisGirth ?? 0, UnitDisplay):0.0} {UnitDisplay}\n";
+                    + $"Length {UnitUtils.ToUnitString(Measurements.PenisLength ?? 0, UnitDisplay)}, "
+                    + $"Width {UnitUtils.ToUnitString(Measurements.PenisWidth ?? 0, UnitDisplay)}, "
+                    + $"Girth {UnitUtils.ToUnitString(Measurements.PenisGirth ?? 0, UnitDisplay)}\n";
             }
-            _markerGroin.Label = _markerGroin.Label + $"Shoulder to Crotch - {shoulderToCrotch:0.0} {UnitDisplay}";
+            _markerGroin.Label = _markerGroin.Label + $"Shoulder to Crotch - {UnitUtils.ToUnitString(shoulderToCrotch, UnitDisplay)}";
             SetMainMarkerProperties(_markerGroin, Measurements.CrotchHeight);
             _markerGroin.transform.position = parentRotEuler * (new Vector3(0, Measurements.CrotchHeight ?? 0, 0) + Offset) + parentPos;
 
-            var crotchToKnee = UnitUtils.ToUnit((Measurements.CrotchHeight ?? 0) - (Measurements.KneeHeight ?? 0), UnitDisplay);
-            _markerKnee.Label = $"Knee - Crotch to Knee {crotchToKnee:0.0} {UnitDisplay}";
+            var crotchToKnee = (Measurements.CrotchHeight ?? 0) - (Measurements.KneeHeight ?? 0);
+            _markerKnee.Label = $"Knee - Crotch to Knee {UnitUtils.ToUnitString(crotchToKnee, UnitDisplay)}";
             SetMainMarkerProperties(_markerKnee, Measurements.KneeHeight);
             _markerKnee.transform.position = parentRotEuler * (new Vector3(0, Measurements.KneeHeight ?? 0, 0) + Offset) + parentPos;
 
-            var kneeToHeel = UnitUtils.ToUnit((Measurements.KneeHeight ?? 0) - (Measurements.HeelHeight ?? 0), UnitDisplay);
-            _markerHeel.Label = $"Heel - Knee to Heel {kneeToHeel:0.0} {UnitDisplay}";
+            var kneeToHeel = (Measurements.KneeHeight ?? 0) - (Measurements.HeelHeight ?? 0);
+            _markerHeel.Label = $"Heel - Knee to Heel {UnitUtils.ToUnitString(kneeToHeel, UnitDisplay)}";
             SetMainMarkerProperties(_markerHeel, Measurements.HeelHeight);
             _markerHeel.Enabled = Measurements.HeelHeight != null && Enabled;
             _markerHeel.transform.position = parentRotEuler * (new Vector3(0, Measurements.HeelHeight ?? 0, 0) + Offset) + parentPos;

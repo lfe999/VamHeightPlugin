@@ -3,7 +3,8 @@ using UnityEngine;
 namespace LFE
 {
     public class UnitUtils {
-
+        public const string US = "us";
+        public const string Metric = "metric";
         public const string Meters = "m";
         public const string Centimeters = "cm";
         public const string Inches = "in";
@@ -22,10 +23,12 @@ namespace LFE
             switch(targetUnits) {
                 case Meters:
                     return unityValue;
+                case Metric:
                 case Centimeters:
                     return unityValue * 100;
                 case Feet:
                     return UnityToFeet(unityValue);
+                case US:
                 case Inches:
                     return UnityToInches(unityValue);
                 default:
@@ -38,7 +41,14 @@ namespace LFE
         }
 
         public static string ToUnitString(float sourceValue, string sourceUnits, string targetUnits) {
-            return $"{ToUnit(sourceValue, sourceUnits, targetUnits)} {targetUnits}";
+            switch(targetUnits) {
+                case US:
+                    return $"{ToUnit(sourceValue, sourceUnits, Inches):0.0} {Inches} / {FeetInchString(ToUnit(sourceValue, sourceUnits, Feet))}";
+                case Metric:
+                    return $"{ToUnit(sourceValue, sourceUnits, Centimeters):0.0} {Centimeters} / {ToUnit(sourceValue, sourceUnits, Meters):0.0} {Meters}";
+                default:
+                    return $"{ToUnit(sourceValue, sourceUnits, targetUnits):0.0} {targetUnits}";
+            }
         }
 
         public static float ConvertToUnity(float value, string units) {
