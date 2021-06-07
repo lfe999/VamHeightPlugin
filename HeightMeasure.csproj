@@ -75,21 +75,20 @@
     <Compile Include="src/BustCalculator/ChateLaineCupCalculator.cs" />
     <Compile Include="src/BustCalculator/CupSize.cs" />
     <Compile Include="src/BustCalculator/EvasIntimatesCupCalculator.cs" />
+    <Compile Include="src/BustCalculator/ICupCalculator.cs" />
     <Compile Include="src/BustCalculator/KnixComCupCalculator.cs" />
     <Compile Include="src/BustCalculator/KSK9404CupCalculator.cs" />
     <Compile Include="src/BustCalculator/SizeChartCupCalculator.cs" />
-    <Compile Include="src/BustCalculator/ICupCalculator.cs" />
-    <Compile Include="src/VisualGuides/LabeledLine.cs" />
-    <Compile Include="src/VisualGuides/BaseVisualGuides.cs" />
-    <Compile Include="src/VisualGuides/MainVisualGuides.cs" />
-    <Compile Include="src/VisualGuides/HeadVisualGuides.cs" />
-    <Compile Include="src/VisualGuides/FaceVisualGuides.cs" />
-    <Compile Include="src/VisualGuides/ArcVisualGuides.cs" />
     <Compile Include="src/Model/CharacterMeasurements.cs" />
     <Compile Include="src/Model/CharacterPointsOfInterest.cs" />
     <Compile Include="src/Model/UnitUtils.cs" />
+    <Compile Include="src/VisualGuides/ArcVisualGuides.cs" />
+    <Compile Include="src/VisualGuides/BaseVisualGuides.cs" />
+    <Compile Include="src/VisualGuides/FaceVisualGuides.cs" />
+    <Compile Include="src/VisualGuides/HeadVisualGuides.cs" />
+    <Compile Include="src/VisualGuides/LabeledLine.cs" />
+    <Compile Include="src/VisualGuides/MainVisualGuides.cs" />
     <Compile Include="src/UI.cs" />
-    <Compile Include="src/CharacterMeasurementsUI.cs" />
     <Compile Include="src/HeightMeasurePlugin.cs" />
   </ItemGroup>
 
