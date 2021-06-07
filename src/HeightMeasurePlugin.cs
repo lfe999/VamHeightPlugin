@@ -387,6 +387,11 @@ namespace LFE
             }
             var poi = new CharacterPointsOfInterest(atom);
 
+            // switching skins sometimes leaves things in a bad state for a few seconds - watch for that
+            if(!poi.HasSkin) {
+                return measurements;
+            }
+
             var rootTransform = atom.mainController.transform;
             var rootPos = rootTransform.position;
 

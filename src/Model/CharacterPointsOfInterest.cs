@@ -198,6 +198,7 @@ namespace LFE {
             }
         }
 
+        public bool HasSkin => _dazSkin != null;
 
         public CharacterPointsOfInterest(Atom person) {
             Person = person;
