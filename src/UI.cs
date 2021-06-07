@@ -186,9 +186,9 @@ namespace LFE {
 
             unitsStorable = new JSONStorableStringChooser(
                 "Units",
-                new List<string> { "us", "metric", "m", "cm", "in", "ft" },
-                new List<string> { "US", "Metric", "Meters", "Centimeters", "Inches", "Feet"},
-                "cm",
+                new List<string> { UnitUtils.US, UnitUtils.Metric, UnitUtils.Meters, UnitUtils.Centimeters, UnitUtils.Inches, UnitUtils.Feet, UnitUtils.Heads },
+                new List<string> { "US (in / ft)", "Metric (cm / m)", "Meters (m)", "Centimeters (cm)", "Inches (in)", "Feet (ft)", "Heads (head.unit.)"},
+                UnitUtils.Centimeters, 
                 "Units"
             );
             _plugin.RegisterStringChooser(unitsStorable);

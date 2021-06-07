@@ -57,6 +57,9 @@ namespace LFE {
             var parentRot = transform.parent.transform.rotation;
             var parentRotEuler = Quaternion.Euler(parentRot.eulerAngles);
 
+            // set the head height to use for all unit conversions
+            UnitUtils.HeadHeightInUnity = Measurements.HeadHeight ?? 0;
+
             _markerHead.Label = $"Height - {UnitUtils.ToUnitString(Measurements.Height ?? 0, UnitDisplay)}";
             SetMainMarkerProperties(_markerHead, Measurements.Height);
             _markerHead.transform.position = parentRotEuler * (new Vector3(0, Measurements.Height ?? 0, 0) + Offset) + parentPos;

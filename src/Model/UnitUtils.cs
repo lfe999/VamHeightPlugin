@@ -3,12 +3,14 @@ using UnityEngine;
 namespace LFE
 {
     public class UnitUtils {
+        public static float HeadHeightInUnity = 0;
         public const string US = "us";
         public const string Metric = "metric";
         public const string Meters = "m";
         public const string Centimeters = "cm";
         public const string Inches = "in";
         public const string Feet = "ft";
+        public const string Heads = "h.u.";
 
         public static float ToUnit(float source, string targetUnit) {
             return ToUnit(source, Meters, targetUnit);
@@ -21,6 +23,8 @@ namespace LFE
 
             float unityValue = ConvertToUnity(sourceValue, sourceUnits);
             switch(targetUnits) {
+                case Heads:
+                    return HeadHeightInUnity == 0 ? 0 : unityValue / HeadHeightInUnity;
                 case Meters:
                     return unityValue;
                 case Metric:
@@ -56,12 +60,16 @@ namespace LFE
             switch(units) {
                 case Meters:
                     return value;
+                case Metric:
                 case Centimeters:
                     return value / 100f;
                 case Feet:
                     return value * 0.3048f;
+                case US:
                 case Inches:
                     return value / 12 * 0.3048f;
+                case Heads:
+                    return value * HeadHeightInUnity;
                 default:
                     return value;
             }
@@ -96,7 +104,7 @@ namespace LFE
 
         public static string FeetInchString(float feet) {
             int f = (int)feet;
-            int inches = (int)((feet - f) * 12);
+            int inches = RoundToInt((feet - f) * 12);
             return $"{f}'{inches}\"";
         }
 
