@@ -108,19 +108,27 @@ namespace LFE {
                 showFeatureMarkersStorable.valNoCallback = value;
                 Draw();
             });
+            showFeatureMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkersStorable);
 
             lineThicknessFigureStorable = new JSONStorableFloat("Feature Guide Line Width", 2, 1, 10, constrain: true);
+            lineThicknessFigureStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(lineThicknessFigureStorable);
 
             featureMarkerColor = new JSONStorableColor("Feature Guide Color", _plugin.ColorToHSV(Color.green), (float h, float s, float v) => {
-                featureMarkerColor.valNoCallback = new HSVColor { H = h, S = s, V = v };
-                _featureMarkerColorButton.buttonColor = _plugin.HSVToColor(featureMarkerColor.valNoCallback);
+                var hsv = new HSVColor { H = h, S = s, V = v };
+                featureMarkerColor.valNoCallback = hsv;
+                if(_featureMarkerColorButton != null) {
+                    _featureMarkerColorButton.buttonColor = _plugin.HSVToColor(hsv);
+                }
             });
+            featureMarkerColor.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterColor(featureMarkerColor);
 
             showFeatureMarkerLabelsStorable = new JSONStorableBool("Feature Guide Labels", true, (bool value) => {
                 Draw();
             });
+            showFeatureMarkerLabelsStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLabelsStorable);
 
             //////////////////
@@ -129,15 +137,21 @@ namespace LFE {
                 showHeadHeightMarkersStorable.valNoCallback = value;
                 Draw();
             });
+            showHeadHeightMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showHeadHeightMarkersStorable);
 
             lineThicknessHeadStorable = new JSONStorableFloat("Head Heights Line Width", 2, 1, 10, constrain: true);
+            lineThicknessHeadStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(lineThicknessHeadStorable);
 
-            headMarkerColor = new JSONStorableColor("Feature Guide Color", _plugin.ColorToHSV(Color.white), (float h, float s, float v) => {
-                headMarkerColor.valNoCallback = new HSVColor { H = h, S = s, V = v };
-                _headMarkerColorButton.buttonColor = _plugin.HSVToColor(headMarkerColor.valNoCallback);
+            headMarkerColor = new JSONStorableColor("Head Guide Color", _plugin.ColorToHSV(Color.white), (float h, float s, float v) => {
+                var hsv = new HSVColor { H = h, S = s, V = v };
+                headMarkerColor.valNoCallback = hsv;
+                if(_headMarkerColorButton != null) {
+                    _headMarkerColorButton.buttonColor = _plugin.HSVToColor(hsv);
+                }
             });
+            headMarkerColor.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterColor(headMarkerColor);
 
             //////////////////
@@ -145,15 +159,21 @@ namespace LFE {
             showFaceMarkersStorable = new JSONStorableBool("Auto Face Guides", true, (bool value) => {
                 Draw();
             });
+            showFaceMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFaceMarkersStorable);
 
             lineThicknessFaceStorable = new JSONStorableFloat("Face Line Width", 2, 1, 10, constrain: true);
+            lineThicknessFaceStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(lineThicknessFaceStorable);
 
             faceMarkerColor = new JSONStorableColor("Face Guide Color", _plugin.ColorToHSV(Color.blue), (float h, float s, float v) => {
-                faceMarkerColor.valNoCallback = new HSVColor { H = h, S = s, V = v };
-                _faceMarkerColorButton.buttonColor = _plugin.HSVToColor(faceMarkerColor.valNoCallback);
+                var hsv = new HSVColor { H = h, S = s, V = v };
+                faceMarkerColor.valNoCallback = hsv;
+                if(_faceMarkerColorButton != null) {
+                    _faceMarkerColorButton.buttonColor = _plugin.HSVToColor(hsv);
+                }
             });
+            faceMarkerColor.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterColor(faceMarkerColor);
 
             //////////////////
@@ -162,15 +182,21 @@ namespace LFE {
                 showCircumferenceMarkersStorable.valNoCallback = value;
                 Draw();
             });
+            showCircumferenceMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showCircumferenceMarkersStorable);
 
             lineThicknessCircumferenceStorable = new JSONStorableFloat("Circumference Guide Line Width", 2, 1, 10, constrain: true);
+            lineThicknessCircumferenceStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(lineThicknessCircumferenceStorable);
 
             circumferenceMarkerColor = new JSONStorableColor("Circumference Guide Color", _plugin.ColorToHSV(Color.green), (float h, float s, float v) => {
-                circumferenceMarkerColor.valNoCallback = new HSVColor { H = h, S = s, V = v };
-                _circumferenceMarkerColorButton.buttonColor = _plugin.HSVToColor(circumferenceMarkerColor.valNoCallback);
+                var hsv = new HSVColor { H = h, S = s, V = v };
+                circumferenceMarkerColor.valNoCallback = hsv;
+                if(_circumferenceMarkerColorButton != null) {
+                    _circumferenceMarkerColorButton.buttonColor = _plugin.HSVToColor(hsv);
+                }
             });
+            circumferenceMarkerColor.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterColor(circumferenceMarkerColor);
 
             //////////////////
@@ -182,6 +208,7 @@ namespace LFE {
                 _cupCalculators[0].Name,
                 "Cup Size Method"
             );
+            cupAlgorithmStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterStringChooser(cupAlgorithmStorable);
 
             unitsStorable = new JSONStorableStringChooser(
@@ -191,22 +218,27 @@ namespace LFE {
                 UnitUtils.Centimeters, 
                 "Units"
             );
+            unitsStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterStringChooser(unitsStorable);
 
             // Float: How far apart markers are spread apart
             markerSpreadStorable = new JSONStorableFloat("Spread Guides", 0.02f, -1, 1);
+            markerSpreadStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(markerSpreadStorable);
 
             // Float: Move markers forward or backward relative to center depth of the head
             markerFrontBackStorable = new JSONStorableFloat("Move Guides Forward/Backward", 0.15f, -5, 5);
+            markerFrontBackStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(markerFrontBackStorable);
 
             // Float: Move markers left or right 
             markerLeftRightStorable = new JSONStorableFloat("Move Guides Left/Right", 0, -5, 5);
+            markerLeftRightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(markerLeftRightStorable);
 
             // Float: Move markers forward or backward relative to center depth of the head
             markerUpDownStorable = new JSONStorableFloat("Move Guides Up/Down", 0, -5, 5);
+            markerUpDownStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(markerUpDownStorable);
 
 
@@ -214,63 +246,83 @@ namespace LFE {
 
             // calculated positions and distances for other _plugins to use if wanted
             fullHeightStorable = new JSONStorableFloat("figureHeight", 0, 0, 100);
+            fullHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(fullHeightStorable);
 
             heightInHeadsStorable = new JSONStorableFloat("figureHeightHeads", 0, 0, 100);
+            heightInHeadsStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(heightInHeadsStorable);
 
             headSizeHeightStorable = new JSONStorableFloat("headSizeHeight", 0, 0, 100);
+            headSizeHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(headSizeHeightStorable);
 
             chinHeightStorable = new JSONStorableFloat("chinHeight", 0, 0, 100);
+            chinHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(chinHeightStorable);
 
             shoulderHeightStorable = new JSONStorableFloat("shoulderHeight", 0, 0, 100);
+            shoulderHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(shoulderHeightStorable);
 
             nippleHeightStorable = new JSONStorableFloat("nippleHeight", 0, 0, 100);
+            nippleHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(nippleHeightStorable);
 
             underbustHeightStorable = new JSONStorableFloat("underbustHeight", 0, 0, 100);
+            underbustHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(underbustHeightStorable);
 
             navelHeightStorable = new JSONStorableFloat("navelHeight", 0, 0, 100);
+            navelHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(navelHeightStorable);
 
             crotchHeightStorable = new JSONStorableFloat("crotchHeight", 0, 0, 100);
+            crotchHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(crotchHeightStorable);
 
             kneeBottomHeightStorable = new JSONStorableFloat("kneeHeight", 0, 0, 100);
+            kneeBottomHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(kneeBottomHeightStorable);
 
             headSizeWidthStorable = new JSONStorableFloat("headSizeWidth", 0, 0, 100);
+            headSizeWidthStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(headSizeWidthStorable);
 
             breastBustStorable = new JSONStorableFloat("breastBustSize", 0, 0, 100);
+            breastBustStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(breastBustStorable);
 
             breastUnderbustStorable = new JSONStorableFloat("breastUnderbustSize", 0, 0, 100);
+            breastUnderbustStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(breastUnderbustStorable);
 
             breastBandStorable = new JSONStorableFloat("breastBandSize", 0, 0, 100);
+            breastBandStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(breastBandStorable);
 
             breastCupStorable = new JSONStorableString("breastCupSize", "");
+            breastCupStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterString(breastCupStorable);
 
             waistSizeStorable = new JSONStorableFloat("waistSize", 0, 0, 100);
+            waistSizeStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(waistSizeStorable);
 
             hipSizeStorable = new JSONStorableFloat("hipSize", 0, 0, 100);
+            hipSizeStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(hipSizeStorable);
 
             penisLength = new JSONStorableFloat("penisLength", 0, 0, 100);
+            penisLength.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(penisLength);
 
             penisWidth = new JSONStorableFloat("penisWidth", 0, 0, 100);
+            penisWidth.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(penisWidth);
 
             penisGirth = new JSONStorableFloat("penisGirth", 0, 0, 100);
+            penisGirth.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(penisGirth);
 
             // manual heights
@@ -278,41 +330,57 @@ namespace LFE {
                 showManualMarkersStorable.valNoCallback = value;
                 Draw();
             });
+            showManualMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showManualMarkersStorable);
 
             manualMarkersCopy = new JSONStorableBool("Copy Markers From Person", false);
+            manualMarkersCopy.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(manualMarkersCopy);
 
             lineThicknessManualStorable = new JSONStorableFloat("Manual Guide Line Width", 2, 1, 10, constrain: true);
+            lineThicknessManualStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(lineThicknessManualStorable);
 
             manualMarkerColor = new JSONStorableColor("Manual Guide Color", _plugin.ColorToHSV(Color.yellow), (float h, float s, float v) => {
-                manualMarkerColor.valNoCallback = new HSVColor { H = h, S = s, V = v };
-                _manualMarkerColorButton.buttonColor = _plugin.HSVToColor(manualMarkerColor.valNoCallback);
+                var hsv = new HSVColor { H = h, S = s, V = v };
+                manualMarkerColor.valNoCallback = hsv;
+                if(_manualMarkerColorButton != null) {
+                    _manualMarkerColorButton.buttonColor = _plugin.HSVToColor(hsv);
+                }
             });
+            manualMarkerColor.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterColor(manualMarkerColor);
 
             manualHeightStorable = new JSONStorableFloat("Height", 0, 0, 300);
+            manualHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualHeightStorable);
 
             manualChinHeightStorable = new JSONStorableFloat("Chin Height", 0, 0, 300);
+            manualChinHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualChinHeightStorable);
 
             manualShoulderHeightStorable = new JSONStorableFloat("Shoulder Height", 0, 0, 300);
+            manualShoulderHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualShoulderHeightStorable);
 
             manualNippleHeightStorable = new JSONStorableFloat("Bust Height", 0, 0, 300);
+            manualNippleHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualNippleHeightStorable);
 
             manualUnderbustHeightStorable = new JSONStorableFloat("Underbust Height", 0, 0, 300);
+            manualUnderbustHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualUnderbustHeightStorable);
 
             manualNavelHeightStorable = new JSONStorableFloat("Navel Height", 0, 0, 300);
+            manualNavelHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualNavelHeightStorable);
 
             manualCrotchHeightStorable = new JSONStorableFloat("Crotch Height", 0, 0, 300);
+            manualCrotchHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualCrotchHeightStorable);
 
             manualKneeBottomHeightStorable = new JSONStorableFloat("Knee Height", 0, 0, 300);
+            manualKneeBottomHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualKneeBottomHeightStorable);
         }
 

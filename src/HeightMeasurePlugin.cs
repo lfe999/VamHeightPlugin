@@ -11,7 +11,7 @@ namespace LFE
         CharacterMeasurements _autoMeasurements;
         CharacterMeasurements _manualMeasurements;
 
-        List<BaseVisualGuides> _visualGuides = new List<BaseVisualGuides>();
+        List<GameObject> _visualGuides = new List<GameObject>();
         MainVisualGuides _mainGuides;
         HeadVisualGuides _headGuides;
         FaceVisualGuides _faceGuides;
@@ -23,58 +23,37 @@ namespace LFE
         MainVisualGuides _mainGuidesManual;
         HeadVisualGuides _headGuidesManual;
 
+        private bool _initRun = false;
         public override void Init()
         {
             _ui = new UI(this);
 
-            _mainGuides = gameObject.AddComponent<MainVisualGuides>();
-            _mainGuides.transform.SetParent(containingAtom.mainController.transform);
-            _visualGuides.Add(_mainGuides);
+            _mainGuides = CreateVisualGuide<MainVisualGuides>();
+            _mainGuidesManual = CreateVisualGuide<MainVisualGuides>();
+            _headGuides = CreateVisualGuide<HeadVisualGuides>();
+            _headGuidesManual = CreateVisualGuide<HeadVisualGuides>();
+            _faceGuides = CreateVisualGuide<FaceVisualGuides>();
+            _bustGuides = CreateVisualGuide<ArcVisualGuides>();
+            _underbustGuides = CreateVisualGuide<ArcVisualGuides>();
+            _waistGuides = CreateVisualGuide<ArcVisualGuides>();
+            _hipGuides = CreateVisualGuide<ArcVisualGuides>();
 
-            _mainGuidesManual = gameObject.AddComponent<MainVisualGuides>();
-            _mainGuidesManual.transform.SetParent(containingAtom.mainController.transform);
-            _visualGuides.Add(_mainGuidesManual);
-
-            _headGuides = gameObject.AddComponent<HeadVisualGuides>();
-            _headGuides.transform.SetParent(containingAtom.mainController.transform);
-            _visualGuides.Add(_headGuides);
-
-            _headGuidesManual = gameObject.AddComponent<HeadVisualGuides>();
-            _headGuidesManual.transform.SetParent(containingAtom.mainController.transform);
-            _visualGuides.Add(_headGuidesManual);
-
-            _faceGuides = gameObject.AddComponent<FaceVisualGuides>();
-            _faceGuides.transform.SetParent(containingAtom.mainController.transform);
-            _visualGuides.Add(_faceGuides);
-
-            _bustGuides = gameObject.AddComponent<ArcVisualGuides>();
-            _bustGuides.transform.SetParent(containingAtom.mainController.transform);
-            _visualGuides.Add(_bustGuides);
-
-            _underbustGuides = gameObject.AddComponent<ArcVisualGuides>();
-            _underbustGuides.transform.SetParent(containingAtom.mainController.transform);
-            _visualGuides.Add(_underbustGuides);
-
-            _waistGuides = gameObject.AddComponent<ArcVisualGuides>();
-            _waistGuides.transform.SetParent(containingAtom.mainController.transform);
-            _visualGuides.Add(_waistGuides);
-
-            _hipGuides = gameObject.AddComponent<ArcVisualGuides>();
-            _hipGuides.transform.SetParent(containingAtom.mainController.transform);
-            _visualGuides.Add(_hipGuides);
+            _initRun = true;
         }
 
         public void OnEnable() {
             _enabled = true;
-            _mainGuides.Enabled = _ui.showFeatureMarkersStorable.val;
-            _mainGuidesManual.Enabled = false;
-            _headGuides.Enabled = _ui.showHeadHeightMarkersStorable.val; 
-            _headGuidesManual.Enabled = false;
-            _faceGuides.Enabled = _ui.showFaceMarkersStorable.val;
-            _bustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
-            _underbustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
-            _waistGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
-            _hipGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
+            if(_initRun) {
+                _mainGuides.Enabled = _ui.showFeatureMarkersStorable.val;
+                _mainGuidesManual.Enabled = false;
+                _headGuides.Enabled = _ui.showHeadHeightMarkersStorable.val; 
+                _headGuidesManual.Enabled = false;
+                _faceGuides.Enabled = _ui.showFaceMarkersStorable.val;
+                _bustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
+                _underbustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
+                _waistGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
+                _hipGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
+            }
         }
 
         public void OnDisable() {
@@ -95,7 +74,7 @@ namespace LFE
             foreach(var g in _visualGuides) {
                 Destroy(g);
             }
-            _visualGuides = new List<BaseVisualGuides>(); 
+            _visualGuides = new List<GameObject>(); 
 
             _mainGuides = null;
             _mainGuidesManual = null;
@@ -181,6 +160,14 @@ namespace LFE
             }
         }
 
+        private T CreateVisualGuide<T>() where T : MonoBehaviour {
+            var go = new GameObject();
+            go.transform.SetParent(transform);
+            var guide = go.AddComponent<T>();
+            guide.transform.SetParent(containingAtom.mainController.transform);
+            _visualGuides.Add(go);
+            return guide;
+        }
 
         private void UpdateVisuals() {
             if(_autoMeasurements == null || _ui == null || _manualMeasurements == null) {
@@ -188,8 +175,11 @@ namespace LFE
             }
 
             // tell all the display elements about the measurements
-            foreach(var g in _visualGuides) {
-                g.Measurements = _autoMeasurements;
+            foreach(var go in _visualGuides) {
+                var g = go.GetComponent<BaseVisualGuides>();
+                if(g) {
+                    g.Measurements = _autoMeasurements;
+                }
             }
             _mainGuidesManual.Measurements = _manualMeasurements;
             _headGuidesManual.Measurements = _manualMeasurements;
