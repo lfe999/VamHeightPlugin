@@ -191,10 +191,10 @@ namespace LFE {
                 _person = value;
                 _dazCharacter = _person?.GetComponentInChildren<DAZCharacter>();
                 _dazSkin = _dazCharacter?.skin;
-                _eyeLeft = _person.GetStorableByID("lEye") as DAZBone;
-                _eyeRight = _person.GetStorableByID("rEye") as DAZBone;
-                _footRightCollider = _person.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("rFoot/_Collider1")); 
-                _footLeftCollider = _person.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("lFoot/_Collider1")); 
+                _eyeLeft = _person?.GetStorableByID("lEye") as DAZBone ?? null;
+                _eyeRight = _person?.GetStorableByID("rEye") as DAZBone ?? null;
+                _footRightCollider = _person?.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("rFoot/_Collider1")) ?? null; 
+                _footLeftCollider = _person?.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("lFoot/_Collider1")) ?? null; 
             }
         }
 

@@ -90,6 +90,14 @@ namespace LFE
             foreach(var h in _penisMarkersFromMorph) {
                 Destroy(h);
             }
+
+            if(_autoMeasurements != null) {
+                if(_autoMeasurements.POI != null) {
+                    _autoMeasurements.POI.Person = null;
+                    _autoMeasurements.POI = null;
+                }
+                _autoMeasurements = null;
+            }
         }
 
         bool _enabledPrev = false; // allows for performant disabling
