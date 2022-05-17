@@ -3,6 +3,11 @@ src/UI.cs
 src/Model/UnitUtils.cs
 src/Model/CharacterMeasurements.cs
 src/Model/CharacterPointsOfInterest.cs
+src/AgeCalculator/AgeCalculation.cs
+src/AgeCalculator/AgeGuess.cs
+src/AgeCalculator/Anatomy4SculptersHeadCalculator.cs
+src/AgeCalculator/CdcHeightCalculator.cs
+src/AgeCalculator/IAgeCalculator.cs
 src/BustCalculator/ChateLaineCupCalculator.cs
 src/BustCalculator/CupSize.cs
 src/BustCalculator/EvasIntimatesCupCalculator.cs
@@ -16,3 +21,4 @@ src/VisualGuides/HeadVisualGuides.cs
 src/VisualGuides/FaceVisualGuides.cs
 src/VisualGuides/MainVisualGuides.cs
 src/VisualGuides/ArcVisualGuides.cs
+src/VisualGuides/AgeStatsVisualGuides.cs

@@ -10,6 +10,10 @@
    "programVersion" : "1.20.77.9", 
    "contentList" : [ 
       "Custom\\Scripts\\LFE\\HeightMeasure\\HeightMeasurePlugin.cslist",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\AgeCalculator\\AgeCalculation.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\AgeCalculator\\AgeGuess.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\AgeCalculator\\Anatomy4SculptersHeadCalculator.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\AgeCalculator\\IAgeCalculator.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\ChateLaineCupCalculator.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\CupSize.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\EvasIntimatesCupCalculator.cs",
@@ -20,6 +24,7 @@
       "Custom\\Scripts\\LFE\\HeightMeasure\\Model\\CharacterMeasurements.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\Model\\CharacterPointsOfInterest.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\Model\\UnitUtils.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\VisualGuides\\AgeStatsVisualGuides.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\VisualGuides\\ArcVisualGuides.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\VisualGuides\\BaseVisualGuides.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\VisualGuides\\FaceVisualGuides.cs",

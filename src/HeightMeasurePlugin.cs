@@ -19,9 +19,13 @@ namespace LFE
         ArcVisualGuides _underbustGuides;
         ArcVisualGuides _waistGuides;
         ArcVisualGuides _hipGuides;
+        AgeStatsVisualGuides _ageGuides;
 
         MainVisualGuides _mainGuidesManual;
         HeadVisualGuides _headGuidesManual;
+
+        readonly CdcHeightCalculator _ageFromHeightCalculator = new CdcHeightCalculator();
+        readonly Anatomy4SculptersCalculator _ageFromHeadRatioCalculator = new Anatomy4SculptersCalculator();
 
         private bool _initRun = false;
         public override void Init()
@@ -37,6 +41,7 @@ namespace LFE
             _underbustGuides = CreateVisualGuide<ArcVisualGuides>();
             _waistGuides = CreateVisualGuide<ArcVisualGuides>();
             _hipGuides = CreateVisualGuide<ArcVisualGuides>();
+            _ageGuides = CreateVisualGuide<AgeStatsVisualGuides>();
 
             _initRun = true;
         }
@@ -53,6 +58,7 @@ namespace LFE
                 _underbustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
                 _waistGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
                 _hipGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
+                _ageGuides.Enabled = true;
             }
         }
 
@@ -67,6 +73,7 @@ namespace LFE
             _underbustGuides.Enabled = false;
             _waistGuides.Enabled = false;
             _hipGuides.Enabled = false;
+            _ageGuides.Enabled = false;
         }
 
         public void OnDestroy() {
@@ -85,6 +92,7 @@ namespace LFE
             _underbustGuides = null;
             _waistGuides = null;
             _hipGuides = null;
+            _ageGuides = null;
             _autoMeasurements = null;
 
             foreach(var h in _penisMarkersFromMorph) {
@@ -158,6 +166,9 @@ namespace LFE
                 _ui.penisLength.val = _autoMeasurements.PenisLength ?? 0;
                 _ui.penisWidth.val = _autoMeasurements.PenisWidth ?? 0;
                 _ui.penisGirth.val = _autoMeasurements.PenisGirth ?? 0;
+
+                _ui.ageFromHeadStorable.val = _autoMeasurements.AgeFromHead?.LikelyAge ?? 0;
+                _ui.ageFromHeightStorable.val = _autoMeasurements.AgeFromHeight?.LikelyAge ?? 0;
 
                 UpdateVisuals();
                 UpdatePenisMarkers();
@@ -265,6 +276,14 @@ namespace LFE
                 _hipGuides.UnitDisplay = _ui.unitsStorable.val;
                 _hipGuides.Offset = pos;
                 _hipGuides.Points = _autoMeasurements.POI?.HipPoints ?? new Vector3[0];
+
+                // age guide
+                _ageGuides.Enabled = true; // TODO
+                _ageGuides.LabelsEnabled = true;
+                _ageGuides.LineColor = Color.cyan; // TODO
+                _ageGuides.LineThickness = 2.0f; // TODO
+                _ageGuides.UnitDisplay = _ui.unitsStorable.val;
+                _ageGuides.Offset = pos;
             }
 
             // manual feature guide
@@ -481,6 +500,19 @@ namespace LFE
                 measurements.PenisLength = null;
                 measurements.PenisGirth = null;
                 measurements.PenisWidth = null;
+            }
+
+            if(measurements.Height != null) {
+                measurements.AgeFromHeight = poi.IsMale
+                    ? _ageFromHeightCalculator.GuessMaleAges(measurements.Height.Value)
+                    : _ageFromHeightCalculator.GuessFemaleAges(measurements.Height.Value); 
+            }
+
+            if(measurements.HeadHeight != null) {
+                var heightInHeads = (float)measurements.Height.Value/measurements.HeadHeight.Value;
+                measurements.AgeFromHead = poi.IsMale
+                    ? _ageFromHeadRatioCalculator.GuessMaleAges(heightInHeads)
+                    : _ageFromHeadRatioCalculator.GuessFemaleAges(heightInHeads);
             }
 
             measurements.POI = poi;

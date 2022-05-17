@@ -42,6 +42,9 @@ namespace LFE {
         public JSONStorableFloat penisWidth;
         public JSONStorableFloat penisGirth;
 
+        public JSONStorableFloat ageFromHeadStorable;
+        public JSONStorableFloat ageFromHeightStorable;
+
         // TOOD: shoulder width
 
         // manual heights
@@ -324,6 +327,14 @@ namespace LFE {
             penisGirth = new JSONStorableFloat("penisGirth", 0, 0, 100);
             penisGirth.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(penisGirth);
+
+            ageFromHeadStorable = new JSONStorableFloat("ageFromHead", 0, 0, 100);
+            ageFromHeadStorable.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterFloat(ageFromHeadStorable);
+
+            ageFromHeightStorable = new JSONStorableFloat("ageFromHeight", 0, 0, 100);
+            ageFromHeightStorable.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterFloat(ageFromHeightStorable);
 
             // manual heights
             showManualMarkersStorable = new JSONStorableBool("Manual Markers", false, (bool value) => {

@@ -72,6 +72,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="src/AgeCalculator/IAgeCalculator.cs" />
+    <Compile Include="src/AgeCalculator/AgeGuess.cs" />
+    <Compile Include="src/AgeCalculator/Anatomy4SculptersHeadCalculator.cs" />
+    <Compile Include="src/AgeCalculator/CdcHeightCalculator.cs" />
+    <Compile Include="src/AgeCalculator/AgeCalculation.cs" />
     <Compile Include="src/BustCalculator/ChateLaineCupCalculator.cs" />
     <Compile Include="src/BustCalculator/CupSize.cs" />
     <Compile Include="src/BustCalculator/EvasIntimatesCupCalculator.cs" />
@@ -82,6 +87,7 @@
     <Compile Include="src/Model/CharacterMeasurements.cs" />
     <Compile Include="src/Model/CharacterPointsOfInterest.cs" />
     <Compile Include="src/Model/UnitUtils.cs" />
+    <Compile Include="src/VisualGuides/AgeStatsVisualGuides.cs" />
     <Compile Include="src/VisualGuides/ArcVisualGuides.cs" />
     <Compile Include="src/VisualGuides/BaseVisualGuides.cs" />
     <Compile Include="src/VisualGuides/FaceVisualGuides.cs" />

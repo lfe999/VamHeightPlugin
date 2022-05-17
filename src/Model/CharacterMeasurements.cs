@@ -37,6 +37,9 @@ namespace LFE {
         public float? EyesWidth { get; set; }
         public Vector3 HeelToFloorOffset { get; set; } = Vector3.zero;
         public CharacterPointsOfInterest POI { get; set; } = null;
+
+        public AgeCalculation AgeFromHead { get; set; }
+        public AgeCalculation AgeFromHeight { get; set; }
     }
 
 }
