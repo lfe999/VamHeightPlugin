@@ -58,7 +58,7 @@ namespace LFE
                 _underbustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
                 _waistGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
                 _hipGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
-                _ageGuides.Enabled = true;
+                _ageGuides.Enabled = false;
             }
         }
 
@@ -278,7 +278,7 @@ namespace LFE
                 _hipGuides.Points = _autoMeasurements.POI?.HipPoints ?? new Vector3[0];
 
                 // age guide
-                _ageGuides.Enabled = true; // TODO
+                _ageGuides.Enabled = false; // TODO
                 _ageGuides.LabelsEnabled = true;
                 _ageGuides.LineColor = Color.cyan; // TODO
                 _ageGuides.LineThickness = 2.0f; // TODO
