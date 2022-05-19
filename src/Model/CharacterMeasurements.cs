@@ -40,6 +40,27 @@ namespace LFE {
 
         public AgeCalculation AgeFromHead { get; set; }
         public AgeCalculation AgeFromHeight { get; set; }
+
+        public Proportions Proportions {
+            get {
+                var p = new Proportions() {
+                    ProportionName = "Current",
+                };
+                if((HeadHeight ?? 0) == 0) {
+                    return p;
+                }
+                var hh = HeadHeight ?? 0;
+                p.FigureHeightInHeads = ((Height ?? 0) - (HeelHeight ?? 0)) / hh;
+                p.FigureChinToShoulder = Mathf.Abs((ChinHeight?? 0) - (ShoulderHeight?? 0)) / hh;
+                p.FigureShoulderToNipples = Mathf.Abs((ShoulderHeight ?? 0) - (NippleHeight ?? 0)) / hh;
+                p.FigureShoulderToNavel = Mathf.Abs((ShoulderHeight ?? 0) - (NavelHeight ?? 0)) / hh;
+                p.FigureShoulderToCrotch = Mathf.Abs((ShoulderHeight?? 0) - (CrotchHeight ?? 0)) / hh;
+                p.FigureLengthOfLowerLimb = Mathf.Abs((CrotchHeight ?? 0) - (HeelHeight ?? 0)) / hh;
+                p.FigureCrotchToBottomOfKnees = Mathf.Abs((CrotchHeight ?? 0) - (KneeHeight ?? 0)) / hh;
+                p.FigureBottomOfKneesToHeels = Mathf.Abs((KneeHeight ?? 0) - (HeelHeight ?? 0)) / hh;
+                return p;
+            }
+        }
     }
 
 }

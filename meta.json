@@ -23,6 +23,7 @@
       "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\SizeChartCupCalculator.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\Model\\CharacterMeasurements.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\Model\\CharacterPointsOfInterest.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\Model\\Proportions.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\Model\\UnitUtils.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\VisualGuides\\AgeStatsVisualGuides.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\VisualGuides\\ArcVisualGuides.cs",
@@ -31,6 +32,7 @@
       "Custom\\Scripts\\LFE\\HeightMeasure\\VisualGuides\\HeadVisualGuides.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\VisualGuides\\LabeledLine.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\VisualGuides\\MainVisualGuides.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\VisualGuides\\ProportionTargetVisualGuides.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\UI.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\HeightMeasurePlugin.cs"
    ], 

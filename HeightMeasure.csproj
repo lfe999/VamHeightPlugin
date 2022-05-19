@@ -86,6 +86,7 @@
     <Compile Include="src/BustCalculator/SizeChartCupCalculator.cs" />
     <Compile Include="src/Model/CharacterMeasurements.cs" />
     <Compile Include="src/Model/CharacterPointsOfInterest.cs" />
+    <Compile Include="src/Model/Proportions.cs" />
     <Compile Include="src/Model/UnitUtils.cs" />
     <Compile Include="src/VisualGuides/AgeStatsVisualGuides.cs" />
     <Compile Include="src/VisualGuides/ArcVisualGuides.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="src/VisualGuides/HeadVisualGuides.cs" />
     <Compile Include="src/VisualGuides/LabeledLine.cs" />
     <Compile Include="src/VisualGuides/MainVisualGuides.cs" />
+    <Compile Include="src/VisualGuides/ProportionTargetVisualGuides.cs" />
     <Compile Include="src/UI.cs" />
     <Compile Include="src/HeightMeasurePlugin.cs" />
   </ItemGroup>

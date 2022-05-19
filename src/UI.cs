@@ -81,6 +81,11 @@ namespace LFE {
         public JSONStorableColor circumferenceMarkerColor;
         public JSONStorableFloat lineThicknessCircumferenceStorable;
 
+        public JSONStorableBool showProportionMarkersStorable;
+        public JSONStorableColor proportionMarkerColor;
+        public JSONStorableFloat lineThicknessProportionStorable;
+        public JSONStorableStringChooser proportionSelectionStorable;
+
         public JSONStorableStringChooser cupAlgorithmStorable;
         public JSONStorableStringChooser unitsStorable;
         public JSONStorableFloat markerSpreadStorable;
@@ -101,13 +106,14 @@ namespace LFE {
         private bool _choosingFaceColor = false;
         private bool _choosingCircumferenceColor = false;
         private bool _choosingManualColor = false;
+        private bool _choosingProportionColor = false;
         private void InitStorables() {
 
             //////////////////////////////////////
             // UI related
             // Cup algorithm choice
 
-            showFeatureMarkersStorable = new JSONStorableBool("Auto Feature Guides", true, (bool value) => {
+            showFeatureMarkersStorable = new JSONStorableBool("Auto Feature Guides", false, (bool value) => {
                 showFeatureMarkersStorable.valNoCallback = value;
                 Draw();
             });
@@ -159,7 +165,7 @@ namespace LFE {
 
             //////////////////
 
-            showFaceMarkersStorable = new JSONStorableBool("Auto Face Guides", true, (bool value) => {
+            showFaceMarkersStorable = new JSONStorableBool("Auto Face Guides", false, (bool value) => {
                 Draw();
             });
             showFaceMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
@@ -203,6 +209,40 @@ namespace LFE {
             _plugin.RegisterColor(circumferenceMarkerColor);
 
             //////////////////
+            showProportionMarkersStorable = new JSONStorableBool("Proportion Guides", true, (bool value) => {
+                Draw();
+            });
+            showProportionMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showProportionMarkersStorable);
+
+            lineThicknessProportionStorable = new JSONStorableFloat("Proportion Line Width", 2, 1, 10, constrain: true);
+            lineThicknessProportionStorable.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterFloat(lineThicknessProportionStorable);
+
+            proportionMarkerColor = new JSONStorableColor("Proportion Guide Color", _plugin.ColorToHSV(Color.yellow), (float h, float s, float v) => {
+                var hsv = new HSVColor { H = h, S = s, V = v };
+                proportionMarkerColor.valNoCallback = hsv;
+                if(_proportionMarkerColorButton != null) {
+                    _proportionMarkerColorButton.buttonColor = _plugin.HSVToColor(hsv);
+                }
+            });
+            proportionMarkerColor.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterColor(proportionMarkerColor);
+
+            var proportionNames = Proportions.CommonProportions.Where(p => p.CanSeeInInterface).Select(p => p.ProportionName).ToList();
+            proportionNames.Insert(0, "Auto Detect");
+            proportionSelectionStorable = new JSONStorableStringChooser(
+                "Proportion Template",
+                proportionNames,
+                proportionNames[0],
+                "Proportion Template"
+            );
+            proportionSelectionStorable.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterStringChooser(proportionSelectionStorable);
+
+            //////////////////
+
+
 
             // Choose
             cupAlgorithmStorable = new JSONStorableStringChooser(
@@ -416,6 +456,12 @@ namespace LFE {
         private UIDynamicColorPicker _circumferenceMarkerColorPicker;
         private UIDynamicSlider _circumferenceMarkerLineThickness;
 
+        private UIDynamicToggle _proportionMarkerToggle;
+        private UIDynamicButton _proportionMarkerColorButton;
+        private UIDynamicColorPicker _proportionMarkerColorPicker;
+        private UIDynamicSlider _proportionMarkerLineThickness;
+        private UIDynamicPopup _proportionSelection;
+
         private UIDynamicPopup _cupAlgorithm;
         private UIDynamicPopup _units;
         private UIDynamicSlider _markerSpread;
@@ -545,6 +591,28 @@ namespace LFE {
                     }
                 }
                 CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
+
+                // Proportion Guides
+                CreateStandardDivider(rightSide: false);
+                _proportionMarkerToggle = _plugin.CreateToggle(showProportionMarkersStorable, rightSide: false);
+                _proportionMarkerToggle.backgroundColor = HEADER_COLOR;
+                if(showProportionMarkersStorable.val) {
+                    _proportionMarkerColorButton = _plugin.CreateButton("Set Line Color");
+                    _proportionMarkerColorButton.buttonColor = _plugin.HSVToColor(proportionMarkerColor.val);
+                    _proportionMarkerColorButton.button.onClick.AddListener(() => {
+                        _choosingProportionColor = !_choosingProportionColor;
+                        Draw();
+                    });
+                    if(_choosingProportionColor) {
+                        _proportionMarkerColorPicker = _plugin.CreateColorPicker(proportionMarkerColor, rightSide: false);
+                    }
+                    _proportionMarkerLineThickness = _plugin.CreateSlider(lineThicknessProportionStorable, rightSide: false);
+
+                    _proportionSelection = _plugin.CreateScrollablePopup(proportionSelectionStorable, rightSide: false);
+
+                    CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                }
+                CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
             }
 
             CreateStandardDivider(rightSide: false);
@@ -661,6 +729,22 @@ namespace LFE {
             }
             if(_circumferenceMarkerLineThickness) {
                 _plugin.RemoveSlider(_circumferenceMarkerLineThickness);
+            }
+
+            if(_proportionMarkerToggle) {
+                _plugin.RemoveToggle(_proportionMarkerToggle);
+            }
+            if(_proportionMarkerColorButton) {
+                _plugin.RemoveButton(_proportionMarkerColorButton);
+            }
+            if(_proportionMarkerColorPicker) {
+                _plugin.RemoveColorPicker(_proportionMarkerColorPicker);
+            }
+            if(_proportionMarkerLineThickness) {
+                _plugin.RemoveSlider(_proportionMarkerLineThickness);
+            }
+            if(_proportionSelection) {
+                _plugin.RemovePopup(_proportionSelection);
             }
 
             if(_cupAlgorithm) {

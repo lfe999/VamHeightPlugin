@@ -3,6 +3,7 @@ src/UI.cs
 src/Model/UnitUtils.cs
 src/Model/CharacterMeasurements.cs
 src/Model/CharacterPointsOfInterest.cs
+src/Model/Proportions.cs
 src/AgeCalculator/AgeCalculation.cs
 src/AgeCalculator/AgeGuess.cs
 src/AgeCalculator/Anatomy4SculptersHeadCalculator.cs
@@ -22,3 +23,4 @@ src/VisualGuides/FaceVisualGuides.cs
 src/VisualGuides/MainVisualGuides.cs
 src/VisualGuides/ArcVisualGuides.cs
 src/VisualGuides/AgeStatsVisualGuides.cs
+src/VisualGuides/ProportionTargetVisualGuides.cs

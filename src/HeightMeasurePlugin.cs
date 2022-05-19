@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace LFE
@@ -20,6 +21,7 @@ namespace LFE
         ArcVisualGuides _waistGuides;
         ArcVisualGuides _hipGuides;
         AgeStatsVisualGuides _ageGuides;
+        ProportionTargetVisualGuides _proportionGuides;
 
         MainVisualGuides _mainGuidesManual;
         HeadVisualGuides _headGuidesManual;
@@ -42,6 +44,7 @@ namespace LFE
             _waistGuides = CreateVisualGuide<ArcVisualGuides>();
             _hipGuides = CreateVisualGuide<ArcVisualGuides>();
             _ageGuides = CreateVisualGuide<AgeStatsVisualGuides>();
+            _proportionGuides = CreateVisualGuide<ProportionTargetVisualGuides>();
 
             _initRun = true;
         }
@@ -59,6 +62,7 @@ namespace LFE
                 _waistGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
                 _hipGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
                 _ageGuides.Enabled = false;
+                _proportionGuides.Enabled = true;
             }
         }
 
@@ -74,6 +78,7 @@ namespace LFE
             _waistGuides.Enabled = false;
             _hipGuides.Enabled = false;
             _ageGuides.Enabled = false;
+            _proportionGuides.Enabled = false;
         }
 
         public void OnDestroy() {
@@ -93,6 +98,7 @@ namespace LFE
             _waistGuides = null;
             _hipGuides = null;
             _ageGuides = null;
+            _proportionGuides = null;
             _autoMeasurements = null;
 
             foreach(var h in _penisMarkersFromMorph) {
@@ -284,6 +290,15 @@ namespace LFE
                 _ageGuides.LineThickness = 2.0f; // TODO
                 _ageGuides.UnitDisplay = _ui.unitsStorable.val;
                 _ageGuides.Offset = pos;
+
+                // proportion guide
+                _proportionGuides.Enabled = _ui.showProportionMarkersStorable.val;
+                _proportionGuides.LabelsEnabled = true;
+                _proportionGuides.LineColor = HSVToColor(_ui.proportionMarkerColor.val);
+                _proportionGuides.LineThickness = _ui.lineThicknessProportionStorable.val;
+                _proportionGuides.UnitDisplay = _ui.unitsStorable.val;
+                _proportionGuides.Offset = pos - spreadVector - new Vector3(0, 0, 0.004f); // put these just a bit behind the auto guides
+                _proportionGuides.TargetProportion = Proportions.CommonProportions.FirstOrDefault(p => p.ProportionName.Equals(_ui.proportionSelectionStorable.val));
             }
 
             // manual feature guide
