@@ -8,6 +8,7 @@ public class Proportions {
     public static List<Proportions> CommonProportions = new List<Proportions>() {
         // https://hpc.anatomy4sculptors.com/
         new Proportions() {
+            IsFemale = true,
             CanAutoDetect = false,
             ProportionName = "Female Elderly",
             FigureHeightInHeads = 7f,
@@ -20,6 +21,7 @@ public class Proportions {
             FigureBottomOfKneesToHeels = 1.7f
         },
         new Proportions() {
+            IsFemale = true,
             ProportionName = "Female Adult",
             FigureHeightInHeads = 8f,
             FigureChinToShoulder = 0.33f,
@@ -31,6 +33,7 @@ public class Proportions {
             FigureBottomOfKneesToHeels = 2f
         },
         new Proportions() {
+            IsFemale = true,
             ProportionName = "Female Young Adult",
             FigureHeightInHeads = 7.5f,
             FigureChinToShoulder = 0.3f,
@@ -42,6 +45,7 @@ public class Proportions {
             FigureBottomOfKneesToHeels = 1.8f
         },
         new Proportions() {
+            IsFemale = true,
             ProportionName = "Female Teenager",
             FigureHeightInHeads = 7f,
             FigureChinToShoulder = 0.3f,
@@ -53,6 +57,7 @@ public class Proportions {
             FigureBottomOfKneesToHeels = 1.8f
         },
         new Proportions() {
+            IsFemale = true,
             CanSeeInInterface = false,
             ShouldShowWarning = true,
             ProportionName = "Female Child",
@@ -66,6 +71,7 @@ public class Proportions {
             FigureBottomOfKneesToHeels = 1.4f
         },
         new Proportions() {
+            IsFemale = true,
             CanSeeInInterface = false,
             ShouldShowWarning = true,
             ProportionName = "Female Young Child",
@@ -79,6 +85,7 @@ public class Proportions {
             FigureBottomOfKneesToHeels = 1.3f
         },
         new Proportions() {
+            IsFemale = true,
             CanSeeInInterface = false,
             ShouldShowWarning = true,
             ProportionName = "Female Infant",
@@ -90,9 +97,137 @@ public class Proportions {
             FigureLengthOfLowerLimb = 2f,
             FigureCrotchToBottomOfKnees = 1f,
             FigureBottomOfKneesToHeels = 1f
+        },
+        new Proportions() {
+            IsFemale = true,
+            CanSeeInInterface = false,
+            ShouldShowWarning = true,
+            ProportionName = "Female Newborn",
+            FigureHeightInHeads = 4f,
+            FigureChinToShoulder = 0.0f,
+            FigureShoulderToNipples = 0.33f,
+            FigureShoulderToNavel = 1.2f,
+            FigureShoulderToCrotch = 1.6f,
+            FigureLengthOfLowerLimb = 0.6f,
+            FigureCrotchToBottomOfKnees = 0.6f,
+            FigureBottomOfKneesToHeels = 0.8f
+        },
+
+        new Proportions() {
+            IsFemale = false,
+            CanSeeInInterface = true,
+            ShouldShowWarning = false,
+            ProportionName = "Male Elderly",
+            FigureHeightInHeads = 7f,
+            FigureChinToShoulder = 0.3f,
+            FigureShoulderToNipples = 0.6f,
+            FigureShoulderToNavel = 1.5f,
+            FigureShoulderToCrotch = 2.1f,
+            FigureLengthOfLowerLimb = 3.5f,
+            FigureCrotchToBottomOfKnees = 1.8f,
+            FigureBottomOfKneesToHeels = 1.7f
+        },
+        new Proportions() {
+            IsFemale = false,
+            CanSeeInInterface = true,
+            ShouldShowWarning = false,
+            ProportionName = "Male Adult",
+            FigureHeightInHeads = 8f,
+            FigureChinToShoulder = 0.33f,
+            FigureShoulderToNipples = 0.66f,
+            FigureShoulderToNavel = 1.65f,
+            FigureShoulderToCrotch = 2.6f,
+            FigureLengthOfLowerLimb = 4f,
+            FigureCrotchToBottomOfKnees = 2f,
+            FigureBottomOfKneesToHeels = 2f
+        },
+        new Proportions() {
+            IsFemale = false,
+            CanSeeInInterface = true,
+            ShouldShowWarning = false,
+            ProportionName = "Male Young Adult",
+            FigureHeightInHeads = 7.5f,
+            FigureChinToShoulder = 0.3f,
+            FigureShoulderToNipples = 0.6f,
+            FigureShoulderToNavel = 1.5f,
+            FigureShoulderToCrotch = 2.4f,
+            FigureLengthOfLowerLimb = 3.7f,
+            FigureCrotchToBottomOfKnees = 1.9f,
+            FigureBottomOfKneesToHeels = 1.8f
+        },
+        new Proportions() {
+            IsFemale = false,
+            CanSeeInInterface = true,
+            ShouldShowWarning = false,
+            ProportionName = "Male Teenager",
+            FigureHeightInHeads = 7f,
+            FigureChinToShoulder = 0.3f,
+            FigureShoulderToNipples = 0.6f,
+            FigureShoulderToNavel = 1.3f,
+            FigureShoulderToCrotch = 2.3f,
+            FigureLengthOfLowerLimb = 3.3f,
+            FigureCrotchToBottomOfKnees = 1.5f,
+            FigureBottomOfKneesToHeels = 1.8f
+        },
+        new Proportions() {
+            IsFemale = false,
+            CanSeeInInterface = false,
+            ShouldShowWarning = true,
+            ProportionName = "Male Child",
+            FigureHeightInHeads = 6f,
+            FigureChinToShoulder = 0.2f,
+            FigureShoulderToNipples = 0.4f,
+            FigureShoulderToNavel = 1.3f,
+            FigureShoulderToCrotch = 2f,
+            FigureLengthOfLowerLimb = 2.8f,
+            FigureCrotchToBottomOfKnees = 1.4f,
+            FigureBottomOfKneesToHeels = 1.4f
+        },
+        new Proportions() {
+            IsFemale = false,
+            CanSeeInInterface = false,
+            ShouldShowWarning = true,
+            ProportionName = "Male Young Child",
+            FigureHeightInHeads = 5.5f,
+            FigureChinToShoulder = 0.2f,
+            FigureShoulderToNipples = 0.4f,
+            FigureShoulderToNavel = 1.2f,
+            FigureShoulderToCrotch = 2f,
+            FigureLengthOfLowerLimb = 2.3f,
+            FigureCrotchToBottomOfKnees = 1f,
+            FigureBottomOfKneesToHeels = 1.3f
+        },
+        new Proportions() {
+            IsFemale = false,
+            CanSeeInInterface = false,
+            ShouldShowWarning = true,
+            ProportionName = "Male Infant",
+            FigureHeightInHeads = 5f,
+            FigureChinToShoulder = 0.2f,
+            FigureShoulderToNipples = 0.4f,
+            FigureShoulderToNavel = 1f,
+            FigureShoulderToCrotch = 1.8f,
+            FigureLengthOfLowerLimb = 2f,
+            FigureCrotchToBottomOfKnees = 1f,
+            FigureBottomOfKneesToHeels = 1f
+        },
+        new Proportions() {
+            IsFemale = false,
+            CanSeeInInterface = false,
+            ShouldShowWarning = true,
+            ProportionName = "Male Newborn",
+            FigureHeightInHeads = 4f,
+            FigureChinToShoulder = 0.0f,
+            FigureShoulderToNipples = 0.33f,
+            FigureShoulderToNavel = 1.2f,
+            FigureShoulderToCrotch = 1.6f,
+            FigureLengthOfLowerLimb = 0.6f,
+            FigureCrotchToBottomOfKnees = 0.6f,
+            FigureBottomOfKneesToHeels = 0.8f
         }
     };
 
+    public bool IsFemale { get; set; } = true;
     public bool CanAutoDetect { get; set; } = true;
     public bool CanSeeInInterface { get; set; } = true;
     public bool ShouldShowWarning { get; set; } = false;
@@ -112,7 +247,7 @@ public class Proportions {
     public float FigureBottomOfKneesToHeels { get; set; }
 
     public List<Proportions> ClosestMatches(List<Proportions> proportions) {
-        return proportions.OrderBy(x => x.ProportionsDeltaScaled(this).SortScore()).ToList();
+        return proportions.Where(p => p.IsFemale == this.IsFemale).OrderBy(x => x.ProportionsDeltaScaled(this).SortScore()).ToList();
     }
 
     public Proportions ClostestMatch(List<Proportions> proportions) {

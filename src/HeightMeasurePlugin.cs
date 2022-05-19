@@ -175,6 +175,7 @@ namespace LFE
 
                 _ui.ageFromHeadStorable.val = _autoMeasurements.AgeFromHead?.LikelyAge ?? 0;
                 _ui.ageFromHeightStorable.val = _autoMeasurements.AgeFromHeight?.LikelyAge ?? 0;
+                _ui.proportionClosestMatch.val = _autoMeasurements.Proportions?.ClostestMatch(Proportions.CommonProportions)?.ProportionName ?? "";
 
                 UpdateVisuals();
                 UpdatePenisMarkers();

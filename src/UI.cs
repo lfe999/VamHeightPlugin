@@ -44,6 +44,7 @@ namespace LFE {
 
         public JSONStorableFloat ageFromHeadStorable;
         public JSONStorableFloat ageFromHeightStorable;
+        public JSONStorableString proportionClosestMatch;
 
         // TOOD: shoulder width
 
@@ -285,7 +286,7 @@ namespace LFE {
             markerUpDownStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(markerUpDownStorable);
 
-            hideDocsStorable = new JSONStorableBool("Hide Docs and Warnings", false);
+            hideDocsStorable = new JSONStorableBool("Hide Documentation", false);
             hideDocsStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(hideDocsStorable);
 
@@ -380,6 +381,10 @@ namespace LFE {
             ageFromHeightStorable = new JSONStorableFloat("ageFromHeight", 0, 0, 100);
             ageFromHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(ageFromHeightStorable);
+
+            proportionClosestMatch = new JSONStorableString("proportionMatch", "");
+            proportionClosestMatch.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterString(proportionClosestMatch);
 
             // manual heights
             showManualMarkersStorable = new JSONStorableBool("Manual Markers", false, (bool value) => {

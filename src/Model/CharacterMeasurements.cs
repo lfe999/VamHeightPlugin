@@ -50,6 +50,7 @@ namespace LFE {
                     return p;
                 }
                 var hh = HeadHeight ?? 0;
+                p.IsFemale = !(POI?.IsMale ?? false);
                 p.FigureHeightInHeads = ((Height ?? 0) - (HeelHeight ?? 0)) / hh;
                 p.FigureChinToShoulder = Mathf.Abs((ChinHeight?? 0) - (ShoulderHeight?? 0)) / hh;
                 p.FigureShoulderToNipples = Mathf.Abs((ShoulderHeight ?? 0) - (NippleHeight ?? 0)) / hh;
