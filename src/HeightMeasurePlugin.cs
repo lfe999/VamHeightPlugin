@@ -224,6 +224,7 @@ namespace LFE
                 var isMale = _autoMeasurements.POI?.IsMale ?? false;
 
                 // auto feature guide
+                _mainGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _mainGuides.Enabled = _ui.showFeatureMarkersStorable.val;
                 _mainGuides.LabelsEnabled = _ui.showFeatureMarkerLabelsStorable.val;
                 _mainGuides.LineColor = HSVToColor(_ui.featureMarkerColor.val);
@@ -232,6 +233,7 @@ namespace LFE
                 _mainGuides.Offset = pos - spreadVector;
 
                 // auto head height guide
+                _headGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _headGuides.Enabled = _ui.showHeadHeightMarkersStorable.val;
                 _headGuides.LabelsEnabled = true;
                 _headGuides.LineColor = HSVToColor(_ui.headMarkerColor.val);
@@ -240,6 +242,7 @@ namespace LFE
                 _headGuides.Offset = pos + spreadVector;
 
                 // auto face guide
+                _faceGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _faceGuides.Enabled = _ui.showFaceMarkersStorable.val;
                 _faceGuides.LabelsEnabled = true;
                 _faceGuides.LineColor = HSVToColor(_ui.faceMarkerColor.val);
@@ -248,6 +251,7 @@ namespace LFE
                 _faceGuides.Offset = pos + new Vector3(0, 0, -0.03f);
 
                 // bust guide
+                _bustGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _bustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
                 _bustGuides.LabelsEnabled = false;
                 _bustGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
@@ -257,6 +261,7 @@ namespace LFE
                 _bustGuides.Points = _autoMeasurements.POI?.BustPoints ?? new Vector3[0];
 
                 // underbust guide
+                _underbustGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _underbustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
                 _underbustGuides.LabelsEnabled = false;
                 _underbustGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
@@ -266,6 +271,7 @@ namespace LFE
                 _underbustGuides.Points = _autoMeasurements.POI?.UnderbustPoints ?? new Vector3[0];
 
                 // waist guide
+                _waistGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _waistGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
                 _waistGuides.LabelsEnabled = false;
                 _waistGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
@@ -275,6 +281,7 @@ namespace LFE
                 _waistGuides.Points = _autoMeasurements.POI?.WaistPoints ?? new Vector3[0];
 
                 // hip guide
+                _hipGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _hipGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
                 _hipGuides.LabelsEnabled = false;
                 _hipGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
@@ -284,6 +291,7 @@ namespace LFE
                 _hipGuides.Points = _autoMeasurements.POI?.HipPoints ?? new Vector3[0];
 
                 // age guide
+                _ageGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _ageGuides.Enabled = false; // TODO
                 _ageGuides.LabelsEnabled = true;
                 _ageGuides.LineColor = Color.cyan; // TODO
@@ -292,6 +300,7 @@ namespace LFE
                 _ageGuides.Offset = pos;
 
                 // proportion guide
+                _proportionGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _proportionGuides.Enabled = _ui.showProportionMarkersStorable.val;
                 _proportionGuides.LabelsEnabled = true;
                 _proportionGuides.LineColor = HSVToColor(_ui.proportionMarkerColor.val);
@@ -302,6 +311,7 @@ namespace LFE
             }
 
             // manual feature guide
+            _mainGuidesManual.ShowDocumentation = !_ui.hideDocsStorable.val;
             _mainGuidesManual.Enabled = _ui.showManualMarkersStorable.val;
             _mainGuidesManual.LabelsEnabled = _ui.showManualMarkersStorable.val && _mainGuidesManual.Measurements.Height > 0;
             _mainGuidesManual.LineColor = HSVToColor(_ui.manualMarkerColor.val);
@@ -310,6 +320,7 @@ namespace LFE
             _mainGuidesManual.Offset = pos - spreadVector - new Vector3(0, 0, 0.002f); // put these just a bit behind the auto guides
 
             // manual head height guide
+            _headGuidesManual.ShowDocumentation = !_ui.hideDocsStorable.val;
             _headGuidesManual.Enabled = _ui.showManualMarkersStorable.val && _headGuidesManual.Measurements.Height > 0;
             _headGuidesManual.LabelsEnabled = true;
             _headGuidesManual.LineColor = HSVToColor(_ui.manualMarkerColor.val);

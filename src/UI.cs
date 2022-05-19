@@ -92,6 +92,7 @@ namespace LFE {
         public JSONStorableFloat markerLeftRightStorable;
         public JSONStorableFloat markerFrontBackStorable;
         public JSONStorableFloat markerUpDownStorable;
+        public JSONStorableBool hideDocsStorable;
 
         public ICupCalculator CupCalculator => _cupCalculators.FirstOrDefault(c => c.Name.Equals(cupAlgorithmStorable.val));
 
@@ -284,6 +285,10 @@ namespace LFE {
             markerUpDownStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(markerUpDownStorable);
 
+            hideDocsStorable = new JSONStorableBool("Hide Docs and Warnings", false);
+            hideDocsStorable.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(hideDocsStorable);
+
 
             //////////////////////////////////////
 
@@ -468,6 +473,7 @@ namespace LFE {
         private UIDynamicSlider _markerFrontBack;
         private UIDynamicSlider _markerLeftRight;
         private UIDynamicSlider _markerUpDown;
+        private UIDynamicToggle _hideDocs;
 
         private UIDynamicToggle _manualMarkerToggle;
         private UIDynamicToggle _copyManualMarkers;
@@ -622,6 +628,7 @@ namespace LFE {
             _markerFrontBack = _plugin.CreateSlider(markerFrontBackStorable, rightSide: false);
             _markerLeftRight = _plugin.CreateSlider(markerLeftRightStorable, rightSide: false);
             _markerUpDown = _plugin.CreateSlider(markerUpDownStorable, rightSide: false);
+            _hideDocs = _plugin.CreateToggle(hideDocsStorable, rightSide: false);
 
             CreateStandardDivider(rightSide: true);
             _manualMarkerToggle = _plugin.CreateToggle(showManualMarkersStorable, rightSide: true);
@@ -764,6 +771,9 @@ namespace LFE {
             }
             if(_markerUpDown) {
                 _plugin.RemoveSlider(_markerUpDown);
+            }
+            if(_hideDocs) {
+                _plugin.RemoveToggle(_hideDocs);
             }
         }
 

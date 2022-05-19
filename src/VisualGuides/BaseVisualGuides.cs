@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace LFE {
     public class BaseVisualGuides : MonoBehaviour {
+        public bool ShowDocumentation { get; set; } = true;
         public string UnitDisplay { get; set; } = UnitUtils.Centimeters;
         public bool Enabled { get; set; } = false;
         public bool LabelsEnabled { get; set; } = false;
