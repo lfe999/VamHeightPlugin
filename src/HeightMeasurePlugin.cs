@@ -114,7 +114,25 @@ namespace LFE
             }
         }
 
+        private DAZMorph GetMorphByName(string name) {
+            JSONStorable geometry = containingAtom.GetStorableByID("geometry");
+            if (geometry == null)  {
+                return null;
+            }
+
+            DAZCharacterSelector dcs = geometry as DAZCharacterSelector;
+            if (dcs == null) {
+                return null;
+            }
+
+            var mcui = dcs.morphsControlUI;
+
+            return mcui.GetMorphByDisplayName(name);
+        }
+
         bool _enabledPrev = false; // allows for performant disabling
+        DAZMorph _headScaleMorph = null;
+        int _lastSex = 0; // 0 female - 1 male
         public void Update() {
             if(SuperController.singleton.freezeAnimation) {
                 return;
@@ -132,6 +150,65 @@ namespace LFE
                 return;
             }
 
+            bool sexWasChanged = false;
+            bool targetHeadMorphChanged = false;
+            if(_autoMeasurements != null) {
+                var curSex = _autoMeasurements.POI.IsMale ? 1 : 0;
+                sexWasChanged = curSex != _lastSex;
+                _lastSex = curSex;
+
+                targetHeadMorphChanged = _ui.targetHeadRatioMorphStorable.val != _headScaleMorph?.morphName;
+            }
+
+            var headRatioTarget = _ui.targetHeadRatioStorable.val;
+
+            // adjust head ratio to match a forced target
+            if(_ui.showTargetHeadRatioStorable.val && _autoMeasurements != null) {
+                var headRatioCurrent = _autoMeasurements.HeadHeight != null ? (_autoMeasurements.Height ?? 0)/(_autoMeasurements.HeadHeight ?? 0) : 0;
+                if(headRatioCurrent > 0) {
+                    // morph preference "Head big" (reloaded lite) and then "Head Scale" (built in)
+                    // head big:
+                    // - increasing the morph makes head bigger, which reduces the RATIO 
+                    // head scale:
+                    // - increasing the morph makes head smaller, which increases the RATIO
+                    if(sexWasChanged || targetHeadMorphChanged) {
+                        _headScaleMorph = null;
+                    }
+
+                    if(_headScaleMorph == null) {
+                        _headScaleMorph = GetMorphByName(_ui.targetHeadRatioMorphStorable.val);
+                        /// hmm try all the morphs in the list
+                        if(_headScaleMorph == null) {
+                            foreach(var morphName in _ui.targetHeadRatioMorphStorable.choices) {
+                                _headScaleMorph = GetMorphByName(morphName);
+                                if(_headScaleMorph != null) {
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+                    else {
+                        int makeHeadBiggerMorphDirection = _headScaleMorph.displayName.Equals("Head big") ? 1 : -1;
+                        int precision = 2;
+                        if(Mathf.RoundToInt(headRatioCurrent*(precision+1)*100) != Mathf.RoundToInt(headRatioTarget*(precision+1)*100)) {
+                            var offByPct = Mathf.Abs(headRatioTarget-headRatioCurrent)/headRatioCurrent * 100;
+                            var morphValue = _headScaleMorph.morphValue;
+                            var changeBy = 0.02f * offByPct;
+                            if(changeBy != 0) {
+                                var newValue = (headRatioCurrent > headRatioTarget) 
+                                    ? morphValue + (makeHeadBiggerMorphDirection * changeBy)
+                                    : morphValue - (makeHeadBiggerMorphDirection * changeBy);
+                                if(newValue > _headScaleMorph.min && newValue < _headScaleMorph.max) {
+                                    _headScaleMorph.morphValue = newValue;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // remeasure model and display things
             try {
                 _autoMeasurements = AutoMeasurements(_ui, containingAtom);
 

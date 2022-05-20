@@ -87,6 +87,10 @@ namespace LFE {
         public JSONStorableFloat lineThicknessProportionStorable;
         public JSONStorableStringChooser proportionSelectionStorable;
 
+        public JSONStorableBool showTargetHeadRatioStorable;
+        public JSONStorableFloat targetHeadRatioStorable;
+        public JSONStorableStringChooser targetHeadRatioMorphStorable;
+
         public JSONStorableStringChooser cupAlgorithmStorable;
         public JSONStorableStringChooser unitsStorable;
         public JSONStorableFloat markerSpreadStorable;
@@ -115,7 +119,7 @@ namespace LFE {
             // UI related
             // Cup algorithm choice
 
-            showFeatureMarkersStorable = new JSONStorableBool("Auto Feature Guides", false, (bool value) => {
+            showFeatureMarkersStorable = new JSONStorableBool("Auto Feature Guides", true, (bool value) => {
                 showFeatureMarkersStorable.valNoCallback = value;
                 Draw();
             });
@@ -211,7 +215,7 @@ namespace LFE {
             _plugin.RegisterColor(circumferenceMarkerColor);
 
             //////////////////
-            showProportionMarkersStorable = new JSONStorableBool("Proportion Guides", true, (bool value) => {
+            showProportionMarkersStorable = new JSONStorableBool("Proportion Guides", false, (bool value) => {
                 Draw();
             });
             showProportionMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
@@ -242,9 +246,22 @@ namespace LFE {
             proportionSelectionStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterStringChooser(proportionSelectionStorable);
 
-            //////////////////
+            showTargetHeadRatioStorable = new JSONStorableBool("Enable Auto Head Ratio Targeting", false);
+            showTargetHeadRatioStorable.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showTargetHeadRatioStorable);
 
+            targetHeadRatioStorable = new JSONStorableFloat("Head Ratio Target", 7.6f, 0, 10);
+            targetHeadRatioStorable.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterFloat(targetHeadRatioStorable);
 
+            targetHeadRatioMorphStorable = new JSONStorableStringChooser(
+                "Head Ratio Morph",
+                new List<string> { "Head big", "Head Scale" },
+                "Head big",
+                "Prefer Morph"
+            );
+            targetHeadRatioMorphStorable.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterStringChooser(targetHeadRatioMorphStorable);
 
             // Choose
             cupAlgorithmStorable = new JSONStorableStringChooser(
@@ -472,6 +489,10 @@ namespace LFE {
         private UIDynamicSlider _proportionMarkerLineThickness;
         private UIDynamicPopup _proportionSelection;
 
+        private UIDynamicToggle _targetHeadRatioToggle;
+        private UIDynamicSlider _targetHeadRatioSlider;
+        private UIDynamicPopup _targetHeadRatioMorph;
+
         private UIDynamicPopup _cupAlgorithm;
         private UIDynamicPopup _units;
         private UIDynamicSlider _markerSpread;
@@ -627,6 +648,11 @@ namespace LFE {
             }
 
             CreateStandardDivider(rightSide: false);
+            _targetHeadRatioToggle = _plugin.CreateToggle(showTargetHeadRatioStorable, rightSide: false);
+            _targetHeadRatioSlider = _plugin.CreateSlider(targetHeadRatioStorable, rightSide: false);
+            _targetHeadRatioMorph = _plugin.CreateScrollablePopup(targetHeadRatioMorphStorable, rightSide: false);
+
+            CreateStandardDivider(rightSide: false);
             _cupAlgorithm = _plugin.CreateScrollablePopup(cupAlgorithmStorable, rightSide: false);
             _units = _plugin.CreateScrollablePopup(unitsStorable, rightSide: false);
             _markerSpread = _plugin.CreateSlider(markerSpreadStorable, rightSide: false);
@@ -757,6 +783,16 @@ namespace LFE {
             }
             if(_proportionSelection) {
                 _plugin.RemovePopup(_proportionSelection);
+            }
+
+            if(_targetHeadRatioToggle) {
+                _plugin.RemoveToggle(_targetHeadRatioToggle);
+            }
+            if(_targetHeadRatioSlider) {
+                _plugin.RemoveSlider(_targetHeadRatioSlider);
+            }
+            if(_targetHeadRatioMorph) {
+                _plugin.RemovePopup(_targetHeadRatioMorph);
             }
 
             if(_cupAlgorithm) {
