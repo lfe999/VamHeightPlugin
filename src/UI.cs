@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
@@ -14,8 +15,12 @@ namespace LFE {
             new KSK9404CupCalculator()
         };
 
-        public List<Proportions> proportionTemplates = new List<Proportions>();
+        private List<Proportions> _proportionTemplates = new List<Proportions>();
 
+        public List<Proportions> ProportionTemplates {
+            get { return _proportionTemplates; }
+            set { _proportionTemplates = value ?? new List<Proportions>(); Draw(); }
+        }
 
         private static Color HEADER_COLOR = new Color(0, 0, 0, 0.25f);
         private static Color SPACER_COLOR = new Color(0, 0, 0, 0.5f);
@@ -105,7 +110,7 @@ namespace LFE {
 
         public UI(HeightMeasurePlugin plugin) {
             _plugin = plugin;
-            proportionTemplates = Proportions.CommonProportions;
+            _proportionTemplates = Proportions.CommonProportions;
             InitStorables();
             Draw();
         }
@@ -116,13 +121,17 @@ namespace LFE {
         private bool _choosingCircumferenceColor = false;
         private bool _choosingManualColor = false;
         private bool _choosingProportionColor = false;
+
+        private bool _editingProportion = false;
+        private bool _creatingProportion = false;
+        private Proportions _preEditProportion;
         private void InitStorables() {
 
             //////////////////////////////////////
             // UI related
             // Cup algorithm choice
 
-            showFeatureMarkersStorable = new JSONStorableBool("Auto Feature Guides", false, (bool value) => {
+            showFeatureMarkersStorable = new JSONStorableBool("Auto Feature Guides", true, (bool value) => {
                 showFeatureMarkersStorable.valNoCallback = value;
                 Draw();
             });
@@ -238,16 +247,18 @@ namespace LFE {
             proportionMarkerColor.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterColor(proportionMarkerColor);
 
-            var proportionNames = proportionTemplates.Select(p => p.ProportionName).ToList();
-            proportionNames.Insert(0, "Auto Detect");
+            var proportionNames = ProportionTemplateNames();
             proportionSelectionStorable = new JSONStorableStringChooser(
-                "Proportion Template",
+                "Selected Proportions",
                 proportionNames,
                 proportionNames[0],
-                "Proportion Template"
+                "Selected Proportions"
             );
             proportionSelectionStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterStringChooser(proportionSelectionStorable);
+
+
+            //////////////////
 
             showTargetHeadRatioStorable = new JSONStorableBool("Enable Auto Head Ratio Targeting", false);
             showTargetHeadRatioStorable.storeType = JSONStorableParam.StoreType.Full;
@@ -491,7 +502,23 @@ namespace LFE {
         private UIDynamicColorPicker _proportionMarkerColorPicker;
         private UIDynamicSlider _proportionMarkerLineThickness;
         private UIDynamicPopup _proportionSelection;
-        private List<UIDynamicSlider> _proportionEditSliders = new List<UIDynamicSlider>();
+
+        private UIDynamicTextField _proportionEditName;
+        private UIDynamicToggle _proportionEditIsFemale;
+        private UIDynamicSlider _proportionEditHeight;
+        private UIDynamicSlider _proportionEditChin;
+        private UIDynamicSlider _proportionEditNipples;
+        private UIDynamicSlider _proportionEditNavel;
+        private UIDynamicSlider _proportionEditCrotch;
+        private UIDynamicSlider _proportionEditLegs;
+        private UIDynamicSlider _proportionEditKnee;
+        private UIDynamicSlider _proportionEditHeel;
+
+        private UIDynamicButton _proportionEditButton;
+        private UIDynamicButton _proportionDeleteButton;
+        private UIDynamicButton _proportionAddButton;
+        private UIDynamicButton _proportionCancelButton;
+        private UIDynamicButton _proportionSaveButton;
 
         private UIDynamicToggle _targetHeadRatioToggle;
         private UIDynamicSlider _targetHeadRatioSlider;
@@ -633,62 +660,151 @@ namespace LFE {
                 _proportionMarkerToggle = _plugin.CreateToggle(showProportionMarkersStorable, rightSide: false);
                 _proportionMarkerToggle.backgroundColor = HEADER_COLOR;
                 if(showProportionMarkersStorable.val) {
-                    _proportionMarkerColorButton = _plugin.CreateButton("Set Line Color");
-                    _proportionMarkerColorButton.buttonColor = _plugin.HSVToColor(proportionMarkerColor.val);
-                    _proportionMarkerColorButton.button.onClick.AddListener(() => {
-                        _choosingProportionColor = !_choosingProportionColor;
-                        Draw();
-                    });
-                    if(_choosingProportionColor) {
-                        _proportionMarkerColorPicker = _plugin.CreateColorPicker(proportionMarkerColor, rightSide: false);
+                    var selectedProportion = ProportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(proportionSelectionStorable.val));
+
+                    proportionSelectionStorable.choices = ProportionTemplateNames();
+                    proportionSelectionStorable.displayChoices = proportionSelectionStorable.choices;
+                    proportionSelectionStorable.val = selectedProportion?.ProportionName ?? "Auto Detect";
+
+
+                    if(_editingProportion || _creatingProportion) {
+                        if(_preEditProportion == null) {
+                            _preEditProportion = selectedProportion.Clone();
+                        }
+                        _proportionEditName =
+                            CreateTextInput(new JSONStorableString("Name", selectedProportion.ProportionName));
+                        _proportionEditIsFemale =
+                            _plugin.CreateToggle(new JSONStorableBool("Female?", selectedProportion.IsFemale, (value) => {
+                                selectedProportion.IsFemale = value;
+                            }));
+                        _proportionEditHeight = 
+                            _plugin.CreateSlider(new JSONStorableFloat("Height in Heads", selectedProportion.FigureHeightInHeads, (value) => {
+                                selectedProportion.FigureHeightInHeads = value;
+                            }, 0, 10));
+                        _proportionEditChin = 
+                            _plugin.CreateSlider(new JSONStorableFloat("Chin to Shoulder", selectedProportion.FigureChinToShoulder, (value) => {
+                                selectedProportion.FigureChinToShoulder = value;
+                            }, 0, 10));
+                        _proportionEditNipples = 
+                            _plugin.CreateSlider(new JSONStorableFloat("Shoulder to Nipples", selectedProportion.FigureShoulderToNipples, (value) => {
+                                selectedProportion.FigureShoulderToNipples = value;
+                            }, 0, 10));
+                        _proportionEditNavel = 
+                            _plugin.CreateSlider(new JSONStorableFloat("Shoulder to Navel", selectedProportion.FigureShoulderToNavel, (value) => {
+                                selectedProportion.FigureShoulderToNavel = value;
+                            }, 0, 10));
+                        _proportionEditCrotch =
+                            _plugin.CreateSlider(new JSONStorableFloat("Shoulder to Crotch", selectedProportion.FigureShoulderToCrotch, (value) => {
+                                selectedProportion.FigureShoulderToCrotch = value;
+                            }, 0, 10));
+                        _proportionEditLegs = 
+                             _plugin.CreateSlider(new JSONStorableFloat("Full Leg Length", selectedProportion.FigureLengthOfLowerLimb, (value) => {
+                                selectedProportion.FigureLengthOfLowerLimb = value;
+                            }, 0, 10));
+                        _proportionEditKnee = 
+                            _plugin.CreateSlider(new JSONStorableFloat("Crotch to Knee", selectedProportion.FigureCrotchToBottomOfKnees, (value) => {
+                                selectedProportion.FigureCrotchToBottomOfKnees = value;
+                            }, 0, 10));
+                        _proportionEditHeel = 
+                            _plugin.CreateSlider(new JSONStorableFloat("Knee to Heel", selectedProportion.FigureBottomOfKneesToHeels, (value) => {
+                                selectedProportion.FigureBottomOfKneesToHeels = value;
+                            }, 0, 10));
+
+                        _proportionCancelButton = _plugin.CreateButton("Cancel");
+                        _proportionCancelButton.buttonColor = Color.red;
+                        _proportionCancelButton.button.onClick.AddListener(() => {
+                            try {
+                                if(_editingProportion) {
+                                    selectedProportion.ProportionName = _preEditProportion.ProportionName;
+                                    selectedProportion.IsFemale = _preEditProportion.IsFemale;
+                                    selectedProportion.FigureHeightInHeads = _preEditProportion.FigureHeightInHeads;
+                                    selectedProportion.FigureChinToShoulder = _preEditProportion.FigureChinToShoulder;
+                                    selectedProportion.FigureShoulderToNipples = _preEditProportion.FigureShoulderToNipples;
+                                    selectedProportion.FigureShoulderToNavel = _preEditProportion.FigureShoulderToNavel;
+                                    selectedProportion.FigureShoulderToCrotch = _preEditProportion.FigureShoulderToCrotch;
+                                    selectedProportion.FigureCrotchToBottomOfKnees = _preEditProportion.FigureCrotchToBottomOfKnees;
+                                    selectedProportion.FigureLengthOfLowerLimb = _preEditProportion.FigureLengthOfLowerLimb;
+                                    selectedProportion.FigureBottomOfKneesToHeels = _preEditProportion.FigureBottomOfKneesToHeels;
+                                }
+
+                                if(_creatingProportion) {
+                                    proportionSelectionStorable.val = "Auto Detect"; // select auto
+                                    _proportionTemplates = ProportionTemplates.Where(p => !p.ProportionName.Equals("-- New --")).ToList(); // do not trigger a Draw using the public property
+                                }
+
+                                _editingProportion = false;
+                                _creatingProportion = false;
+                                _preEditProportion = (Proportions)null;
+                                Draw();
+                            }
+                            catch(Exception e) {
+                                SuperController.LogError($"{e}");
+                            }
+                        });
+
+                        _proportionSaveButton = _plugin.CreateButton(_creatingProportion ? "Create" : "Save");
+                        _proportionSaveButton.buttonColor = Color.green;
+                        _proportionSaveButton.button.onClick.AddListener(() => {
+                            if(_preEditProportion != null) {
+                                selectedProportion.ProportionName = _proportionEditName.text;
+                                proportionSelectionStorable.val = selectedProportion.ProportionName;
+                            }
+                            _editingProportion = false;
+                            _creatingProportion = false;
+                            _preEditProportion = (Proportions)null;
+                            Draw();
+                        });
+
                     }
-                    _proportionMarkerLineThickness = _plugin.CreateSlider(lineThicknessProportionStorable, rightSide: false);
+                    else {
+                        _proportionMarkerColorButton = _plugin.CreateButton("Set Line Color");
+                        _proportionMarkerColorButton.buttonColor = _plugin.HSVToColor(proportionMarkerColor.val);
+                        _proportionMarkerColorButton.button.onClick.AddListener(() => {
+                            _choosingProportionColor = !_choosingProportionColor;
+                            Draw();
+                        });
+                        if(_choosingProportionColor) {
+                            _proportionMarkerColorPicker = _plugin.CreateColorPicker(proportionMarkerColor, rightSide: false);
+                        }
+                        _proportionMarkerLineThickness = _plugin.CreateSlider(lineThicknessProportionStorable, rightSide: false);
 
-                    _proportionSelection = _plugin.CreateScrollablePopup(proportionSelectionStorable, rightSide: false);
-                    // _proportionSelection.popup.onValueChangeHandlers += (e) => {
-                    //     // SuperController.LogMessage($"value changed {e}");
-                    //     Draw();
-                    // };
+                        _proportionSelection = _plugin.CreateScrollablePopup(proportionSelectionStorable, rightSide: false);
+                        _proportionSelection.popup.onValueChangeHandlers += (e) => {
+                            Draw();
+                        };
 
-                    // var selectedProportion = Proportions.CommonProportions.FirstOrDefault(p => p.ProportionName.Equals(proportionSelectionStorable.val));
-                    // if(selectedProportion != null) {
-                    //     _proportionEditSliders.Add(
-                    //         _plugin.CreateSlider(new JSONStorableFloat("Height in Heads", selectedProportion.FigureHeightInHeads, (value) => {
-                    //             selectedProportion.FigureHeightInHeads = value;
-                    //         }, 0, 10))
-                    //     );
-                    //     _proportionEditSliders.Add(
-                    //         _plugin.CreateSlider(new JSONStorableFloat("Chin to Shoulder", selectedProportion.FigureChinToShoulder, (value) => {
-                    //             selectedProportion.FigureChinToShoulder = value;
-                    //         }, 0, 10))
-                    //     );
-                    //     _proportionEditSliders.Add(
-                    //         _plugin.CreateSlider(new JSONStorableFloat("Shoulder to Nipples", selectedProportion.FigureShoulderToNipples, (value) => {
-                    //             selectedProportion.FigureShoulderToNipples = value;
-                    //         }, 0, 10))
-                    //     );
-                    //     _proportionEditSliders.Add(
-                    //         _plugin.CreateSlider(new JSONStorableFloat("Shoulder to Navel", selectedProportion.FigureShoulderToNavel, (value) => {
-                    //             selectedProportion.FigureShoulderToNavel = value;
-                    //         }, 0, 10))
-                    //     );
-                    //     _proportionEditSliders.Add(
-                    //         _plugin.CreateSlider(new JSONStorableFloat("Shoulder to Crotch", selectedProportion.FigureShoulderToCrotch, (value) => {
-                    //             selectedProportion.FigureShoulderToCrotch = value;
-                    //         }, 0, 10))
-                    //     );
-                    //     _proportionEditSliders.Add(
-                    //         _plugin.CreateSlider(new JSONStorableFloat("Full Leg Length", selectedProportion.FigureLengthOfLowerLimb, (value) => {
-                    //             selectedProportion.FigureLengthOfLowerLimb = value;
-                    //         }, 0, 10))
-                    //     );
-                    //     _proportionEditSliders.Add(
-                    //         _plugin.CreateSlider(new JSONStorableFloat("Crotch to Knee", selectedProportion.FigureCrotchToBottomOfKnees, (value) => {
-                    //             selectedProportion.FigureCrotchToBottomOfKnees = value;
-                    //         }, 0, 10))
-                    //     );
-                    // }
+                        // proportion action buttons
+                        if(selectedProportion != null) {
+                            _proportionEditButton = _plugin.CreateButton("Edit Selected Proportions", rightSide: false);
+                            _proportionEditButton.button.onClick.AddListener(() => {
+                                _creatingProportion = false;
+                                _editingProportion = true;
+                                Draw();
+                            });
+                        }
+                        if(selectedProportion != null) {
+                            _proportionDeleteButton = _plugin.CreateButton("Delete Selected Proportions", rightSide: false);
+                            _proportionDeleteButton.buttonColor = Color.red;
+                            _proportionDeleteButton.button.onClick.AddListener(() => {
+                                proportionSelectionStorable.val = "Auto Detect"; // select auto
+                                ProportionTemplates = ProportionTemplates.Where(p => !p.ProportionName.Equals(selectedProportion.ProportionName)).ToList();
+                                Draw();
+                            });
+                        }
+                        _proportionAddButton = _plugin.CreateButton("New Proportions", rightSide: false);
+                        _proportionAddButton.button.onClick.AddListener(() => {
+                            var newName = "-- New --";
+                            var newProportion = selectedProportion ?? ProportionTemplates.First() ?? new Proportions(); // copy selected, or the first one, or start over
+                            newProportion.ProportionName = newName;
 
+                            ProportionTemplates = ProportionTemplates.Concat(new List<Proportions>{ newProportion }).ToList();
+                            proportionSelectionStorable.val = newName;
+
+                            _creatingProportion = true;
+                            _editingProportion = false;
+                            Draw();
+                        });
+                    }
                     CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                 }
                 CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
@@ -831,10 +947,52 @@ namespace LFE {
             if(_proportionSelection) {
                 _plugin.RemovePopup(_proportionSelection);
             }
-            foreach(var s in _proportionEditSliders) {
-                _plugin.RemoveSlider(s);
+            if(_proportionEditButton) {
+                _plugin.RemoveButton(_proportionEditButton);
             }
-            _proportionEditSliders = new List<UIDynamicSlider>();
+            if(_proportionDeleteButton) {
+                _plugin.RemoveButton(_proportionDeleteButton);
+            }
+            if(_proportionAddButton) {
+                _plugin.RemoveButton(_proportionAddButton);
+            }
+            if(_proportionSaveButton) {
+                _plugin.RemoveButton(_proportionSaveButton);
+            }
+            if(_proportionCancelButton) {
+                _plugin.RemoveButton(_proportionCancelButton);
+            }
+
+            if(_proportionEditName) {
+                _plugin.RemoveTextField(_proportionEditName);
+            }
+            if(_proportionEditIsFemale) {
+                _plugin.RemoveToggle(_proportionEditIsFemale);
+            }
+            if(_proportionEditHeight) {
+                _plugin.RemoveSlider(_proportionEditHeight);
+            }
+            if(_proportionEditChin) {
+                _plugin.RemoveSlider(_proportionEditChin);
+            }
+            if(_proportionEditNipples) {
+                _plugin.RemoveSlider(_proportionEditNipples);
+            }
+            if(_proportionEditNavel) {
+                _plugin.RemoveSlider(_proportionEditNavel);
+            }
+            if(_proportionEditCrotch) {
+                _plugin.RemoveSlider(_proportionEditCrotch);
+            }
+            if(_proportionEditLegs) {
+                _plugin.RemoveSlider(_proportionEditLegs);
+            }
+            if(_proportionEditKnee) {
+                _plugin.RemoveSlider(_proportionEditKnee);
+            }
+            if(_proportionEditHeel) {
+                _plugin.RemoveSlider(_proportionEditHeel);
+            }
 
             if(_targetHeadRatioToggle) {
                 _plugin.RemoveToggle(_targetHeadRatioToggle);
@@ -892,5 +1050,22 @@ namespace LFE {
             }
             _spacerLinesList.Add(textField);
         }
+
+        private List<string> ProportionTemplateNames() {
+            var proportionNames = ProportionTemplates.Select(p => p.ProportionName).ToList();
+            proportionNames.Insert(0, "Auto Detect");
+            return proportionNames;
+        }
+
+        private UIDynamicTextField CreateTextInput(JSONStorableString jss, bool rightSide = false, InputField.LineType inputFieldType = InputField.LineType.MultiLineNewline) {
+            UIDynamicTextField textfield = _plugin.CreateTextField(jss, rightSide); 
+            textfield.height = 1f; 
+            textfield.backgroundColor = Color.white; 
+            var input = textfield.gameObject.AddComponent<InputField>(); 
+            input.textComponent = textfield.UItext; 
+            input.lineType = inputFieldType; input.textComponent.resizeTextMaxSize = 30; input.textComponent.resizeTextForBestFit = true; jss.inputField = input; 
+            return (textfield);
+        } 
+
     }
 }

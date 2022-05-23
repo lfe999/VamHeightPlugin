@@ -63,7 +63,7 @@ namespace LFE
                 _waistGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
                 _hipGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
                 _ageGuides.Enabled = false;
-                _proportionGuides.Enabled = true;
+                _proportionGuides.Enabled = _ui.showProportionMarkersStorable.val;
             }
         }
 
@@ -107,7 +107,7 @@ namespace LFE
                         };
                         proportionTemplates.Add(p);
                     }
-                    _ui.proportionTemplates = proportionTemplates;
+                    _ui.ProportionTemplates = proportionTemplates;
                 }
             }
             catch(Exception e) {
@@ -120,7 +120,7 @@ namespace LFE
             var json = base.GetJSON(includePhysical, includeAppearance, forceStore);
 
             var proportionTemplates = new SimpleJSON.JSONArray();
-            foreach(var p in _ui.proportionTemplates) {
+            foreach(var p in _ui.ProportionTemplates) {
                 var pJson = new SimpleJSON.JSONClass();
                 pJson["isFemale"].AsBool = p.IsFemale;
                 pJson["name"] = p.ProportionName;
@@ -135,24 +135,7 @@ namespace LFE
 
                 proportionTemplates.Add(pJson);
             }
-
             json[_jsonTemplatesKey] = proportionTemplates;
-            // SuperController.LogMessage($"{proportionTemplates}");
-
-            // try {
-            //     var settings = SettingsController.ToJSONClass();
-            //     if(settings != null) {
-            //         json["Settings"] = settings;
-            //         json["Settings"].Remove(SettingsController.DEVICE_KEY);
-            //         json["Settings"].Remove(SettingsController.CLIENT_IP_KEY);
-            //         json["Settings"].Remove(SettingsController.SERVER_IP_KEY);
-            //         needsStore = true;
-            //     }
-            // }
-            // catch(Exception e) {
-            //     SuperController.LogError($"Save settings failed: {e.ToString()}");
-            // }
-
             return json;
         }
 
@@ -329,7 +312,7 @@ namespace LFE
 
                 _ui.ageFromHeadStorable.val = _autoMeasurements.AgeFromHead?.LikelyAge ?? 0;
                 _ui.ageFromHeightStorable.val = _autoMeasurements.AgeFromHeight?.LikelyAge ?? 0;
-                _ui.proportionClosestMatch.val = _autoMeasurements.Proportions?.ClostestMatch(_ui.proportionTemplates)?.ProportionName ?? "";
+                _ui.proportionClosestMatch.val = _autoMeasurements.Proportions?.ClostestMatch(_ui.ProportionTemplates)?.ProportionName ?? "";
 
                 UpdateVisuals();
                 UpdatePenisMarkers();
@@ -462,7 +445,7 @@ namespace LFE
                 _proportionGuides.LineThickness = _ui.lineThicknessProportionStorable.val;
                 _proportionGuides.UnitDisplay = _ui.unitsStorable.val;
                 _proportionGuides.Offset = pos - spreadVector - new Vector3(0, 0, 0.004f); // put these just a bit behind the auto guides
-                _proportionGuides.TargetProportion = _ui.proportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(_ui.proportionSelectionStorable.val)) ?? _autoMeasurements.Proportions.ClostestMatch(_ui.proportionTemplates);
+                _proportionGuides.TargetProportion = _ui.ProportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(_ui.proportionSelectionStorable.val)) ?? _autoMeasurements.Proportions.ClostestMatch(_ui.ProportionTemplates);
             }
 
             // manual feature guide
