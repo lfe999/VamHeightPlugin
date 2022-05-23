@@ -54,8 +54,12 @@ namespace LFE {
 
 
         public void UpdateMainMarkers() {
-            var currentProportion = Measurements.Proportions;
-            var targetProportion = TargetProportion ?? currentProportion.ClostestMatch(Proportions.CommonProportions);
+            var targetProportion = TargetProportion;
+
+            if(targetProportion == null) {
+                targetProportion = new Proportions();
+                Enabled = false;
+            }
 
             var targetHeads = targetProportion.FigureHeightInHeads;
 

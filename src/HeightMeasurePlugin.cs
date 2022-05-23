@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using SimpleJSON;
 
 namespace LFE
 {
@@ -80,6 +81,82 @@ namespace LFE
             _ageGuides.Enabled = false;
             _proportionGuides.Enabled = false;
         }
+
+
+        private string _jsonTemplatesKey = "ProportionTemplates";
+        // loading scene
+        public override void RestoreFromJSON(JSONClass jc, bool restorePhysical = true, bool restoreAppearance = true, JSONArray presetAtoms = null, bool setMissingToDefault = true)
+        {
+            base.RestoreFromJSON(jc, restorePhysical, restoreAppearance, presetAtoms, setMissingToDefault);
+
+            try {
+                if(jc.HasKey(_jsonTemplatesKey)) {
+                    var proportionTemplates = new List<Proportions>();
+                    foreach(SimpleJSON.JSONClass pj in jc[_jsonTemplatesKey].AsArray) {
+                        var p = new Proportions() {
+                            IsFemale = pj["isFemale"]?.AsBool ?? true,
+                            ProportionName = pj["name"].Value,
+                            FigureHeightInHeads = pj["figureHeightInHeads"]?.AsFloat ?? 0,
+                            FigureChinToShoulder = pj["figureChinToShoulder"]?.AsFloat ?? 0,
+                            FigureShoulderToNipples = pj["figureShoulderToNipples"]?.AsFloat ?? 0,
+                            FigureShoulderToNavel = pj["figureShoulderToNavel"]?.AsFloat ?? 0,
+                            FigureShoulderToCrotch = pj["figureShoulderToCrotch"]?.AsFloat ?? 0,
+                            FigureCrotchToBottomOfKnees = pj["figureCrotchToBottomOfKnees"]?.AsFloat ?? 0,
+                            FigureLengthOfLowerLimb = pj["figureLengthOfLowerLimb"]?.AsFloat ?? 0,
+                            FigureBottomOfKneesToHeels = pj["figureBottomOfKneesToHeels"]?.AsFloat ?? 0
+                        };
+                        proportionTemplates.Add(p);
+                    }
+                    _ui.proportionTemplates = proportionTemplates;
+                }
+            }
+            catch(Exception e) {
+                SuperController.LogError($"{e}");
+            }
+        }
+
+        // saving scene
+        public override JSONClass GetJSON(bool includePhysical = true, bool includeAppearance = true, bool forceStore = false) {
+            var json = base.GetJSON(includePhysical, includeAppearance, forceStore);
+
+            var proportionTemplates = new SimpleJSON.JSONArray();
+            foreach(var p in _ui.proportionTemplates) {
+                var pJson = new SimpleJSON.JSONClass();
+                pJson["isFemale"].AsBool = p.IsFemale;
+                pJson["name"] = p.ProportionName;
+                pJson["figureHeightInHeads"].AsFloat = p.FigureHeightInHeads;
+                pJson["figureChinToShoulder"].AsFloat = p.FigureChinToShoulder;
+                pJson["figureShoulderToNipples"].AsFloat = p.FigureShoulderToNipples;
+                pJson["figureShoulderToNavel"].AsFloat = p.FigureShoulderToNavel;
+                pJson["figureShoulderToCrotch"].AsFloat = p.FigureShoulderToCrotch;
+                pJson["figureCrotchToBottomOfKnees"].AsFloat = p.FigureCrotchToBottomOfKnees;
+                pJson["figureLengthOfLowerLimb"].AsFloat = p.FigureLengthOfLowerLimb;
+                pJson["figureBottomOfKneesToHeels"].AsFloat = p.FigureBottomOfKneesToHeels;
+
+                proportionTemplates.Add(pJson);
+            }
+
+            json[_jsonTemplatesKey] = proportionTemplates;
+            // SuperController.LogMessage($"{proportionTemplates}");
+
+            // try {
+            //     var settings = SettingsController.ToJSONClass();
+            //     if(settings != null) {
+            //         json["Settings"] = settings;
+            //         json["Settings"].Remove(SettingsController.DEVICE_KEY);
+            //         json["Settings"].Remove(SettingsController.CLIENT_IP_KEY);
+            //         json["Settings"].Remove(SettingsController.SERVER_IP_KEY);
+            //         needsStore = true;
+            //     }
+            // }
+            // catch(Exception e) {
+            //     SuperController.LogError($"Save settings failed: {e.ToString()}");
+            // }
+
+            return json;
+        }
+
+
 
         public void OnDestroy() {
             _enabled = false;
@@ -252,7 +329,7 @@ namespace LFE
 
                 _ui.ageFromHeadStorable.val = _autoMeasurements.AgeFromHead?.LikelyAge ?? 0;
                 _ui.ageFromHeightStorable.val = _autoMeasurements.AgeFromHeight?.LikelyAge ?? 0;
-                _ui.proportionClosestMatch.val = _autoMeasurements.Proportions?.ClostestMatch(Proportions.CommonProportions)?.ProportionName ?? "";
+                _ui.proportionClosestMatch.val = _autoMeasurements.Proportions?.ClostestMatch(_ui.proportionTemplates)?.ProportionName ?? "";
 
                 UpdateVisuals();
                 UpdatePenisMarkers();
@@ -385,7 +462,7 @@ namespace LFE
                 _proportionGuides.LineThickness = _ui.lineThicknessProportionStorable.val;
                 _proportionGuides.UnitDisplay = _ui.unitsStorable.val;
                 _proportionGuides.Offset = pos - spreadVector - new Vector3(0, 0, 0.004f); // put these just a bit behind the auto guides
-                _proportionGuides.TargetProportion = Proportions.CommonProportions.FirstOrDefault(p => p.ProportionName.Equals(_ui.proportionSelectionStorable.val));
+                _proportionGuides.TargetProportion = _ui.proportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(_ui.proportionSelectionStorable.val)) ?? _autoMeasurements.Proportions.ClostestMatch(_ui.proportionTemplates);
             }
 
             // manual feature guide

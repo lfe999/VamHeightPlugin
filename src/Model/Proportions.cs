@@ -55,54 +55,54 @@ public class Proportions {
             FigureCrotchToBottomOfKnees = 1.5f,
             FigureBottomOfKneesToHeels = 1.8f
         },
-        new Proportions() {
-            IsFemale = true,
-            ProportionName = "Female Child",
-            FigureHeightInHeads = 6f,
-            FigureChinToShoulder = 0.2f,
-            FigureShoulderToNipples = 0.4f,
-            FigureShoulderToNavel = 1.3f,
-            FigureShoulderToCrotch = 2f,
-            FigureLengthOfLowerLimb = 2.8f,
-            FigureCrotchToBottomOfKnees = 1.4f,
-            FigureBottomOfKneesToHeels = 1.4f
-        },
-        new Proportions() {
-            IsFemale = true,
-            ProportionName = "Female Young Child",
-            FigureHeightInHeads = 5.5f,
-            FigureChinToShoulder = 0.2f,
-            FigureShoulderToNipples = 0.4f,
-            FigureShoulderToNavel = 1.2f,
-            FigureShoulderToCrotch = 2f,
-            FigureLengthOfLowerLimb = 2.3f,
-            FigureCrotchToBottomOfKnees = 1f,
-            FigureBottomOfKneesToHeels = 1.3f
-        },
-        new Proportions() {
-            IsFemale = true,
-            ProportionName = "Female Infant",
-            FigureHeightInHeads = 5f,
-            FigureChinToShoulder = 0.2f,
-            FigureShoulderToNipples = 0.4f,
-            FigureShoulderToNavel = 1f,
-            FigureShoulderToCrotch = 1.8f,
-            FigureLengthOfLowerLimb = 2f,
-            FigureCrotchToBottomOfKnees = 1f,
-            FigureBottomOfKneesToHeels = 1f
-        },
-        new Proportions() {
-            IsFemale = true,
-            ProportionName = "Female Newborn",
-            FigureHeightInHeads = 4f,
-            FigureChinToShoulder = 0.0f,
-            FigureShoulderToNipples = 0.33f,
-            FigureShoulderToNavel = 1.2f,
-            FigureShoulderToCrotch = 1.6f,
-            FigureLengthOfLowerLimb = 0.6f,
-            FigureCrotchToBottomOfKnees = 0.6f,
-            FigureBottomOfKneesToHeels = 0.8f
-        },
+        // new Proportions() {
+        //     IsFemale = true,
+        //     ProportionName = "Female Child",
+        //     FigureHeightInHeads = 6f,
+        //     FigureChinToShoulder = 0.2f,
+        //     FigureShoulderToNipples = 0.4f,
+        //     FigureShoulderToNavel = 1.3f,
+        //     FigureShoulderToCrotch = 2f,
+        //     FigureLengthOfLowerLimb = 2.8f,
+        //     FigureCrotchToBottomOfKnees = 1.4f,
+        //     FigureBottomOfKneesToHeels = 1.4f
+        // },
+        // new Proportions() {
+        //     IsFemale = true,
+        //     ProportionName = "Female Young Child",
+        //     FigureHeightInHeads = 5.5f,
+        //     FigureChinToShoulder = 0.2f,
+        //     FigureShoulderToNipples = 0.4f,
+        //     FigureShoulderToNavel = 1.2f,
+        //     FigureShoulderToCrotch = 2f,
+        //     FigureLengthOfLowerLimb = 2.3f,
+        //     FigureCrotchToBottomOfKnees = 1f,
+        //     FigureBottomOfKneesToHeels = 1.3f
+        // },
+        // new Proportions() {
+        //     IsFemale = true,
+        //     ProportionName = "Female Infant",
+        //     FigureHeightInHeads = 5f,
+        //     FigureChinToShoulder = 0.2f,
+        //     FigureShoulderToNipples = 0.4f,
+        //     FigureShoulderToNavel = 1f,
+        //     FigureShoulderToCrotch = 1.8f,
+        //     FigureLengthOfLowerLimb = 2f,
+        //     FigureCrotchToBottomOfKnees = 1f,
+        //     FigureBottomOfKneesToHeels = 1f
+        // },
+        // new Proportions() {
+        //     IsFemale = true,
+        //     ProportionName = "Female Newborn",
+        //     FigureHeightInHeads = 4f,
+        //     FigureChinToShoulder = 0.0f,
+        //     FigureShoulderToNipples = 0.33f,
+        //     FigureShoulderToNavel = 1.2f,
+        //     FigureShoulderToCrotch = 1.6f,
+        //     FigureLengthOfLowerLimb = 0.6f,
+        //     FigureCrotchToBottomOfKnees = 0.6f,
+        //     FigureBottomOfKneesToHeels = 0.8f
+        // },
 
         new Proportions() {
             IsFemale = false,
@@ -152,54 +152,54 @@ public class Proportions {
             FigureCrotchToBottomOfKnees = 1.5f,
             FigureBottomOfKneesToHeels = 1.8f
         },
-        new Proportions() {
-            IsFemale = false,
-            ProportionName = "Male Child",
-            FigureHeightInHeads = 6f,
-            FigureChinToShoulder = 0.2f,
-            FigureShoulderToNipples = 0.4f,
-            FigureShoulderToNavel = 1.3f,
-            FigureShoulderToCrotch = 2f,
-            FigureLengthOfLowerLimb = 2.8f,
-            FigureCrotchToBottomOfKnees = 1.4f,
-            FigureBottomOfKneesToHeels = 1.4f
-        },
-        new Proportions() {
-            IsFemale = false,
-            ProportionName = "Male Young Child",
-            FigureHeightInHeads = 5.5f,
-            FigureChinToShoulder = 0.2f,
-            FigureShoulderToNipples = 0.4f,
-            FigureShoulderToNavel = 1.2f,
-            FigureShoulderToCrotch = 2f,
-            FigureLengthOfLowerLimb = 2.3f,
-            FigureCrotchToBottomOfKnees = 1f,
-            FigureBottomOfKneesToHeels = 1.3f
-        },
-        new Proportions() {
-            IsFemale = false,
-            ProportionName = "Male Infant",
-            FigureHeightInHeads = 5f,
-            FigureChinToShoulder = 0.2f,
-            FigureShoulderToNipples = 0.4f,
-            FigureShoulderToNavel = 1f,
-            FigureShoulderToCrotch = 1.8f,
-            FigureLengthOfLowerLimb = 2f,
-            FigureCrotchToBottomOfKnees = 1f,
-            FigureBottomOfKneesToHeels = 1f
-        },
-        new Proportions() {
-            IsFemale = false,
-            ProportionName = "Male Newborn",
-            FigureHeightInHeads = 4f,
-            FigureChinToShoulder = 0.0f,
-            FigureShoulderToNipples = 0.33f,
-            FigureShoulderToNavel = 1.2f,
-            FigureShoulderToCrotch = 1.6f,
-            FigureLengthOfLowerLimb = 0.6f,
-            FigureCrotchToBottomOfKnees = 0.6f,
-            FigureBottomOfKneesToHeels = 0.8f
-        }
+        // new Proportions() {
+        //     IsFemale = false,
+        //     ProportionName = "Male Child",
+        //     FigureHeightInHeads = 6f,
+        //     FigureChinToShoulder = 0.2f,
+        //     FigureShoulderToNipples = 0.4f,
+        //     FigureShoulderToNavel = 1.3f,
+        //     FigureShoulderToCrotch = 2f,
+        //     FigureLengthOfLowerLimb = 2.8f,
+        //     FigureCrotchToBottomOfKnees = 1.4f,
+        //     FigureBottomOfKneesToHeels = 1.4f
+        // },
+        // new Proportions() {
+        //     IsFemale = false,
+        //     ProportionName = "Male Young Child",
+        //     FigureHeightInHeads = 5.5f,
+        //     FigureChinToShoulder = 0.2f,
+        //     FigureShoulderToNipples = 0.4f,
+        //     FigureShoulderToNavel = 1.2f,
+        //     FigureShoulderToCrotch = 2f,
+        //     FigureLengthOfLowerLimb = 2.3f,
+        //     FigureCrotchToBottomOfKnees = 1f,
+        //     FigureBottomOfKneesToHeels = 1.3f
+        // },
+        // new Proportions() {
+        //     IsFemale = false,
+        //     ProportionName = "Male Infant",
+        //     FigureHeightInHeads = 5f,
+        //     FigureChinToShoulder = 0.2f,
+        //     FigureShoulderToNipples = 0.4f,
+        //     FigureShoulderToNavel = 1f,
+        //     FigureShoulderToCrotch = 1.8f,
+        //     FigureLengthOfLowerLimb = 2f,
+        //     FigureCrotchToBottomOfKnees = 1f,
+        //     FigureBottomOfKneesToHeels = 1f
+        // },
+        // new Proportions() {
+        //     IsFemale = false,
+        //     ProportionName = "Male Newborn",
+        //     FigureHeightInHeads = 4f,
+        //     FigureChinToShoulder = 0.0f,
+        //     FigureShoulderToNipples = 0.33f,
+        //     FigureShoulderToNavel = 1.2f,
+        //     FigureShoulderToCrotch = 1.6f,
+        //     FigureLengthOfLowerLimb = 0.6f,
+        //     FigureCrotchToBottomOfKnees = 0.6f,
+        //     FigureBottomOfKneesToHeels = 0.8f
+        // }
     };
 
     public bool IsFemale { get; set; } = true;
@@ -223,7 +223,11 @@ public class Proportions {
     }
 
     public Proportions ClostestMatch(List<Proportions> proportions) {
-        return ClosestMatches(proportions).First();
+        var matches = ClosestMatches(proportions);
+        if(matches.Count == 0) {
+            return null;
+        }
+        return matches[0];
     }
 
     public Proportions ProportionsDelta(Proportions x) {
