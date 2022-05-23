@@ -34,9 +34,10 @@ namespace LFE {
         }
 
         public void Update() {
-            bool isHubShowing = SuperController.singleton?.hubBrowser?.UITransform?.gameObject?.activeSelf ?? false;
+            // bool isHubShowing = SuperController.singleton?.hubBrowser?.UITransform?.gameObject?.activeSelf ?? false;
             bool isTopMenuShowing = SuperController.singleton?.worldUI?.gameObject?.activeSelf ?? false;
-            if(isHubShowing || isTopMenuShowing) {
+
+            if(isTopMenuShowing) {
                 _canvas.enabled = false;
             }
             else {
