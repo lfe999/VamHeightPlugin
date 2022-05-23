@@ -9,7 +9,6 @@ public class Proportions {
         // https://hpc.anatomy4sculptors.com/
         new Proportions() {
             IsFemale = true,
-            CanAutoDetect = false,
             ProportionName = "Female Elderly",
             FigureHeightInHeads = 7f,
             FigureChinToShoulder = 0.3f,
@@ -58,8 +57,6 @@ public class Proportions {
         },
         new Proportions() {
             IsFemale = true,
-            CanSeeInInterface = false,
-            ShouldShowWarning = true,
             ProportionName = "Female Child",
             FigureHeightInHeads = 6f,
             FigureChinToShoulder = 0.2f,
@@ -72,8 +69,6 @@ public class Proportions {
         },
         new Proportions() {
             IsFemale = true,
-            CanSeeInInterface = false,
-            ShouldShowWarning = true,
             ProportionName = "Female Young Child",
             FigureHeightInHeads = 5.5f,
             FigureChinToShoulder = 0.2f,
@@ -86,8 +81,6 @@ public class Proportions {
         },
         new Proportions() {
             IsFemale = true,
-            CanSeeInInterface = false,
-            ShouldShowWarning = true,
             ProportionName = "Female Infant",
             FigureHeightInHeads = 5f,
             FigureChinToShoulder = 0.2f,
@@ -100,8 +93,6 @@ public class Proportions {
         },
         new Proportions() {
             IsFemale = true,
-            CanSeeInInterface = false,
-            ShouldShowWarning = true,
             ProportionName = "Female Newborn",
             FigureHeightInHeads = 4f,
             FigureChinToShoulder = 0.0f,
@@ -115,8 +106,6 @@ public class Proportions {
 
         new Proportions() {
             IsFemale = false,
-            CanSeeInInterface = true,
-            ShouldShowWarning = false,
             ProportionName = "Male Elderly",
             FigureHeightInHeads = 7f,
             FigureChinToShoulder = 0.3f,
@@ -129,8 +118,6 @@ public class Proportions {
         },
         new Proportions() {
             IsFemale = false,
-            CanSeeInInterface = true,
-            ShouldShowWarning = false,
             ProportionName = "Male Adult",
             FigureHeightInHeads = 8f,
             FigureChinToShoulder = 0.33f,
@@ -143,8 +130,6 @@ public class Proportions {
         },
         new Proportions() {
             IsFemale = false,
-            CanSeeInInterface = true,
-            ShouldShowWarning = false,
             ProportionName = "Male Young Adult",
             FigureHeightInHeads = 7.5f,
             FigureChinToShoulder = 0.3f,
@@ -157,8 +142,6 @@ public class Proportions {
         },
         new Proportions() {
             IsFemale = false,
-            CanSeeInInterface = true,
-            ShouldShowWarning = false,
             ProportionName = "Male Teenager",
             FigureHeightInHeads = 7f,
             FigureChinToShoulder = 0.3f,
@@ -171,8 +154,6 @@ public class Proportions {
         },
         new Proportions() {
             IsFemale = false,
-            CanSeeInInterface = false,
-            ShouldShowWarning = true,
             ProportionName = "Male Child",
             FigureHeightInHeads = 6f,
             FigureChinToShoulder = 0.2f,
@@ -185,8 +166,6 @@ public class Proportions {
         },
         new Proportions() {
             IsFemale = false,
-            CanSeeInInterface = false,
-            ShouldShowWarning = true,
             ProportionName = "Male Young Child",
             FigureHeightInHeads = 5.5f,
             FigureChinToShoulder = 0.2f,
@@ -199,8 +178,6 @@ public class Proportions {
         },
         new Proportions() {
             IsFemale = false,
-            CanSeeInInterface = false,
-            ShouldShowWarning = true,
             ProportionName = "Male Infant",
             FigureHeightInHeads = 5f,
             FigureChinToShoulder = 0.2f,
@@ -213,8 +190,6 @@ public class Proportions {
         },
         new Proportions() {
             IsFemale = false,
-            CanSeeInInterface = false,
-            ShouldShowWarning = true,
             ProportionName = "Male Newborn",
             FigureHeightInHeads = 4f,
             FigureChinToShoulder = 0.0f,
@@ -228,9 +203,6 @@ public class Proportions {
     };
 
     public bool IsFemale { get; set; } = true;
-    public bool CanAutoDetect { get; set; } = true;
-    public bool CanSeeInInterface { get; set; } = true;
-    public bool ShouldShowWarning { get; set; } = false;
 
     public string ProportionName { get; set; }
     public float FigureHeightInHeads { get; set; }

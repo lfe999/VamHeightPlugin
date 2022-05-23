@@ -235,7 +235,7 @@ namespace LFE {
             proportionMarkerColor.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterColor(proportionMarkerColor);
 
-            var proportionNames = Proportions.CommonProportions.Where(p => p.CanSeeInInterface).Select(p => p.ProportionName).ToList();
+            var proportionNames = Proportions.CommonProportions.Select(p => p.ProportionName).ToList();
             proportionNames.Insert(0, "Auto Detect");
             proportionSelectionStorable = new JSONStorableStringChooser(
                 "Proportion Template",

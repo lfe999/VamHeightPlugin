@@ -63,8 +63,6 @@ namespace LFE {
             var parentRot = transform.parent.transform.rotation;
             var parentRotEuler = Quaternion.Euler(parentRot.eulerAngles);
 
-            var ageWarn = targetProportion.ShouldShowWarning && ShowDocumentation;
-
             // set the head height to use for all unit conversions
             UnitUtils.HeadHeightInUnity = Measurements.Height ?? 0;
 
@@ -72,64 +70,45 @@ namespace LFE {
             var unitsPerHead = height / targetHeads;
             var proportionDisplayName = TargetProportion != null ? $"{targetProportion.ProportionName} Proportions" : $"{targetProportion.ProportionName}";
             var title = $"{proportionDisplayName} - Target {targetHeads} h.u.";
-            if(ageWarn) {
-                _markerHead.Label = $"                                        WARNING! WARNING! WARNING!\n\n"
-                    +"Proportions on this model MAY indicate a younger age.  DO NOT use this plugin for purposes that are ILLEGAL.\n\n"
-                    +"This plugin makes GUESSES based on PROPORTIONS, AND THE GUESS COULD BE WRONG.\n"
-                    +"You think this is a mistake? Use your best judgement at your own risk.\n\n"
-                    +"Information on proportions used can be seen here:\n\n"
-                    +"           https://hpc.anatomy4sculptors.com/\n\n"
-                    +"You may choose to turn off this documenation in settings using 'Hide Documentation'.";
-            }
-            else {
-                _markerHead.Label = $"{title}";
-            }
+            _markerHead.Label = $"{title}";
             SetMainMarkerProperties(_markerHead, height);
             _markerHead.transform.position = parentRotEuler * (new Vector3(0, height, 0) + Offset) + parentPos;
-            _markerHead.Color = targetProportion.ShouldShowWarning && ShowDocumentation ? Color.red : LineColor;
 
             var headHeight = 1 * unitsPerHead;
             var chinHeight = height - headHeight;
             _markerChin.Label = $"Head Size";
             SetMainMarkerProperties(_markerChin, chinHeight);
             _markerChin.transform.position = parentRotEuler * (new Vector3(0, chinHeight, 0) + Offset) + parentPos;
-            _markerChin.Enabled = Enabled && !ageWarn;
 
             var shoulderHeight = chinHeight - (targetProportion.FigureChinToShoulder * unitsPerHead);
             _markerShoulder.Label = $"Chin To Shoulder - Target {targetProportion.FigureChinToShoulder} h.u.";
             SetMainMarkerProperties(_markerShoulder, shoulderHeight);
             _markerShoulder.transform.position = parentRotEuler * (new Vector3(0, shoulderHeight, 0) + Offset) + parentPos;
-            _markerShoulder.Enabled = Enabled && !ageWarn;
 
             var nippleHeight = shoulderHeight - (targetProportion.FigureShoulderToNipples * unitsPerHead);
             _markerNipple.Label = $"Shoulder To Nipple - Target {targetProportion.FigureShoulderToNipples} h.u.";
             SetMainMarkerProperties(_markerNipple, nippleHeight);
             _markerNipple.transform.position = parentRotEuler * (new Vector3(0, nippleHeight, 0) + Offset) + parentPos;
-            _markerNipple.Enabled = Enabled && !ageWarn;
 
             var navelHeight = shoulderHeight - (targetProportion.FigureShoulderToNavel * unitsPerHead);
             _markerNavel.Label = $"Shoulder To Navel - Target {targetProportion.FigureShoulderToNavel} h.u.";
             SetMainMarkerProperties(_markerNavel, navelHeight);
             _markerNavel.transform.position = parentRotEuler * (new Vector3(0, navelHeight, 0) + Offset) + parentPos;
-            _markerNavel.Enabled = Enabled && !ageWarn;
 
             var crotchHeight = shoulderHeight - (targetProportion.FigureShoulderToCrotch * unitsPerHead);
             _markerGroin.Label = $"Shoulder To Crotch - Target {targetProportion.FigureShoulderToNavel} h.u.";
             SetMainMarkerProperties(_markerGroin, crotchHeight);
             _markerGroin.transform.position = parentRotEuler * (new Vector3(0, crotchHeight, 0) + Offset) + parentPos;
-            _markerGroin.Enabled = Enabled && !ageWarn;
 
             var kneeHeight = crotchHeight - (targetProportion.FigureCrotchToBottomOfKnees * unitsPerHead);
             _markerKnee.Label = $"Crotch To Knee - Target {targetProportion.FigureCrotchToBottomOfKnees} h.u.";
             SetMainMarkerProperties(_markerKnee, kneeHeight);
             _markerKnee.transform.position = parentRotEuler * (new Vector3(0, kneeHeight, 0) + Offset) + parentPos;
-            _markerKnee.Enabled = Enabled && !ageWarn;
 
             _markerHeel.Label = $"Knee to Heel - Target {targetProportion.FigureBottomOfKneesToHeels}";
             SetMainMarkerProperties(_markerHeel, Measurements.HeelHeight);
             _markerHeel.Enabled = Measurements.HeelHeight != null && Enabled;
             _markerHeel.transform.position = parentRotEuler * (new Vector3(0, Measurements.HeelHeight ?? 0, 0) + Offset) + parentPos;
-            _markerHeel.Enabled = Enabled && !ageWarn;
 
         }
 
