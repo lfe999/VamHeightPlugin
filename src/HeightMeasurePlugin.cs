@@ -194,78 +194,84 @@ namespace LFE
         DAZMorph _headScaleMorph = null;
         int _lastSex = 0; // 0 female - 1 male
         public void Update() {
-            if(SuperController.singleton.freezeAnimation) {
-                return;
-            }
+            try {
+                if(SuperController.singleton.freezeAnimation) {
+                    return;
+                }
 
-            // allows for performant disabling with OnEnable/Disable
-            // if disabling, the Update should still try and shut off
-            // components one last time
-            if(_enabledPrev == false && !_enabled) {
-                return;
-            }
-            _enabledPrev = _enabled;
+                // allows for performant disabling with OnEnable/Disable
+                // if disabling, the Update should still try and shut off
+                // components one last time
+                if(_enabledPrev == false && !_enabled) {
+                    return;
+                }
+                _enabledPrev = _enabled;
 
-            if(_ui == null) {
-                return;
-            }
+                if(_ui == null) {
+                    return;
+                }
+                bool sexWasChanged = false;
+                bool targetHeadMorphChanged = false;
+                if(_autoMeasurements != null) {
+                    var curSex = _autoMeasurements.POI?.IsMale ?? false ? 1 : 0;
+                    sexWasChanged = curSex != _lastSex;
+                    _lastSex = curSex;
 
-            bool sexWasChanged = false;
-            bool targetHeadMorphChanged = false;
-            if(_autoMeasurements != null) {
-                var curSex = _autoMeasurements.POI.IsMale ? 1 : 0;
-                sexWasChanged = curSex != _lastSex;
-                _lastSex = curSex;
+                    targetHeadMorphChanged = _ui.targetHeadRatioMorphStorable.val != _headScaleMorph?.morphName;
+                }
 
-                targetHeadMorphChanged = _ui.targetHeadRatioMorphStorable.val != _headScaleMorph?.morphName;
-            }
+                var headRatioTarget = _ui.targetHeadRatioStorable.val;
 
-            var headRatioTarget = _ui.targetHeadRatioStorable.val;
-
-            // adjust head ratio to match a forced target
-            if(_ui.showTargetHeadRatioStorable.val && _autoMeasurements != null) {
-                var headRatioCurrent = _autoMeasurements.HeadHeight != null ? (_autoMeasurements.Height ?? 0)/(_autoMeasurements.HeadHeight ?? 0) : 0;
-                if(headRatioCurrent > 0) {
-                    // morph preference "Head big" (reloaded lite) and then "Head Scale" (built in)
-                    // head big:
-                    // - increasing the morph makes head bigger, which reduces the RATIO 
-                    // head scale:
-                    // - increasing the morph makes head smaller, which increases the RATIO
-                    if(sexWasChanged || targetHeadMorphChanged) {
-                        _headScaleMorph = null;
-                    }
-
-                    if(_headScaleMorph == null) {
-                        _headScaleMorph = GetMorphByName(_ui.targetHeadRatioMorphStorable.val);
-                        /// hmm try all the morphs in the list
-                        if(_headScaleMorph == null) {
-                            foreach(var morphName in _ui.targetHeadRatioMorphStorable.choices) {
-                                _headScaleMorph = GetMorphByName(morphName);
-                                if(_headScaleMorph != null) {
-                                    break;
-                                }
-                            }
-
+                // adjust head ratio to match a forced target
+                if(_ui.showTargetHeadRatioStorable.val && _autoMeasurements != null) {
+                    var headRatioCurrent = _autoMeasurements.HeadHeight != null ? (_autoMeasurements.Height ?? 0)/(_autoMeasurements.HeadHeight ?? 0) : 0;
+                    if(headRatioCurrent > 0) {
+                        // morph preference "Head big" (reloaded lite) and then "Head Scale" (built in)
+                        // head big:
+                        // - increasing the morph makes head bigger, which reduces the RATIO 
+                        // head scale:
+                        // - increasing the morph makes head smaller, which increases the RATIO
+                        if(sexWasChanged || targetHeadMorphChanged) {
+                            _headScaleMorph = null;
                         }
-                    }
-                    else {
-                        int makeHeadBiggerMorphDirection = _headScaleMorph.displayName.Equals("Head big") ? 1 : -1;
-                        int precision = 2;
-                        if(Mathf.RoundToInt(headRatioCurrent*(precision+1)*100) != Mathf.RoundToInt(headRatioTarget*(precision+1)*100)) {
-                            var offByPct = Mathf.Abs(headRatioTarget-headRatioCurrent)/headRatioCurrent * 100;
-                            var morphValue = _headScaleMorph.morphValue;
-                            var changeBy = 0.02f * offByPct;
-                            if(changeBy != 0) {
-                                var newValue = (headRatioCurrent > headRatioTarget) 
-                                    ? morphValue + (makeHeadBiggerMorphDirection * changeBy)
-                                    : morphValue - (makeHeadBiggerMorphDirection * changeBy);
-                                if(newValue > _headScaleMorph.min && newValue < _headScaleMorph.max) {
-                                    _headScaleMorph.morphValue = newValue;
+
+                        if(_headScaleMorph == null) {
+                            _headScaleMorph = GetMorphByName(_ui.targetHeadRatioMorphStorable.val);
+                            /// hmm try all the morphs in the list
+                            if(_headScaleMorph == null) {
+                                foreach(var morphName in _ui.targetHeadRatioMorphStorable.choices) {
+                                    _headScaleMorph = GetMorphByName(morphName);
+                                    if(_headScaleMorph != null) {
+                                        break;
+                                    }
+                                }
+
+                            }
+                        }
+                        else {
+                            int makeHeadBiggerMorphDirection = _headScaleMorph.displayName.Equals("Head big") ? 1 : -1;
+                            int precision = 2;
+                            if(Mathf.RoundToInt(headRatioCurrent*(precision+1)*100) != Mathf.RoundToInt(headRatioTarget*(precision+1)*100)) {
+                                var offByPct = Mathf.Abs(headRatioTarget-headRatioCurrent)/headRatioCurrent * 100;
+                                var morphValue = _headScaleMorph.morphValue;
+                                var changeBy = 0.02f * offByPct;
+                                if(changeBy != 0) {
+                                    var newValue = (headRatioCurrent > headRatioTarget) 
+                                        ? morphValue + (makeHeadBiggerMorphDirection * changeBy)
+                                        : morphValue - (makeHeadBiggerMorphDirection * changeBy);
+                                    if(newValue > _headScaleMorph.min && newValue < _headScaleMorph.max) {
+                                        _headScaleMorph.morphValue = newValue;
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
+            }
+            catch(Exception e) {
+                SuperController.LogError($"{e}");
+                return;
             }
 
             // remeasure model and display things

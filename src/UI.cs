@@ -810,14 +810,18 @@ namespace LFE {
                 CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
             }
 
-            CreateStandardDivider(rightSide: false);
-            _targetHeadRatioToggle = _plugin.CreateToggle(showTargetHeadRatioStorable, rightSide: false);
-            _targetHeadRatioSlider = _plugin.CreateSlider(targetHeadRatioStorable, rightSide: false);
-            _targetHeadRatioMorph = _plugin.CreateScrollablePopup(targetHeadRatioMorphStorable, rightSide: false);
+            if(_plugin.containingAtom.type == "Person") {
+                CreateStandardDivider(rightSide: false);
+                _targetHeadRatioToggle = _plugin.CreateToggle(showTargetHeadRatioStorable, rightSide: false);
+                _targetHeadRatioSlider = _plugin.CreateSlider(targetHeadRatioStorable, rightSide: false);
+                _targetHeadRatioMorph = _plugin.CreateScrollablePopup(targetHeadRatioMorphStorable, rightSide: false);
+            }
 
             CreateStandardDivider(rightSide: false);
-            _cupAlgorithm = _plugin.CreateScrollablePopup(cupAlgorithmStorable, rightSide: false);
-            _units = _plugin.CreateScrollablePopup(unitsStorable, rightSide: false);
+            if(_plugin.containingAtom.type == "Person") {
+                _cupAlgorithm = _plugin.CreateScrollablePopup(cupAlgorithmStorable, rightSide: false);
+                _units = _plugin.CreateScrollablePopup(unitsStorable, rightSide: false);
+            }
             _markerSpread = _plugin.CreateSlider(markerSpreadStorable, rightSide: false);
             _markerFrontBack = _plugin.CreateSlider(markerFrontBackStorable, rightSide: false);
             _markerLeftRight = _plugin.CreateSlider(markerLeftRightStorable, rightSide: false);
