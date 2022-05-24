@@ -6,6 +6,7 @@ namespace LFE {
         public float? Height { get; set; }
         public float? ChinHeight { get; set; }
         public float? ShoulderHeight { get; set; }
+        public float? ShoulderWidth { get; set; }
         public float? NippleHeight { get; set; }
         public float? UnderbustHeight { get; set; }
         public float? NavelHeight { get; set; }

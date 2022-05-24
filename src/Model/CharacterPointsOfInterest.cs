@@ -11,6 +11,8 @@ namespace LFE {
         public Vector3 CraniumHeight => RoughVertex(2087);
         public Vector3 ChinHeight => RoughVertex(2079);
         public Vector3 ShoulderHeight => Vector3.Lerp(RoughVertex(11110), RoughVertex(182), 0.5f);
+        public Vector3 ShoulderLeftSide => RoughVertex(182);
+        public Vector3 ShoulderRightSide => RoughVertex(11110);
         public Vector3 BustHeight => RoughVertex(10939);
         public Vector3 UnderbustHeight => RoughVertex(21469);
         public Vector3 NavelHeight => Vector3.Lerp(RoughVertex(18824), RoughVertex(8147), 0.5f);

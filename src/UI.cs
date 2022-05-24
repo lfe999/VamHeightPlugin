@@ -33,6 +33,7 @@ namespace LFE {
         public JSONStorableFloat headSizeWidthStorable;
         public JSONStorableFloat chinHeightStorable;
         public JSONStorableFloat shoulderHeightStorable;
+        public JSONStorableFloat shoulderWidthStorable;
         public JSONStorableFloat nippleHeightStorable;
         public JSONStorableFloat underbustHeightStorable;
         public JSONStorableFloat navelHeightStorable;
@@ -52,8 +53,6 @@ namespace LFE {
         public JSONStorableFloat ageFromHeadStorable;
         public JSONStorableFloat ageFromHeightStorable;
         public JSONStorableString proportionClosestMatch;
-
-        // TOOD: shoulder width
 
         // manual heights
         public JSONStorableBool showManualMarkersStorable;
@@ -345,6 +344,10 @@ namespace LFE {
             shoulderHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(shoulderHeightStorable);
 
+            shoulderWidthStorable = new JSONStorableFloat("shoulderWidth", 0, 0, 100);
+            shoulderWidthStorable.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterFloat(shoulderWidthStorable);
+
             nippleHeightStorable = new JSONStorableFloat("nippleHeight", 0, 0, 100);
             nippleHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(nippleHeightStorable);
@@ -507,6 +510,7 @@ namespace LFE {
         private UIDynamicToggle _proportionEditIsFemale;
         private UIDynamicSlider _proportionEditHeight;
         private UIDynamicSlider _proportionEditChin;
+        private UIDynamicSlider _proportionEditShoulderWidth;
         private UIDynamicSlider _proportionEditNipples;
         private UIDynamicSlider _proportionEditNavel;
         private UIDynamicSlider _proportionEditCrotch;
@@ -685,6 +689,10 @@ namespace LFE {
                             _plugin.CreateSlider(new JSONStorableFloat("Chin to Shoulder", selectedProportion.FigureChinToShoulder, (value) => {
                                 selectedProportion.FigureChinToShoulder = value;
                             }, 0, 10));
+                        _proportionEditShoulderWidth = 
+                            _plugin.CreateSlider(new JSONStorableFloat("Shoulder Width", selectedProportion.FigureShoulderWidth, (value) => {
+                                selectedProportion.FigureShoulderWidth = value;
+                            }, 0, 10));
                         _proportionEditNipples = 
                             _plugin.CreateSlider(new JSONStorableFloat("Shoulder to Nipples", selectedProportion.FigureShoulderToNipples, (value) => {
                                 selectedProportion.FigureShoulderToNipples = value;
@@ -719,6 +727,7 @@ namespace LFE {
                                     selectedProportion.IsFemale = _preEditProportion.IsFemale;
                                     selectedProportion.FigureHeightInHeads = _preEditProportion.FigureHeightInHeads;
                                     selectedProportion.FigureChinToShoulder = _preEditProportion.FigureChinToShoulder;
+                                    selectedProportion.FigureShoulderWidth = _preEditProportion.FigureShoulderWidth;
                                     selectedProportion.FigureShoulderToNipples = _preEditProportion.FigureShoulderToNipples;
                                     selectedProportion.FigureShoulderToNavel = _preEditProportion.FigureShoulderToNavel;
                                     selectedProportion.FigureShoulderToCrotch = _preEditProportion.FigureShoulderToCrotch;
@@ -978,6 +987,9 @@ namespace LFE {
             }
             if(_proportionEditChin) {
                 _plugin.RemoveSlider(_proportionEditChin);
+            }
+            if(_proportionEditShoulderWidth) {
+                _plugin.RemoveSlider(_proportionEditShoulderWidth);
             }
             if(_proportionEditNipples) {
                 _plugin.RemoveSlider(_proportionEditNipples);

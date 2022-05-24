@@ -98,6 +98,7 @@ namespace LFE
                             ProportionName = pj["name"].Value,
                             FigureHeightInHeads = pj["figureHeightInHeads"]?.AsFloat ?? 0,
                             FigureChinToShoulder = pj["figureChinToShoulder"]?.AsFloat ?? 0,
+                            FigureShoulderWidth = pj["figureShoulderWidth"]?.AsFloat ?? 0,
                             FigureShoulderToNipples = pj["figureShoulderToNipples"]?.AsFloat ?? 0,
                             FigureShoulderToNavel = pj["figureShoulderToNavel"]?.AsFloat ?? 0,
                             FigureShoulderToCrotch = pj["figureShoulderToCrotch"]?.AsFloat ?? 0,
@@ -126,6 +127,7 @@ namespace LFE
                 pJson["name"] = p.ProportionName;
                 pJson["figureHeightInHeads"].AsFloat = p.FigureHeightInHeads;
                 pJson["figureChinToShoulder"].AsFloat = p.FigureChinToShoulder;
+                pJson["figureShoulderWidth"].AsFloat = p.FigureShoulderWidth;
                 pJson["figureShoulderToNipples"].AsFloat = p.FigureShoulderToNipples;
                 pJson["figureShoulderToNavel"].AsFloat = p.FigureShoulderToNavel;
                 pJson["figureShoulderToCrotch"].AsFloat = p.FigureShoulderToCrotch;
@@ -298,6 +300,7 @@ namespace LFE
                 _ui.heightInHeadsStorable.val = _ui.headSizeHeightStorable.val == 0 ? 0 : _ui.fullHeightStorable.val / _ui.headSizeHeightStorable.val;
                 _ui.chinHeightStorable.val = _autoMeasurements.ChinHeight ?? 0;
                 _ui.shoulderHeightStorable.val = _autoMeasurements.ShoulderHeight ?? 0;
+                _ui.shoulderWidthStorable.val = _autoMeasurements.ShoulderWidth ?? 0;
                 _ui.nippleHeightStorable.val = _autoMeasurements.NippleHeight ?? 0;
                 _ui.underbustHeightStorable.val = _autoMeasurements.UnderbustHeight ?? 0;
                 _ui.navelHeightStorable.val = _autoMeasurements.NavelHeight ?? 0;
@@ -589,6 +592,8 @@ namespace LFE
             var footPos = poi.HeelHeight;
             var chinPos = poi.ChinHeight;
             var shoulderPos = poi.ShoulderHeight;
+            var shoulderLeftPos = poi.ShoulderLeftSide;
+            var shoulderRightPos = poi.ShoulderRightSide;
             var nipplePos = poi.BustHeight;
             var underbustPos = poi.UnderbustHeight;
             var navelPos = poi.NavelHeight;
@@ -621,6 +626,7 @@ namespace LFE
             measurements.ChinHeight = Vector3.Distance(chinPos, Vector3.ProjectOnPlane(chinPos, rootTransform.up)) - floorDistanceOffset - footOffset;
             measurements.HeadWidth = Vector3.Distance(poi.CraniumLeftSide, poi.CraniumRightSide);
             measurements.ShoulderHeight = Vector3.Distance(shoulderPos, Vector3.ProjectOnPlane(shoulderPos, rootTransform.up)) - floorDistanceOffset - footOffset;
+            measurements.ShoulderWidth = LineLength(new Vector3[] {shoulderLeftPos, shoulderRightPos});
             measurements.NippleHeight = poi.IsMale ? (float?)null : Vector3.Distance(nipplePos, Vector3.ProjectOnPlane(nipplePos, rootTransform.up)) - floorDistanceOffset - footOffset;
             measurements.UnderbustHeight = poi.IsMale ? (float?)null : Vector3.Distance(underbustPos, Vector3.ProjectOnPlane(underbustPos, rootTransform.up)) - floorDistanceOffset - footOffset;
             measurements.NavelHeight = Vector3.Distance(navelPos, Vector3.ProjectOnPlane(navelPos, rootTransform.up)) - floorDistanceOffset - footOffset;

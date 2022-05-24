@@ -7,6 +7,7 @@ namespace LFE {
         LabeledLine _markerHead;
         LabeledLine _markerChin;
         LabeledLine _markerShoulder;
+        LabeledLine _markerShoulderWidth;
         LabeledLine _markerNipple;
         LabeledLine _markerUnderbust;
         LabeledLine _markerNavel;
@@ -19,6 +20,7 @@ namespace LFE {
             _markerHead = CreateLineMarker("Head", LineColor);
             _markerChin = CreateLineMarker("Chin", LineColor);
             _markerShoulder = CreateLineMarker("Shoulder", LineColor);
+            _markerShoulderWidth = CreateLineMarker("ShoulderWidth", LineColor);
             _markerNipple = CreateLineMarker("Nipple", LineColor);
             _markerUnderbust = CreateLineMarker("Underbust", LineColor);
             _markerNavel = CreateLineMarker("Navel", LineColor);
@@ -73,9 +75,18 @@ namespace LFE {
             _markerChin.transform.position = parentRotEuler * (new Vector3(0, Measurements.ChinHeight ?? 0, 0) + Offset) + parentPos;
 
             var chinToShoulder = (Measurements.ChinHeight ?? 0) - (Measurements.ShoulderHeight ?? 0);
-            _markerShoulder.Label = $"Chin To Shoulder - {UnitUtils.ToUnitString(chinToShoulder, UnitDisplay)}";
+            var shoulderWidth = Measurements.ShoulderWidth ?? 0;
+            var shoulderLineBuffer = Mathf.Abs(Offset.x) < Mathf.Abs(shoulderWidth/2) ? shoulderWidth/2 + 0.02f : 0;
+            _markerShoulder.Label = $"Chin To Shoulder - {UnitUtils.ToUnitString(chinToShoulder, UnitDisplay)} Width - {UnitUtils.ToUnitString(shoulderWidth, UnitDisplay)}";
             SetMainMarkerProperties(_markerShoulder, Measurements.ShoulderHeight);
-            _markerShoulder.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + Offset) + parentPos;
+            _markerShoulder.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(Offset.x - shoulderLineBuffer, Offset.y, Offset.z)) + parentPos;
+            _markerShoulder.Length = _markerChin.Length - shoulderLineBuffer;
+
+            _markerShoulderWidth.Label = "";
+            SetMainMarkerProperties(_markerShoulderWidth, Measurements.ShoulderWidth);
+            _markerShoulderWidth.Length = shoulderWidth;
+            _markerShoulderWidth.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(-1*shoulderWidth/2, Offset.y, Offset.z + 0.01f)) + parentPos;
+            _markerShoulderWidth.LineDirection = Vector3.right;
 
             if(Measurements.BustSize == null || Measurements.BustSize == 0) {
                 _markerNipple.Label = $"Bust";

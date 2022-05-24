@@ -12,6 +12,7 @@ public class Proportions {
             ProportionName = "Female Elderly",
             FigureHeightInHeads = 7f,
             FigureChinToShoulder = 0.3f,
+            FigureShoulderWidth = 1.5f,
             FigureShoulderToNipples = 0.8f,
             FigureShoulderToNavel = 1.5f,
             FigureShoulderToCrotch = 2.1f,
@@ -24,6 +25,7 @@ public class Proportions {
             ProportionName = "Female Adult",
             FigureHeightInHeads = 8f,
             FigureChinToShoulder = 0.33f,
+            FigureShoulderWidth = 2f,
             FigureShoulderToNipples = 0.8f,
             FigureShoulderToNavel = 1.8f,
             FigureShoulderToCrotch = 3f,
@@ -36,6 +38,7 @@ public class Proportions {
             ProportionName = "Female Young Adult",
             FigureHeightInHeads = 7.5f,
             FigureChinToShoulder = 0.3f,
+            FigureShoulderWidth = 1.5f,
             FigureShoulderToNipples = 0.6f,
             FigureShoulderToNavel = 1.6f,
             FigureShoulderToCrotch = 2.7f,
@@ -48,6 +51,7 @@ public class Proportions {
             ProportionName = "Female Teenager",
             FigureHeightInHeads = 7f,
             FigureChinToShoulder = 0.3f,
+            FigureShoulderWidth = 1.3f,
             FigureShoulderToNipples = 0.6f,
             FigureShoulderToNavel = 1.3f,
             FigureShoulderToCrotch = 2.3f,
@@ -60,6 +64,7 @@ public class Proportions {
             ProportionName = "Male Elderly",
             FigureHeightInHeads = 7f,
             FigureChinToShoulder = 0.3f,
+            FigureShoulderWidth = 1.3f,
             FigureShoulderToNipples = 0.6f,
             FigureShoulderToNavel = 1.5f,
             FigureShoulderToCrotch = 2.1f,
@@ -72,6 +77,7 @@ public class Proportions {
             ProportionName = "Male Adult",
             FigureHeightInHeads = 8f,
             FigureChinToShoulder = 0.33f,
+            FigureShoulderWidth = 2.0f,
             FigureShoulderToNipples = 0.66f,
             FigureShoulderToNavel = 1.65f,
             FigureShoulderToCrotch = 2.6f,
@@ -84,6 +90,7 @@ public class Proportions {
             ProportionName = "Male Young Adult",
             FigureHeightInHeads = 7.5f,
             FigureChinToShoulder = 0.3f,
+            FigureShoulderWidth = 1.7f,
             FigureShoulderToNipples = 0.6f,
             FigureShoulderToNavel = 1.5f,
             FigureShoulderToCrotch = 2.4f,
@@ -96,6 +103,7 @@ public class Proportions {
             ProportionName = "Male Teenager",
             FigureHeightInHeads = 7f,
             FigureChinToShoulder = 0.3f,
+            FigureShoulderWidth = 1.3f,
             FigureShoulderToNipples = 0.6f,
             FigureShoulderToNavel = 1.3f,
             FigureShoulderToCrotch = 2.3f,
@@ -110,7 +118,7 @@ public class Proportions {
     public string ProportionName { get; set; }
     public float FigureHeightInHeads { get; set; }
     public float FigureChinToShoulder { get; set; }
-    // public float FigureWidthOfShoulders { get; set; } // TODO
+    public float FigureShoulderWidth { get; set; }
     public float FigureShoulderToNipples { get; set; }
     public float FigureShoulderToNavel { get; set; }
     public float FigureShoulderToCrotch { get; set; }
@@ -138,6 +146,7 @@ public class Proportions {
             ProportionName = $"{ProportionName} vs {x.ProportionName}",
             FigureHeightInHeads = FigureHeightInHeads - x.FigureHeightInHeads,
             FigureChinToShoulder = FigureChinToShoulder - x.FigureChinToShoulder,
+            FigureShoulderWidth = FigureShoulderWidth - x.FigureShoulderWidth,
             FigureShoulderToNipples = FigureShoulderToNipples - x.FigureShoulderToNipples,
             FigureShoulderToNavel = FigureShoulderToNavel - x.FigureShoulderToNavel,
             FigureShoulderToCrotch = FigureShoulderToCrotch - x.FigureShoulderToCrotch,
@@ -161,6 +170,7 @@ public class Proportions {
             ProportionName = $"{ProportionName} vs {x.ProportionName}",
             FigureHeightInHeads = FigureHeightInHeads - x.FigureHeightInHeads,
             FigureChinToShoulder = (FigureChinToShoulder*normalizeThis) - (x.FigureChinToShoulder*normalizeX),
+            FigureShoulderWidth = (FigureShoulderWidth*normalizeThis) - (x.FigureShoulderWidth*normalizeX),
             FigureShoulderToNipples = (FigureShoulderToNipples*normalizeThis) - (x.FigureShoulderToNipples*normalizeX),
             FigureShoulderToNavel = (FigureShoulderToNavel*normalizeThis) - (x.FigureShoulderToNavel*normalizeX),
             FigureShoulderToCrotch = (FigureShoulderToCrotch*normalizeThis) - (x.FigureShoulderToCrotch*normalizeX),
@@ -176,6 +186,7 @@ public class Proportions {
             ProportionName = $"{deltaFixed.ProportionName} %",
             FigureHeightInHeads = (FigureHeightInHeads - x.FigureHeightInHeads) / FigureHeightInHeads,
             FigureChinToShoulder = (FigureChinToShoulder - x.FigureChinToShoulder) / FigureChinToShoulder,
+            FigureShoulderWidth = (FigureShoulderWidth - x.FigureShoulderWidth) / FigureShoulderWidth,
             FigureShoulderToNipples = (FigureShoulderToNipples - x.FigureShoulderToNipples) / FigureShoulderToNipples,
             FigureShoulderToNavel = (FigureShoulderToNavel - x.FigureShoulderToNavel) / FigureShoulderToNavel,
             FigureShoulderToCrotch = (FigureShoulderToCrotch - x.FigureShoulderToCrotch) / FigureShoulderToCrotch,
@@ -188,6 +199,7 @@ public class Proportions {
     public float SortScore() {
         return (Math.Abs(FigureHeightInHeads))
             + Math.Abs(FigureChinToShoulder)
+            + Math.Abs(FigureShoulderWidth)
             + Math.Abs(FigureShoulderToNipples)
             + Math.Abs(FigureShoulderToNavel)
             + Math.Abs(FigureShoulderToCrotch)
@@ -200,6 +212,7 @@ public class Proportions {
         return $"Proportions({ProportionName})\n"
                 + $"    FigureHeightInHeads={r(FigureHeightInHeads)}\n"
                 + $"    FigureChinToShoulder={r(FigureChinToShoulder)}\n"
+                + $"    FigureShoulderWidth={r(FigureShoulderWidth)}\n"
                 + $"    FigureShoulderToNipples={r(FigureShoulderToNipples)}\n"
                 + $"    FigureShoulderToNavel={r(FigureShoulderToNavel)}\n"
                 + $"    FigureShoulderToCrotch={r(FigureShoulderToCrotch)}\n"
@@ -214,6 +227,7 @@ public class Proportions {
             IsFemale = this.IsFemale,
             FigureHeightInHeads = this.FigureHeightInHeads,
             FigureChinToShoulder = this.FigureChinToShoulder,
+            FigureShoulderWidth = this.FigureShoulderWidth,
             FigureShoulderToNavel = this.FigureShoulderToNavel,
             FigureShoulderToNipples = this.FigureShoulderToNipples,
             FigureShoulderToCrotch = this.FigureShoulderToCrotch,
