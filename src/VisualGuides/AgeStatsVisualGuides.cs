@@ -28,7 +28,6 @@ namespace LFE {
 
         bool _enabledPrev = false; // allows for performant disabling
         public void Update()  {
-            // SuperController.singleton.ClearMessages();
             if(Measurements == null){
                 return;
             }

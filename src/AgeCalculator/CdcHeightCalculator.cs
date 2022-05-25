@@ -39,14 +39,12 @@ public class CdcHeightCalculator : IAgeCalculator {
     }
 
     public AgeCalculation GuessFemaleAgesAlgo2(float y) {
-        // SuperController.singleton.ClearMessages();
         var results = new List<AgeGuess>();
 
         int heightMm = (int)(y * 1000);
         int idxH = heightMm - HeightMinMm;
 
         if(idxH >= HeightIndexMin && idxH <= HeightIndexMax) {
-            // SuperController.singleton.ClearMessages();
             for(var idxA = AgeIndexMin; idxA <= AgeIndexMax; idxA++) {
                 var ageYear = idxA + AgeYearsMin;
                 var confidence = _ageByHeight[idxH, idxA];
@@ -80,12 +78,9 @@ public class CdcHeightCalculator : IAgeCalculator {
             var maxConfidence = results.Max(x => x.Confidence);
             var minConfidence = 0;
             if(maxConfidence - minConfidence != 0) {
-                // SuperController.singleton.ClearMessages();
                 for(var i = 0; i < results.Count; i++) {
                     var g = results[i];
-                    // SuperController.LogMessage($"BEFORE Input={g.Input}, Age={g.Age}, Confidence={g.Confidence}");
                     results[i].Confidence = (results[i].Confidence - minConfidence)/(maxConfidence - minConfidence);
-                    // SuperController.LogMessage($"AFTER Input={g.Input}, Age={g.Age}, Confidence={g.Confidence}");
                 }
             }
             return new AgeCalculation(results);
@@ -93,10 +88,6 @@ public class CdcHeightCalculator : IAgeCalculator {
         else {
             return null;
         }
-
-        // foreach(var g in results) {
-        //     SuperController.LogMessage($"AFTER Input={g.Input}, Age={g.Age}, Confidence={g.Confidence}");
-        // }
     }
 
 

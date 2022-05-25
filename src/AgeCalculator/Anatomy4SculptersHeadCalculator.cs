@@ -14,7 +14,6 @@ public class Anatomy4SculptersCalculator : IAgeCalculator {
     }
 
     private AgeCalculation Algorithm1(float y) {
-        // SuperController.singleton.ClearMessages();
         var response = new List<AgeGuess>();
         
         var rangeSize = 4;
@@ -25,7 +24,6 @@ public class Anatomy4SculptersCalculator : IAgeCalculator {
             var guess = GuessSingleFemaleAge(headSize);
             if(guess != null) {
                 guess.Confidence = 1.0f / (float)Math.Pow(1 + Math.Abs(i), 1.4);
-                // SuperController.LogMessage($"y={Math.Round(y, 3)} age={guess.Age} confidence={guess.Confidence}");
                 response.Add(guess);
             }
         }
