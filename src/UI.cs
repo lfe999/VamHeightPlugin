@@ -34,6 +34,7 @@ namespace LFE {
         public JSONStorableFloat chinHeightStorable;
         public JSONStorableFloat shoulderHeightStorable;
         public JSONStorableFloat shoulderWidthStorable;
+        public JSONStorableFloat armLengthStorable;
         public JSONStorableFloat nippleHeightStorable;
         public JSONStorableFloat underbustHeightStorable;
         public JSONStorableFloat navelHeightStorable;
@@ -297,12 +298,12 @@ namespace LFE {
             _plugin.RegisterStringChooser(unitsStorable);
 
             // Float: How far apart markers are spread apart
-            markerSpreadStorable = new JSONStorableFloat("Spread Guides", 0.02f, -1, 1);
+            markerSpreadStorable = new JSONStorableFloat("Spread Guides", 0.25f, -1, 1);
             markerSpreadStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(markerSpreadStorable);
 
             // Float: Move markers forward or backward relative to center depth of the head
-            markerFrontBackStorable = new JSONStorableFloat("Move Guides Forward/Backward", 0.15f, -5, 5);
+            markerFrontBackStorable = new JSONStorableFloat("Move Guides Forward/Backward", 0, -5, 5);
             markerFrontBackStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(markerFrontBackStorable);
 
@@ -347,6 +348,10 @@ namespace LFE {
             shoulderWidthStorable = new JSONStorableFloat("shoulderWidth", 0, 0, 100);
             shoulderWidthStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(shoulderWidthStorable);
+
+            armLengthStorable = new JSONStorableFloat("armLength", 0, 0, 100);
+            armLengthStorable.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterFloat(armLengthStorable);
 
             nippleHeightStorable = new JSONStorableFloat("nippleHeight", 0, 0, 100);
             nippleHeightStorable.storeType = JSONStorableParam.StoreType.Full;
@@ -511,6 +516,7 @@ namespace LFE {
         private UIDynamicSlider _proportionEditHeight;
         private UIDynamicSlider _proportionEditChin;
         private UIDynamicSlider _proportionEditShoulderWidth;
+        private UIDynamicSlider _proportionEditArms;
         private UIDynamicSlider _proportionEditNipples;
         private UIDynamicSlider _proportionEditNavel;
         private UIDynamicSlider _proportionEditCrotch;
@@ -693,6 +699,10 @@ namespace LFE {
                             _plugin.CreateSlider(new JSONStorableFloat("Shoulder Width", selectedProportion.FigureShoulderWidth, (value) => {
                                 selectedProportion.FigureShoulderWidth = value;
                             }, 0, 10));
+                        _proportionEditArms = 
+                             _plugin.CreateSlider(new JSONStorableFloat("Full Arm Length", selectedProportion.FigureLengthOfUpperLimb, (value) => {
+                                selectedProportion.FigureLengthOfUpperLimb = value;
+                            }, 0, 10));
                         _proportionEditNipples = 
                             _plugin.CreateSlider(new JSONStorableFloat("Shoulder to Nipples", selectedProportion.FigureShoulderToNipples, (value) => {
                                 selectedProportion.FigureShoulderToNipples = value;
@@ -733,6 +743,7 @@ namespace LFE {
                                     selectedProportion.FigureShoulderToCrotch = _preEditProportion.FigureShoulderToCrotch;
                                     selectedProportion.FigureCrotchToBottomOfKnees = _preEditProportion.FigureCrotchToBottomOfKnees;
                                     selectedProportion.FigureLengthOfLowerLimb = _preEditProportion.FigureLengthOfLowerLimb;
+                                    selectedProportion.FigureLengthOfUpperLimb = _preEditProportion.FigureLengthOfUpperLimb;
                                     selectedProportion.FigureBottomOfKneesToHeels = _preEditProportion.FigureBottomOfKneesToHeels;
                                 }
 
@@ -990,6 +1001,9 @@ namespace LFE {
             }
             if(_proportionEditShoulderWidth) {
                 _plugin.RemoveSlider(_proportionEditShoulderWidth);
+            }
+            if(_proportionEditArms) {
+                _plugin.RemoveSlider(_proportionEditArms);
             }
             if(_proportionEditNipples) {
                 _plugin.RemoveSlider(_proportionEditNipples);

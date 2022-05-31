@@ -54,9 +54,9 @@ namespace LFE
             _enabled = true;
             if(_initRun) {
                 _mainGuides.Enabled = _ui.showFeatureMarkersStorable.val;
-                _mainGuidesManual.Enabled = false;
+                _mainGuidesManual.Enabled = _ui.showManualMarkersStorable.val;
                 _headGuides.Enabled = _ui.showHeadHeightMarkersStorable.val; 
-                _headGuidesManual.Enabled = false;
+                _headGuidesManual.Enabled = _ui.showHeadHeightMarkersStorable.val;
                 _faceGuides.Enabled = _ui.showFaceMarkersStorable.val;
                 _bustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
                 _underbustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
@@ -301,6 +301,7 @@ namespace LFE
                 _ui.chinHeightStorable.val = _autoMeasurements.ChinHeight ?? 0;
                 _ui.shoulderHeightStorable.val = _autoMeasurements.ShoulderHeight ?? 0;
                 _ui.shoulderWidthStorable.val = _autoMeasurements.ShoulderWidth ?? 0;
+                _ui.armLengthStorable.val = _autoMeasurements.ArmLength ?? 0;
                 _ui.nippleHeightStorable.val = _autoMeasurements.NippleHeight ?? 0;
                 _ui.underbustHeightStorable.val = _autoMeasurements.UnderbustHeight ?? 0;
                 _ui.navelHeightStorable.val = _autoMeasurements.NavelHeight ?? 0;
@@ -594,6 +595,7 @@ namespace LFE
             var shoulderPos = poi.ShoulderHeight;
             var shoulderLeftPos = poi.ShoulderLeftSide;
             var shoulderRightPos = poi.ShoulderRightSide;
+            var fingertipRightPos = poi.FingerTipRightSide;
             var nipplePos = poi.BustHeight;
             var underbustPos = poi.UnderbustHeight;
             var navelPos = poi.NavelHeight;
@@ -601,6 +603,9 @@ namespace LFE
             var kneePos = poi.KneeUnderHeight;
             var eyeHeightPos = poi.EyeLeftCenter;
             var mouthHeightPos = poi.MouthCenterHeight;
+
+            var floorDistancePosNeg = (Vector3.Dot(footPos, rootTransform.up) < 0 ? -1 : 1);
+            var floorDistanceOffset = Vector3.Distance(rootPos, floor) * floorDistancePosNeg;
 
             // if(_debugLine == null) {
             //     var go = new GameObject();
@@ -627,6 +632,7 @@ namespace LFE
             measurements.HeadWidth = Vector3.Distance(poi.CraniumLeftSide, poi.CraniumRightSide);
             measurements.ShoulderHeight = Vector3.Distance(shoulderPos, Vector3.ProjectOnPlane(shoulderPos, rootTransform.up)) - floorDistanceOffset - footOffset;
             measurements.ShoulderWidth = LineLength(new Vector3[] {shoulderLeftPos, shoulderRightPos});
+            measurements.ArmLength = LineLength(new Vector3[] {shoulderRightPos, fingertipRightPos});
             measurements.NippleHeight = poi.IsMale ? (float?)null : Vector3.Distance(nipplePos, Vector3.ProjectOnPlane(nipplePos, rootTransform.up)) - floorDistanceOffset - footOffset;
             measurements.UnderbustHeight = poi.IsMale ? (float?)null : Vector3.Distance(underbustPos, Vector3.ProjectOnPlane(underbustPos, rootTransform.up)) - floorDistanceOffset - footOffset;
             measurements.NavelHeight = Vector3.Distance(navelPos, Vector3.ProjectOnPlane(navelPos, rootTransform.up)) - floorDistanceOffset - footOffset;

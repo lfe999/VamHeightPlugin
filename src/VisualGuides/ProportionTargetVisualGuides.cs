@@ -96,7 +96,7 @@ namespace LFE {
 
             _markerShoulderWidth.Label = "";
             SetMainMarkerProperties(_markerShoulderWidth, shoulderWidth);
-            _markerShoulderWidth.transform.position = parentRotEuler * (new Vector3(0, shoulderHeight, 0) + new Vector3(shoulderWidth/2, Offset.y, Offset.z + 0.01f)) + parentPos;
+            _markerShoulderWidth.transform.position = parentRotEuler * (new Vector3(0, shoulderHeight, 0) + new Vector3(shoulderWidth/2, Offset.y, Offset.z + 0.04f)) + parentPos;
             _markerShoulderWidth.Length = shoulderWidth;
 
             var nippleHeight = shoulderHeight - (targetProportion.FigureShoulderToNipples * unitsPerHead);

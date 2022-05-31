@@ -90,6 +90,16 @@ namespace LFE {
                             _rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
                         }
                     }
+                    if(LineDirection == Vector3.down) {
+                        text.alignment = TextAnchor.UpperCenter;
+                        text.text = Label;
+                        text.color = Color;
+                        if(_rt != null){
+                            _rt.anchoredPosition = new Vector2(0, (Length * -500) - 10);
+                            _rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 0);
+                            _rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
+                        }
+                    }
                 }
             }
         }

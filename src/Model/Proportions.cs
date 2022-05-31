@@ -122,7 +122,7 @@ public class Proportions {
     public float FigureShoulderToNipples { get; set; }
     public float FigureShoulderToNavel { get; set; }
     public float FigureShoulderToCrotch { get; set; }
-    // public float FigureLengthOfUpperLimb { get; set; } // TODO
+    public float FigureLengthOfUpperLimb { get; set; }
     // public float FigureLengthOfArm { get; set; } // TODO
     // public float FigureLengthOfForearmAndHand { get; set; } // TODO
     public float FigureLengthOfLowerLimb { get; set; } // crotch to feet
@@ -151,6 +151,7 @@ public class Proportions {
             FigureShoulderToNavel = FigureShoulderToNavel - x.FigureShoulderToNavel,
             FigureShoulderToCrotch = FigureShoulderToCrotch - x.FigureShoulderToCrotch,
             FigureLengthOfLowerLimb = FigureLengthOfLowerLimb - x.FigureLengthOfLowerLimb,
+            FigureLengthOfUpperLimb = FigureLengthOfUpperLimb - x.FigureLengthOfUpperLimb,
             FigureCrotchToBottomOfKnees = FigureCrotchToBottomOfKnees - x.FigureCrotchToBottomOfKnees,
             FigureBottomOfKneesToHeels = FigureBottomOfKneesToHeels - x.FigureBottomOfKneesToHeels
         };
@@ -175,6 +176,7 @@ public class Proportions {
             FigureShoulderToNavel = (FigureShoulderToNavel*normalizeThis) - (x.FigureShoulderToNavel*normalizeX),
             FigureShoulderToCrotch = (FigureShoulderToCrotch*normalizeThis) - (x.FigureShoulderToCrotch*normalizeX),
             FigureLengthOfLowerLimb = (FigureLengthOfLowerLimb*normalizeThis) - (x.FigureLengthOfLowerLimb*normalizeX),
+            FigureLengthOfUpperLimb = (FigureLengthOfUpperLimb*normalizeThis) - (x.FigureLengthOfUpperLimb*normalizeX),
             FigureCrotchToBottomOfKnees = (FigureCrotchToBottomOfKnees*normalizeThis) - (x.FigureCrotchToBottomOfKnees*normalizeX),
             FigureBottomOfKneesToHeels = (FigureBottomOfKneesToHeels*normalizeThis) - (x.FigureBottomOfKneesToHeels*normalizeX)
         };
@@ -191,6 +193,7 @@ public class Proportions {
             FigureShoulderToNavel = (FigureShoulderToNavel - x.FigureShoulderToNavel) / FigureShoulderToNavel,
             FigureShoulderToCrotch = (FigureShoulderToCrotch - x.FigureShoulderToCrotch) / FigureShoulderToCrotch,
             FigureLengthOfLowerLimb = (FigureLengthOfLowerLimb - x.FigureLengthOfLowerLimb) / FigureLengthOfLowerLimb,
+            FigureLengthOfUpperLimb = (FigureLengthOfUpperLimb - x.FigureLengthOfUpperLimb) / FigureLengthOfUpperLimb,
             FigureCrotchToBottomOfKnees = (FigureCrotchToBottomOfKnees - x.FigureCrotchToBottomOfKnees) / FigureCrotchToBottomOfKnees,
             FigureBottomOfKneesToHeels = (FigureBottomOfKneesToHeels - x.FigureBottomOfKneesToHeels) / FigureBottomOfKneesToHeels
         };
@@ -204,6 +207,7 @@ public class Proportions {
             + Math.Abs(FigureShoulderToNavel)
             + Math.Abs(FigureShoulderToCrotch)
             + Math.Abs(FigureLengthOfLowerLimb)
+            + Math.Abs(FigureLengthOfUpperLimb)
             + Math.Abs(FigureCrotchToBottomOfKnees)
             + Math.Abs(FigureBottomOfKneesToHeels);
     }
@@ -217,6 +221,7 @@ public class Proportions {
                 + $"    FigureShoulderToNavel={r(FigureShoulderToNavel)}\n"
                 + $"    FigureShoulderToCrotch={r(FigureShoulderToCrotch)}\n"
                 + $"    FigureLengthOfLowerLimb={r(FigureLengthOfLowerLimb)}\n"
+                + $"    FigureLengthOfUpperLimb={r(FigureLengthOfLowerLimb)}\n"
                 + $"    FigureCrotchToBottomOfKnees={r(FigureCrotchToBottomOfKnees)}\n"
                 + $"    FigureBottomOfKneesToHeels={r(FigureBottomOfKneesToHeels)}";
     }
@@ -232,6 +237,7 @@ public class Proportions {
             FigureShoulderToNipples = this.FigureShoulderToNipples,
             FigureShoulderToCrotch = this.FigureShoulderToCrotch,
             FigureLengthOfLowerLimb = this.FigureLengthOfLowerLimb,
+            FigureLengthOfUpperLimb = this.FigureLengthOfUpperLimb,
             FigureCrotchToBottomOfKnees = this.FigureCrotchToBottomOfKnees,
             FigureBottomOfKneesToHeels = this.FigureBottomOfKneesToHeels
         };

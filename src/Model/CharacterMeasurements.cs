@@ -7,6 +7,7 @@ namespace LFE {
         public float? ChinHeight { get; set; }
         public float? ShoulderHeight { get; set; }
         public float? ShoulderWidth { get; set; }
+        public float? ArmLength { get; set; }
         public float? NippleHeight { get; set; }
         public float? UnderbustHeight { get; set; }
         public float? NavelHeight { get; set; }
@@ -57,6 +58,7 @@ namespace LFE {
                 p.FigureShoulderToNipples = Mathf.Abs((ShoulderHeight ?? 0) - (NippleHeight ?? 0)) / hh;
                 p.FigureShoulderToNavel = Mathf.Abs((ShoulderHeight ?? 0) - (NavelHeight ?? 0)) / hh;
                 p.FigureShoulderToCrotch = Mathf.Abs((ShoulderHeight?? 0) - (CrotchHeight ?? 0)) / hh;
+                p.FigureLengthOfUpperLimb = Mathf.Abs(ArmLength ?? 0) / hh;
                 p.FigureLengthOfLowerLimb = Mathf.Abs((CrotchHeight ?? 0) - (HeelHeight ?? 0)) / hh;
                 p.FigureCrotchToBottomOfKnees = Mathf.Abs((CrotchHeight ?? 0) - (KneeHeight ?? 0)) / hh;
                 p.FigureBottomOfKneesToHeels = Mathf.Abs((KneeHeight ?? 0) - (HeelHeight ?? 0)) / hh;
