@@ -617,21 +617,21 @@ namespace LFE
             //     Vector3.ProjectOnPlane(footPos, rootTransform.up),
             //     Vector3.ProjectOnPlane(rootPos, rootTransform.up)
             // });
-
-            var footOffset = Vector3.Distance(footPos, Vector3.ProjectOnPlane(footPos, rootTransform.up)) - floorDistanceOffset;
+            
+            var footOffset = Vector3.Dot(footPos - rootPos, rootTransform.up);
 
             // set measurements
             measurements.HeelToFloorOffset = Vector3.up * footOffset;
-            measurements.Height = Vector3.Distance(headPos, Vector3.ProjectOnPlane(headPos, rootTransform.up)) - floorDistanceOffset - footOffset;
-            measurements.ChinHeight = Vector3.Distance(chinPos, Vector3.ProjectOnPlane(chinPos, rootTransform.up)) - floorDistanceOffset - footOffset;
+            measurements.Height = Vector3.Dot(headPos - rootPos, rootTransform.up);
+            measurements.ChinHeight = Vector3.Dot(chinPos - rootPos, rootTransform.up);
             measurements.HeadWidth = Vector3.Distance(poi.CraniumLeftSide, poi.CraniumRightSide);
-            measurements.ShoulderHeight = Vector3.Distance(shoulderPos, Vector3.ProjectOnPlane(shoulderPos, rootTransform.up)) - floorDistanceOffset - footOffset;
+            measurements.ShoulderHeight = Vector3.Dot(shoulderPos - rootPos, rootTransform.up);
             measurements.ShoulderWidth = LineLength(new Vector3[] {shoulderLeftPos, shoulderRightPos});
-            measurements.NippleHeight = poi.IsMale ? (float?)null : Vector3.Distance(nipplePos, Vector3.ProjectOnPlane(nipplePos, rootTransform.up)) - floorDistanceOffset - footOffset;
-            measurements.UnderbustHeight = poi.IsMale ? (float?)null : Vector3.Distance(underbustPos, Vector3.ProjectOnPlane(underbustPos, rootTransform.up)) - floorDistanceOffset - footOffset;
-            measurements.NavelHeight = Vector3.Distance(navelPos, Vector3.ProjectOnPlane(navelPos, rootTransform.up)) - floorDistanceOffset - footOffset;
-            measurements.CrotchHeight = Vector3.Distance(crotchPos, Vector3.ProjectOnPlane(crotchPos, rootTransform.up)) - floorDistanceOffset - footOffset;
-            measurements.KneeHeight = Vector3.Distance(kneePos, Vector3.ProjectOnPlane(kneePos, rootTransform.up)) - floorDistanceOffset - footOffset;
+            measurements.NippleHeight = poi.IsMale ? (float?)null : Vector3.Dot(nipplePos - rootPos, rootTransform.up);
+            measurements.UnderbustHeight = poi.IsMale ? (float?)null : Vector3.Dot(underbustPos - rootPos, rootTransform.up);
+            measurements.NavelHeight = Vector3.Dot(navelPos - rootPos, rootTransform.up);
+            measurements.CrotchHeight = Vector3.Dot(crotchPos - rootPos, rootTransform.up);
+            measurements.KneeHeight = Vector3.Dot(kneePos - rootPos, rootTransform.up);
             measurements.HeelHeight = 0;
 
             measurements.WaistSize = LineLength(poi.WaistPoints);
