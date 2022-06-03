@@ -622,17 +622,26 @@ namespace LFE
 
             // set measurements
             measurements.HeelToFloorOffset = Vector3.up * footOffset;
-            measurements.Height = Vector3.Dot(headPos - rootPos, rootTransform.up);
-            measurements.ChinHeight = Vector3.Dot(chinPos - rootPos, rootTransform.up);
+            measurements.Height = Vector3.Dot(headPos - footPos, rootTransform.up);
+            measurements.ChinHeight = Vector3.Dot(chinPos - footPos, rootTransform.up);
             measurements.HeadWidth = Vector3.Distance(poi.CraniumLeftSide, poi.CraniumRightSide);
-            measurements.ShoulderHeight = Vector3.Dot(shoulderPos - rootPos, rootTransform.up);
+            measurements.ShoulderHeight = Vector3.Dot(shoulderPos - footPos, rootTransform.up);
             measurements.ShoulderWidth = LineLength(new Vector3[] {shoulderLeftPos, shoulderRightPos});
-            measurements.NippleHeight = poi.IsMale ? (float?)null : Vector3.Dot(nipplePos - rootPos, rootTransform.up);
-            measurements.UnderbustHeight = poi.IsMale ? (float?)null : Vector3.Dot(underbustPos - rootPos, rootTransform.up);
-            measurements.NavelHeight = Vector3.Dot(navelPos - rootPos, rootTransform.up);
-            measurements.CrotchHeight = Vector3.Dot(crotchPos - rootPos, rootTransform.up);
-            measurements.KneeHeight = Vector3.Dot(kneePos - rootPos, rootTransform.up);
+            measurements.NippleHeight = poi.IsMale ? (float?)null : Vector3.Dot(nipplePos - footPos, rootTransform.up);
+            measurements.UnderbustHeight = poi.IsMale ? (float?)null : Vector3.Dot(underbustPos - footPos, rootTransform.up);
+            measurements.NavelHeight = Vector3.Dot(navelPos - footPos, rootTransform.up);
+            measurements.CrotchHeight = Vector3.Dot(crotchPos - footPos, rootTransform.up);
+            measurements.KneeHeight = Vector3.Dot(kneePos - footPos, rootTransform.up);
             measurements.HeelHeight = 0;
+
+            // SuperController.singleton.ClearMessages();
+            // SuperController.LogMessage($"height={measurements.Height}");
+            // SuperController.LogMessage($"rootPos={rootPos}");
+            // SuperController.LogMessage($"footOffset={footOffset}");
+            // SuperController.LogMessage($"footPos={footPos}");
+            // SuperController.LogMessage($"floor={floor}");
+            // SuperController.LogMessage($"floorDistanceOffset={floorDistanceOffset}");
+
 
             measurements.WaistSize = LineLength(poi.WaistPoints);
             measurements.HipSize = LineLength(poi.HipPoints);
