@@ -267,7 +267,9 @@ public class Proportions {
             FigureShoulderToCrotch = this.FigureShoulderToCrotch,
             FigureLengthOfLowerLimb = this.FigureLengthOfLowerLimb,
             FigureCrotchToBottomOfKnees = this.FigureCrotchToBottomOfKnees,
-            FigureBottomOfKneesToHeels = this.FigureBottomOfKneesToHeels
+            FigureBottomOfKneesToHeels = this.FigureBottomOfKneesToHeels,
+            EstimatedAgeRangeMin = this.EstimatedAgeRangeMin,
+            EstimatedAgeRangeMax = this.EstimatedAgeRangeMax
         };
     }
 

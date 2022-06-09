@@ -531,6 +531,8 @@ namespace LFE {
         private UIDynamicSlider _proportionEditLegs;
         private UIDynamicSlider _proportionEditKnee;
         private UIDynamicSlider _proportionEditHeel;
+        private UIDynamicSlider _proportionEditAgeMin;
+        private UIDynamicSlider _proportionEditAgeMax;
 
         private UIDynamicButton _proportionEditButton;
         private UIDynamicButton _proportionDeleteButton;
@@ -734,6 +736,32 @@ namespace LFE {
                                 selectedProportion.FigureBottomOfKneesToHeels = value;
                             }, 0, 10));
 
+#if LFE_EXPERIMENTAL
+                        JSONStorableFloat minStorable = new JSONStorableFloat("Age Estimage Min", selectedProportion.EstimatedAgeRangeMin, 0, 100);
+                        minStorable.setCallbackFunction = (value) => {
+                            selectedProportion.EstimatedAgeRangeMin = (int)Math.Floor(value);
+                            if(selectedProportion.EstimatedAgeRangeMin > selectedProportion.EstimatedAgeRangeMax) {
+                                selectedProportion.EstimatedAgeRangeMin = selectedProportion.EstimatedAgeRangeMax;
+                            }
+                            if(minStorable != null) {
+                                minStorable.valNoCallback = (float)selectedProportion.EstimatedAgeRangeMin;
+                            }
+                        };
+                        _proportionEditAgeMin = _plugin.CreateSlider(minStorable);
+
+                        JSONStorableFloat maxStorable = new JSONStorableFloat("Age Estimage Max", selectedProportion.EstimatedAgeRangeMax, 0, 100);
+                        maxStorable.setCallbackFunction = (value) => {
+                            selectedProportion.EstimatedAgeRangeMax = (int)Math.Floor(value);
+                            if(selectedProportion.EstimatedAgeRangeMax < selectedProportion.EstimatedAgeRangeMin) {
+                                selectedProportion.EstimatedAgeRangeMax = selectedProportion.EstimatedAgeRangeMin;
+                            }
+                            if(maxStorable != null) {
+                                maxStorable.valNoCallback = (float)selectedProportion.EstimatedAgeRangeMax;
+                            }
+                        };
+                        _proportionEditAgeMax = _plugin.CreateSlider(maxStorable);
+
+#endif
                         _proportionCancelButton = _plugin.CreateButton("Cancel");
                         _proportionCancelButton.buttonColor = Color.red;
                         _proportionCancelButton.button.onClick.AddListener(() => {
@@ -1036,6 +1064,12 @@ namespace LFE {
             }
             if(_proportionEditHeel) {
                 _plugin.RemoveSlider(_proportionEditHeel);
+            }
+            if(_proportionEditAgeMin) {
+                _plugin.RemoveSlider(_proportionEditAgeMin);
+            }
+            if(_proportionEditAgeMax) {
+                _plugin.RemoveSlider(_proportionEditAgeMax);
             }
 
             if(_targetHeadRatioToggle) {

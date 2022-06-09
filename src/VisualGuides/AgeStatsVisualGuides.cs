@@ -54,7 +54,7 @@ namespace LFE {
                 var proportionQuartiles = TargetProportion?.Quartiles;
 
                 var quartiles = new List<Quartiles>() { heightQuartiles, headQuartiles, proportionQuartiles };
-                var overlapQuartiles = Quartiles.GroupOverlapQuartile(new List<Quartiles>() { headQuartiles, proportionQuartiles });
+                var overlapQuartiles = Quartiles.GroupOverlapQuartile(quartiles);
 
                 int? minAge = (int?)Quartiles.GroupMin(quartiles);
                 int? maxAge = (int?)Quartiles.GroupMax(quartiles);
@@ -62,13 +62,13 @@ namespace LFE {
                 var width = 0.5f;
 
                 int currentRow = 0;
-                if(RenderRow(currentRow, heightQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, "Based On Height (Ignored In Guess)")) {
+                if(RenderRow(currentRow, heightQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? "Height Age Guess From CDC Growth Charts" : "Height Age Guess")) {
                     currentRow++;
                 }
-                if(RenderRow(currentRow, headQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, "Based On Head Proportion")) {
+                if(RenderRow(currentRow, headQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? "Head Proportion Age Guess From CDC Growth Charts" : "Head Proportion Age Guess")) {
                     currentRow++;
                 }
-                if(RenderRow(currentRow, proportionQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, "Based On Body Proportion")) {
+                if(RenderRow(currentRow, proportionQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? "Body Proportion Age Guess From anatomy4sculptors.com Or User Created Custom Proportions" : "Body Proportion Age Guess")) {
                     currentRow++;
                 }
                 if(RenderRow(currentRow, overlapQuartiles, width, minAge.Value, maxAge.Value, Color.yellow, transform, "Age Guess")) {
