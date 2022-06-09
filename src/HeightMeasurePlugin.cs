@@ -441,7 +441,7 @@ namespace LFE
                 _hipGuides.Offset = pos;
                 _hipGuides.Points = _autoMeasurements.POI?.HipPoints ?? new Vector3[0];
 
-                var targetProportions = _ui.ProportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(_ui.proportionSelectionStorable.val)) ?? _autoMeasurements.Proportions.ClostestMatch(_ui.ProportionTemplates);
+                var proportionClosestMatch = _autoMeasurements.Proportions.ClostestMatch(_ui.ProportionTemplates);
 
                 // age guide
                 _ageGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
@@ -451,7 +451,7 @@ namespace LFE
                 _ageGuides.LineThickness = 2.0f; // TODO
                 _ageGuides.UnitDisplay = _ui.unitsStorable.val;
                 _ageGuides.Offset = pos;
-                _ageGuides.TargetProportion = targetProportions;
+                _ageGuides.TargetProportion = proportionClosestMatch;
 
                 // proportion guide
                 _proportionGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
@@ -461,7 +461,8 @@ namespace LFE
                 _proportionGuides.LineThickness = _ui.lineThicknessProportionStorable.val;
                 _proportionGuides.UnitDisplay = _ui.unitsStorable.val;
                 _proportionGuides.Offset = pos - spreadVector - new Vector3(0, 0, 0.004f); // put these just a bit behind the auto guides
-                _proportionGuides.TargetProportion = targetProportions;
+
+                _proportionGuides.TargetProportion = _ui.ProportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(_ui.proportionSelectionStorable.val)) ?? proportionClosestMatch;
             }
 
             // manual feature guide
