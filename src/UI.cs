@@ -1,3 +1,4 @@
+// #define LFE_EXPERIMENTAL
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -49,6 +50,9 @@ namespace LFE {
         public JSONStorableFloat penisLength;
         public JSONStorableFloat penisWidth;
         public JSONStorableFloat penisGirth;
+
+
+        public JSONStorableBool showAgeMarkersStorable;
 
         public JSONStorableFloat ageFromHeadStorable;
         public JSONStorableFloat ageFromHeightStorable;
@@ -408,6 +412,14 @@ namespace LFE {
             penisGirth.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(penisGirth);
 
+#if LFE_EXPERIMENTAL
+            showAgeMarkersStorable = new JSONStorableBool("Age Markers", true);
+            _plugin.RegisterBool(showAgeMarkersStorable);
+#else
+            showAgeMarkersStorable = new JSONStorableBool("Age Markers", false);
+            _plugin.RegisterBool(showAgeMarkersStorable);
+#endif
+
             ageFromHeadStorable = new JSONStorableFloat("ageFromHead", 0, 0, 100);
             ageFromHeadStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(ageFromHeadStorable);
@@ -535,6 +547,8 @@ namespace LFE {
         private UIDynamicSlider _markerLeftRight;
         private UIDynamicSlider _markerUpDown;
         private UIDynamicToggle _hideDocs;
+
+        private UIDynamicToggle _ageMarkerToggle;
 
         private UIDynamicToggle _manualMarkerToggle;
         private UIDynamicToggle _copyManualMarkers;
@@ -734,6 +748,8 @@ namespace LFE {
                                     selectedProportion.FigureCrotchToBottomOfKnees = _preEditProportion.FigureCrotchToBottomOfKnees;
                                     selectedProportion.FigureLengthOfLowerLimb = _preEditProportion.FigureLengthOfLowerLimb;
                                     selectedProportion.FigureBottomOfKneesToHeels = _preEditProportion.FigureBottomOfKneesToHeels;
+                                    selectedProportion.EstimatedAgeRangeMin = _preEditProportion.EstimatedAgeRangeMin;
+                                    selectedProportion.EstimatedAgeRangeMax = _preEditProportion.EstimatedAgeRangeMax;
                                 }
 
                                 if(_creatingProportion) {
@@ -837,8 +853,15 @@ namespace LFE {
             _markerUpDown = _plugin.CreateSlider(markerUpDownStorable, rightSide: false);
             _hideDocs = _plugin.CreateToggle(hideDocsStorable, rightSide: false);
 
+#if LFE_EXPERIMENTAL
+            CreateStandardDivider(rightSide: true);
+            _ageMarkerToggle = _plugin.CreateToggle(showAgeMarkersStorable, rightSide: true);
+            _ageMarkerToggle.backgroundColor = HEADER_COLOR;
+#endif
+
             CreateStandardDivider(rightSide: true);
             _manualMarkerToggle = _plugin.CreateToggle(showManualMarkersStorable, rightSide: true);
+            _manualMarkerToggle.backgroundColor = HEADER_COLOR;
             if(showManualMarkersStorable.val) {
                 if(_plugin.containingAtom.type == "Person") {
                     _copyManualMarkers = _plugin.CreateToggle(manualMarkersCopy, rightSide: true);
@@ -870,6 +893,9 @@ namespace LFE {
             }
             foreach(var spacer in _spacerLinesList) {
                 _plugin.RemoveTextField(spacer);
+            }
+            if(_ageMarkerToggle) {
+                _plugin.RemoveToggle(_ageMarkerToggle);
             }
             if(_manualMarkerToggle) {
                 _plugin.RemoveToggle(_manualMarkerToggle);

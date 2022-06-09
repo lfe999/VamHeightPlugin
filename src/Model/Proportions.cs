@@ -18,7 +18,9 @@ public class Proportions {
             FigureShoulderToCrotch = 2.1f,
             FigureLengthOfLowerLimb = 3.5f,
             FigureCrotchToBottomOfKnees = 1.8f,
-            FigureBottomOfKneesToHeels = 1.7f
+            FigureBottomOfKneesToHeels = 1.7f,
+            EstimatedAgeRangeMin = 65,
+            EstimatedAgeRangeMax = 90
         },
         new Proportions() {
             IsFemale = true,
@@ -31,7 +33,9 @@ public class Proportions {
             FigureShoulderToCrotch = 3f,
             FigureLengthOfLowerLimb = 3.6f,
             FigureCrotchToBottomOfKnees = 1.7f,
-            FigureBottomOfKneesToHeels = 2f
+            FigureBottomOfKneesToHeels = 2f,
+            EstimatedAgeRangeMin = 25,
+            EstimatedAgeRangeMax = 64
         },
         new Proportions() {
             IsFemale = true,
@@ -44,7 +48,9 @@ public class Proportions {
             FigureShoulderToCrotch = 2.7f,
             FigureLengthOfLowerLimb = 3.5f,
             FigureCrotchToBottomOfKnees = 1.7f,
-            FigureBottomOfKneesToHeels = 1.8f
+            FigureBottomOfKneesToHeels = 1.8f,
+            EstimatedAgeRangeMin = 19,
+            EstimatedAgeRangeMax = 24 
         },
         new Proportions() {
             IsFemale = true,
@@ -57,7 +63,9 @@ public class Proportions {
             FigureShoulderToCrotch = 2.3f,
             FigureLengthOfLowerLimb = 3.3f,
             FigureCrotchToBottomOfKnees = 1.5f,
-            FigureBottomOfKneesToHeels = 1.8f
+            FigureBottomOfKneesToHeels = 1.8f,
+            EstimatedAgeRangeMin = 12,
+            EstimatedAgeRangeMax = 18
         },
         new Proportions() {
             IsFemale = false,
@@ -70,7 +78,9 @@ public class Proportions {
             FigureShoulderToCrotch = 2.1f,
             FigureLengthOfLowerLimb = 3.5f,
             FigureCrotchToBottomOfKnees = 1.8f,
-            FigureBottomOfKneesToHeels = 1.7f
+            FigureBottomOfKneesToHeels = 1.7f,
+            EstimatedAgeRangeMin = 65,
+            EstimatedAgeRangeMax = 90
         },
         new Proportions() {
             IsFemale = false,
@@ -83,7 +93,9 @@ public class Proportions {
             FigureShoulderToCrotch = 2.6f,
             FigureLengthOfLowerLimb = 4f,
             FigureCrotchToBottomOfKnees = 2f,
-            FigureBottomOfKneesToHeels = 2f
+            FigureBottomOfKneesToHeels = 2f,
+            EstimatedAgeRangeMin = 25,
+            EstimatedAgeRangeMax = 64
         },
         new Proportions() {
             IsFemale = false,
@@ -96,7 +108,9 @@ public class Proportions {
             FigureShoulderToCrotch = 2.4f,
             FigureLengthOfLowerLimb = 3.7f,
             FigureCrotchToBottomOfKnees = 1.9f,
-            FigureBottomOfKneesToHeels = 1.8f
+            FigureBottomOfKneesToHeels = 1.8f,
+            EstimatedAgeRangeMin = 19,
+            EstimatedAgeRangeMax = 24
         },
         new Proportions() {
             IsFemale = false,
@@ -109,7 +123,9 @@ public class Proportions {
             FigureShoulderToCrotch = 2.3f,
             FigureLengthOfLowerLimb = 3.3f,
             FigureCrotchToBottomOfKnees = 1.5f,
-            FigureBottomOfKneesToHeels = 1.8f
+            FigureBottomOfKneesToHeels = 1.8f,
+            EstimatedAgeRangeMin = 12,
+            EstimatedAgeRangeMax = 18
         }
     };
 
@@ -128,6 +144,24 @@ public class Proportions {
     public float FigureLengthOfLowerLimb { get; set; } // crotch to feet
     public float FigureCrotchToBottomOfKnees { get; set; }
     public float FigureBottomOfKneesToHeels { get; set; }
+    public int EstimatedAgeRangeMin { get; set; }
+    public int EstimatedAgeRangeMax { get; set; }
+
+    public Quartiles Quartiles {
+        get {
+            if(EstimatedAgeRangeMin == 0 && EstimatedAgeRangeMax == 0) {
+                return null;
+            }
+
+            return new Quartiles(
+                EstimatedAgeRangeMin,
+                EstimatedAgeRangeMin,
+                (EstimatedAgeRangeMin + EstimatedAgeRangeMax) / 2f,
+                EstimatedAgeRangeMax,
+                EstimatedAgeRangeMax
+            );
+        }
+    }
 
     public List<Proportions> ClosestMatches(List<Proportions> proportions) {
         return proportions.Where(p => p.IsFemale == this.IsFemale).OrderBy(x => x.ProportionsDeltaScaled(this).SortScore()).ToList();

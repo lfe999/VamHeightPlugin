@@ -11,6 +11,7 @@
    "contentList" : [ 
       "Custom\\Scripts\\LFE\\HeightMeasure\\HeightMeasurePlugin.cslist",
       "Custom\\Scripts\\LFE\\HeightMeasure\\AgeCalculator\\AgeCalculation.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\AgeCalculator\\Quartiles.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\AgeCalculator\\AgeGuess.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\AgeCalculator\\Anatomy4SculptersHeadCalculator.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\AgeCalculator\\IAgeCalculator.cs",

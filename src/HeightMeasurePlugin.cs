@@ -62,7 +62,7 @@ namespace LFE
                 _underbustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
                 _waistGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
                 _hipGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
-                _ageGuides.Enabled = false;
+                _ageGuides.Enabled = _ui.showAgeMarkersStorable.val;
                 _proportionGuides.Enabled = _ui.showProportionMarkersStorable.val;
             }
         }
@@ -104,7 +104,9 @@ namespace LFE
                             FigureShoulderToCrotch = pj["figureShoulderToCrotch"]?.AsFloat ?? 0,
                             FigureCrotchToBottomOfKnees = pj["figureCrotchToBottomOfKnees"]?.AsFloat ?? 0,
                             FigureLengthOfLowerLimb = pj["figureLengthOfLowerLimb"]?.AsFloat ?? 0,
-                            FigureBottomOfKneesToHeels = pj["figureBottomOfKneesToHeels"]?.AsFloat ?? 0
+                            FigureBottomOfKneesToHeels = pj["figureBottomOfKneesToHeels"]?.AsFloat ?? 0,
+                            EstimatedAgeRangeMin = pj["estimatedAgeRangeMin"]?.AsInt ?? 0,
+                            EstimatedAgeRangeMax = pj["estimatedAgeRangeMax"]?.AsInt ?? 0 
                         };
                         proportionTemplates.Add(p);
                     }
@@ -134,6 +136,8 @@ namespace LFE
                 pJson["figureCrotchToBottomOfKnees"].AsFloat = p.FigureCrotchToBottomOfKnees;
                 pJson["figureLengthOfLowerLimb"].AsFloat = p.FigureLengthOfLowerLimb;
                 pJson["figureBottomOfKneesToHeels"].AsFloat = p.FigureBottomOfKneesToHeels;
+                pJson["estimatedAgeRangeMin"].AsInt = p.EstimatedAgeRangeMin;
+                pJson["estimatedAgeRangeMax"].AsInt = p.EstimatedAgeRangeMax;
 
                 proportionTemplates.Add(pJson);
             }
@@ -437,14 +441,17 @@ namespace LFE
                 _hipGuides.Offset = pos;
                 _hipGuides.Points = _autoMeasurements.POI?.HipPoints ?? new Vector3[0];
 
+                var targetProportions = _ui.ProportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(_ui.proportionSelectionStorable.val)) ?? _autoMeasurements.Proportions.ClostestMatch(_ui.ProportionTemplates);
+
                 // age guide
                 _ageGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
-                _ageGuides.Enabled = false; // TODO
+                _ageGuides.Enabled = _ui.showAgeMarkersStorable.val;
                 _ageGuides.LabelsEnabled = true;
-                _ageGuides.LineColor = Color.cyan; // TODO
+                _ageGuides.LineColor = Color.cyan;
                 _ageGuides.LineThickness = 2.0f; // TODO
                 _ageGuides.UnitDisplay = _ui.unitsStorable.val;
                 _ageGuides.Offset = pos;
+                _ageGuides.TargetProportion = targetProportions;
 
                 // proportion guide
                 _proportionGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
@@ -454,7 +461,7 @@ namespace LFE
                 _proportionGuides.LineThickness = _ui.lineThicknessProportionStorable.val;
                 _proportionGuides.UnitDisplay = _ui.unitsStorable.val;
                 _proportionGuides.Offset = pos - spreadVector - new Vector3(0, 0, 0.004f); // put these just a bit behind the auto guides
-                _proportionGuides.TargetProportion = _ui.ProportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(_ui.proportionSelectionStorable.val)) ?? _autoMeasurements.Proportions.ClostestMatch(_ui.ProportionTemplates);
+                _proportionGuides.TargetProportion = targetProportions;
             }
 
             // manual feature guide
