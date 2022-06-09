@@ -15,6 +15,17 @@ public class Quartiles {
     public float Q75 { get; set; }
     public float Q100 { get; set; }
 
+    public string RangeString {
+        get {
+            if((int)Q25 != (int)Q75) {
+                return $"{Q25} to {Q75}";
+            }
+            else {
+                return $"{Q25}";
+            }
+        }
+    }
+
     public static float? GroupMin(IEnumerable<Quartiles> quartiles)
     {
         if(quartiles == null) {

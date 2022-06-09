@@ -62,16 +62,19 @@ namespace LFE {
                 var width = 0.5f;
 
                 int currentRow = 0;
-                if(RenderRow(currentRow, heightQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? "Height Age Guess From CDC Growth Charts - Caution: UNRELIABLE" : "Height Age Guess")) {
+                var height = UnitUtils.ToUnitString(Measurements.Height??0, UnitDisplay);
+                if(RenderRow(currentRow, heightQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Height Age Guess {heightQuartiles.RangeString} ({height}) From CDC Growth Charts - Caution: UNRELIABLE" : $"Height Age Guess {heightQuartiles.RangeString} ({height})")) {
                     currentRow++;
                 }
-                if(RenderRow(currentRow, headQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? "Head Proportion Age Guess From CDC Growth Charts - Caution: UNRELIABLE" : "Head Proportion Age Guess")) {
+                var heightInHeads = (Measurements.Height??0) / (Measurements.HeadHeight??1);
+                if(RenderRow(currentRow, headQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Head Proportion Age Guess {headQuartiles.RangeString} ({heightInHeads:0.0} heads) From CDC Growth Charts - Caution: UNRELIABLE" : $"Head Proportion Age Guess {headQuartiles.RangeString} ({heightInHeads:0.0} heads)")) {
                     currentRow++;
                 }
-                if(RenderRow(currentRow, proportionQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? "Body Proportion Age Guess From anatomy4sculptors.com Or User Created Custom Proportions - Caution: UNRELIABLE" : "Body Proportion Age Guess")) {
+                var proportionName = TargetProportion?.ProportionName ?? "none";
+                if(RenderRow(currentRow, proportionQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Body Proportion Age Guess {proportionQuartiles.RangeString} ({proportionName}) From anatomy4sculptors.com Or User Created Custom Proportions - Caution: UNRELIABLE" : $"Body Proportion Age Guess {proportionQuartiles.RangeString} ({proportionName})")) {
                     currentRow++;
                 }
-                if(RenderRow(currentRow, overlapQuartiles, width, minAge.Value, maxAge.Value, Color.yellow, transform, ShowDocumentation ? "Age Guess - Caution: UNRELIABLE" : "Age Guess")) {
+                if(RenderRow(currentRow, overlapQuartiles, width, minAge.Value, maxAge.Value, Color.yellow, transform, ShowDocumentation ? $"Age Guess {overlapQuartiles.RangeString} - Caution: UNRELIABLE" : $"Age Guess {overlapQuartiles.RangeString}")) {
                     currentRow++;
                 }
             }
