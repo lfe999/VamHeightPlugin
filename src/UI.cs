@@ -28,6 +28,12 @@ namespace LFE {
 
         private readonly HeightMeasurePlugin _plugin;
 
+#if LFE_EXPERIMENTAL
+        private bool EXPERIMENTAL_MODE = true;
+#else
+        private bool EXPERIMENTAL_MODE = false;
+#endif
+
         // measurement storables
         public JSONStorableFloat fullHeightStorable;
         public JSONStorableFloat headSizeHeightStorable;
@@ -412,15 +418,19 @@ namespace LFE {
             penisGirth.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(penisGirth);
 
-#if LFE_EXPERIMENTAL
-            showAgeMarkersStorable = new JSONStorableBool("Age Markers", true);
-            showAgeMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
-            _plugin.RegisterBool(showAgeMarkersStorable);
-#else
-            showAgeMarkersStorable = new JSONStorableBool("Age Markers", false);
-            showAgeMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
-            _plugin.RegisterBool(showAgeMarkersStorable);
-#endif
+            if(EXPERIMENTAL_MODE) {
+                showAgeMarkersStorable = new JSONStorableBool("Age Markers", true, (bool value) => {
+                    showAgeMarkersStorable.valNoCallback = value;
+                    Draw();
+                });
+                showAgeMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
+                _plugin.RegisterBool(showAgeMarkersStorable);
+            }
+            else {
+                showAgeMarkersStorable = new JSONStorableBool("Age Markers", false);
+                showAgeMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
+                _plugin.RegisterBool(showAgeMarkersStorable);
+            }
 
             ageFromHeadStorable = new JSONStorableFloat("ageFromHead", 0, 0, 100);
             ageFromHeadStorable.storeType = JSONStorableParam.StoreType.Full;
@@ -736,32 +746,32 @@ namespace LFE {
                                 selectedProportion.FigureBottomOfKneesToHeels = value;
                             }, 0, 10));
 
-#if LFE_EXPERIMENTAL
-                        JSONStorableFloat minStorable = new JSONStorableFloat("Age Estimage Min", selectedProportion.EstimatedAgeRangeMin, 0, 100);
-                        minStorable.setCallbackFunction = (value) => {
-                            selectedProportion.EstimatedAgeRangeMin = (int)Math.Floor(value);
-                            if(selectedProportion.EstimatedAgeRangeMin > selectedProportion.EstimatedAgeRangeMax) {
-                                selectedProportion.EstimatedAgeRangeMin = selectedProportion.EstimatedAgeRangeMax;
-                            }
-                            if(minStorable != null) {
-                                minStorable.valNoCallback = (float)selectedProportion.EstimatedAgeRangeMin;
-                            }
-                        };
-                        _proportionEditAgeMin = _plugin.CreateSlider(minStorable);
+                        if(EXPERIMENTAL_MODE || showAgeMarkersStorable.val){
+                            JSONStorableFloat minStorable = new JSONStorableFloat("Age Estimage Min", selectedProportion.EstimatedAgeRangeMin, 0, 100);
+                            minStorable.setCallbackFunction = (value) => {
+                                selectedProportion.EstimatedAgeRangeMin = (int)Math.Floor(value);
+                                if(selectedProportion.EstimatedAgeRangeMin > selectedProportion.EstimatedAgeRangeMax) {
+                                    selectedProportion.EstimatedAgeRangeMin = selectedProportion.EstimatedAgeRangeMax;
+                                }
+                                if(minStorable != null) {
+                                    minStorable.valNoCallback = (float)selectedProportion.EstimatedAgeRangeMin;
+                                }
+                            };
+                            _proportionEditAgeMin = _plugin.CreateSlider(minStorable);
 
-                        JSONStorableFloat maxStorable = new JSONStorableFloat("Age Estimage Max", selectedProportion.EstimatedAgeRangeMax, 0, 100);
-                        maxStorable.setCallbackFunction = (value) => {
-                            selectedProportion.EstimatedAgeRangeMax = (int)Math.Floor(value);
-                            if(selectedProportion.EstimatedAgeRangeMax < selectedProportion.EstimatedAgeRangeMin) {
-                                selectedProportion.EstimatedAgeRangeMax = selectedProportion.EstimatedAgeRangeMin;
-                            }
-                            if(maxStorable != null) {
-                                maxStorable.valNoCallback = (float)selectedProportion.EstimatedAgeRangeMax;
-                            }
-                        };
-                        _proportionEditAgeMax = _plugin.CreateSlider(maxStorable);
+                            JSONStorableFloat maxStorable = new JSONStorableFloat("Age Estimage Max", selectedProportion.EstimatedAgeRangeMax, 0, 100);
+                            maxStorable.setCallbackFunction = (value) => {
+                                selectedProportion.EstimatedAgeRangeMax = (int)Math.Floor(value);
+                                if(selectedProportion.EstimatedAgeRangeMax < selectedProportion.EstimatedAgeRangeMin) {
+                                    selectedProportion.EstimatedAgeRangeMax = selectedProportion.EstimatedAgeRangeMin;
+                                }
+                                if(maxStorable != null) {
+                                    maxStorable.valNoCallback = (float)selectedProportion.EstimatedAgeRangeMax;
+                                }
+                            };
+                            _proportionEditAgeMax = _plugin.CreateSlider(maxStorable);
+                        }
 
-#endif
                         _proportionCancelButton = _plugin.CreateButton("Cancel");
                         _proportionCancelButton.buttonColor = Color.red;
                         _proportionCancelButton.button.onClick.AddListener(() => {
@@ -883,11 +893,11 @@ namespace LFE {
             _markerUpDown = _plugin.CreateSlider(markerUpDownStorable, rightSide: false);
             _hideDocs = _plugin.CreateToggle(hideDocsStorable, rightSide: false);
 
-#if LFE_EXPERIMENTAL
-            CreateStandardDivider(rightSide: true);
-            _ageMarkerToggle = _plugin.CreateToggle(showAgeMarkersStorable, rightSide: true);
-            _ageMarkerToggle.backgroundColor = HEADER_COLOR;
-#endif
+            if(EXPERIMENTAL_MODE || showAgeMarkersStorable.val) {
+                CreateStandardDivider(rightSide: true);
+                _ageMarkerToggle = _plugin.CreateToggle(showAgeMarkersStorable, rightSide: true);
+                _ageMarkerToggle.backgroundColor = HEADER_COLOR;
+            }
 
             CreateStandardDivider(rightSide: true);
             _manualMarkerToggle = _plugin.CreateToggle(showManualMarkersStorable, rightSide: true);
