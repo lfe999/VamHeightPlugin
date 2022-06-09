@@ -414,9 +414,11 @@ namespace LFE {
 
 #if LFE_EXPERIMENTAL
             showAgeMarkersStorable = new JSONStorableBool("Age Markers", true);
+            showAgeMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showAgeMarkersStorable);
 #else
             showAgeMarkersStorable = new JSONStorableBool("Age Markers", false);
+            showAgeMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showAgeMarkersStorable);
 #endif
 
