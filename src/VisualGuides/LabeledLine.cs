@@ -12,6 +12,8 @@ namespace LFE {
         public Vector3 LineDirection { get; set; } = Vector3.left;
         public bool Enabled { get; set; } = false;
         public bool LabelEnabled { get; set; } = false;
+        public float LabelOffsetX { get; set; } = 0f;
+        public float LabelOffsetY { get; set; } = 0f;
 
         LineRenderer _lineRenderer;
         RectTransform _rt;
@@ -26,6 +28,7 @@ namespace LFE {
             _lineRenderer.startWidth = Thickness;
             _lineRenderer.endWidth = Thickness;
             _lineRenderer.material.color = Color;
+            _lineRenderer.material = new Material(Shader.Find("Sprites/Default")) {renderQueue = 4000};
             _lineRenderer.SetPositions(new Vector3[] {
                 Vector3.zero,
                 CalculateEndpoint(Vector3.zero)
@@ -36,6 +39,8 @@ namespace LFE {
         public void Update() {
             // bool isHubShowing = SuperController.singleton?.hubBrowser?.UITransform?.gameObject?.activeSelf ?? false;
             bool isTopMenuShowing = SuperController.singleton?.worldUI?.gameObject?.activeSelf ?? false;
+
+            bool enabled = isTopMenuShowing ? false : Enabled;
 
             if(isTopMenuShowing) {
                 _canvas.enabled = false;
@@ -53,9 +58,9 @@ namespace LFE {
                 Vector3.zero,
                 CalculateEndpoint(Vector3.zero)
             });
-            _lineRenderer.gameObject.SetActive(Enabled);
+            _lineRenderer.gameObject.SetActive(enabled);
             _canvas.gameObject.SetActive(_lineRenderer.gameObject.activeInHierarchy);
-            if(Enabled) {
+            if(enabled) {
                 var text = _canvas.GetComponentInChildren<Text>();
                 if(text) {
                     _canvas.gameObject.SetActive(LabelEnabled);
@@ -64,7 +69,7 @@ namespace LFE {
                         text.text = Label;
                         text.color = Color;
                         if(_rt != null) {
-                            _rt.anchoredPosition = new Vector2((Length * 500f) + 5, 0);
+                            _rt.anchoredPosition = new Vector2((Length * 500f) + 5 + LabelOffsetX, 0 + LabelOffsetY);
                             _rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 0);
                             _rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
 
@@ -75,7 +80,7 @@ namespace LFE {
                         text.text = Label;
                         text.color = Color;
                         if(_rt != null){
-                            _rt.anchoredPosition = new Vector2((Length * -500f) - 30, 0);
+                            _rt.anchoredPosition = new Vector2((Length * -500f) - 30 + LabelOffsetX, 0 + LabelOffsetY);
                             _rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 50);
                             _rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
                         }
@@ -85,7 +90,7 @@ namespace LFE {
                         text.text = Label;
                         text.color = Color;
                         if(_rt != null){
-                            _rt.anchoredPosition = new Vector2(0, -10);
+                            _rt.anchoredPosition = new Vector2(0 + LabelOffsetX, -10 + LabelOffsetY);
                             _rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 10);
                             _rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
                         }

@@ -62,7 +62,7 @@ namespace LFE
                 _underbustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
                 _waistGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
                 _hipGuides.Enabled = _ui.showCircumferenceMarkersStorable.val;
-                _ageGuides.Enabled = false;
+                _ageGuides.Enabled = _ui.showAgeMarkersStorable.val;
                 _proportionGuides.Enabled = _ui.showProportionMarkersStorable.val;
             }
         }
@@ -104,7 +104,9 @@ namespace LFE
                             FigureShoulderToCrotch = pj["figureShoulderToCrotch"]?.AsFloat ?? 0,
                             FigureCrotchToBottomOfKnees = pj["figureCrotchToBottomOfKnees"]?.AsFloat ?? 0,
                             FigureLengthOfLowerLimb = pj["figureLengthOfLowerLimb"]?.AsFloat ?? 0,
-                            FigureBottomOfKneesToHeels = pj["figureBottomOfKneesToHeels"]?.AsFloat ?? 0
+                            FigureBottomOfKneesToHeels = pj["figureBottomOfKneesToHeels"]?.AsFloat ?? 0,
+                            EstimatedAgeRangeMin = pj["estimatedAgeRangeMin"]?.AsInt ?? 0,
+                            EstimatedAgeRangeMax = pj["estimatedAgeRangeMax"]?.AsInt ?? 0 
                         };
                         proportionTemplates.Add(p);
                     }
@@ -134,6 +136,8 @@ namespace LFE
                 pJson["figureCrotchToBottomOfKnees"].AsFloat = p.FigureCrotchToBottomOfKnees;
                 pJson["figureLengthOfLowerLimb"].AsFloat = p.FigureLengthOfLowerLimb;
                 pJson["figureBottomOfKneesToHeels"].AsFloat = p.FigureBottomOfKneesToHeels;
+                pJson["estimatedAgeRangeMin"].AsInt = p.EstimatedAgeRangeMin;
+                pJson["estimatedAgeRangeMax"].AsInt = p.EstimatedAgeRangeMax;
 
                 proportionTemplates.Add(pJson);
             }
@@ -438,14 +442,17 @@ namespace LFE
                 _hipGuides.Offset = pos;
                 _hipGuides.Points = _autoMeasurements.POI?.HipPoints ?? new Vector3[0];
 
+                var proportionClosestMatch = _autoMeasurements.Proportions.ClostestMatch(_ui.ProportionTemplates);
+
                 // age guide
                 _ageGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
-                _ageGuides.Enabled = false; // TODO
+                _ageGuides.Enabled = _ui.showAgeMarkersStorable.val;
                 _ageGuides.LabelsEnabled = true;
-                _ageGuides.LineColor = Color.cyan; // TODO
+                _ageGuides.LineColor = Color.cyan;
                 _ageGuides.LineThickness = 2.0f; // TODO
                 _ageGuides.UnitDisplay = _ui.unitsStorable.val;
                 _ageGuides.Offset = pos;
+                _ageGuides.TargetProportion = proportionClosestMatch;
 
                 // proportion guide
                 _proportionGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
@@ -455,7 +462,8 @@ namespace LFE
                 _proportionGuides.LineThickness = _ui.lineThicknessProportionStorable.val;
                 _proportionGuides.UnitDisplay = _ui.unitsStorable.val;
                 _proportionGuides.Offset = pos - spreadVector - new Vector3(0, 0, 0.004f); // put these just a bit behind the auto guides
-                _proportionGuides.TargetProportion = _ui.ProportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(_ui.proportionSelectionStorable.val)) ?? _autoMeasurements.Proportions.ClostestMatch(_ui.ProportionTemplates);
+
+                _proportionGuides.TargetProportion = _ui.ProportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(_ui.proportionSelectionStorable.val)) ?? proportionClosestMatch;
             }
 
             // manual feature guide
@@ -604,9 +612,6 @@ namespace LFE
             var eyeHeightPos = poi.EyeLeftCenter;
             var mouthHeightPos = poi.MouthCenterHeight;
 
-            var floorDistancePosNeg = (Vector3.Dot(footPos, rootTransform.up) < 0 ? -1 : 1);
-            var floorDistanceOffset = Vector3.Distance(rootPos, floor) * floorDistancePosNeg;
-
             // if(_debugLine == null) {
             //     var go = new GameObject();
             //     go.transform.SetParent(transform);
@@ -622,23 +627,32 @@ namespace LFE
             //     Vector3.ProjectOnPlane(footPos, rootTransform.up),
             //     Vector3.ProjectOnPlane(rootPos, rootTransform.up)
             // });
-
-            var footOffset = Vector3.Distance(footPos, Vector3.ProjectOnPlane(footPos, rootTransform.up)) - floorDistanceOffset;
+            
+            var footOffset = Vector3.Dot(footPos - rootPos, rootTransform.up);
 
             // set measurements
             measurements.HeelToFloorOffset = Vector3.up * footOffset;
-            measurements.Height = Vector3.Distance(headPos, Vector3.ProjectOnPlane(headPos, rootTransform.up)) - floorDistanceOffset - footOffset;
-            measurements.ChinHeight = Vector3.Distance(chinPos, Vector3.ProjectOnPlane(chinPos, rootTransform.up)) - floorDistanceOffset - footOffset;
+            measurements.Height = Vector3.Dot(headPos - footPos, rootTransform.up);
+            measurements.ChinHeight = Vector3.Dot(chinPos - footPos, rootTransform.up);
             measurements.HeadWidth = Vector3.Distance(poi.CraniumLeftSide, poi.CraniumRightSide);
-            measurements.ShoulderHeight = Vector3.Distance(shoulderPos, Vector3.ProjectOnPlane(shoulderPos, rootTransform.up)) - floorDistanceOffset - footOffset;
+            measurements.ShoulderHeight = Vector3.Dot(shoulderPos - footPos, rootTransform.up);
             measurements.ShoulderWidth = LineLength(new Vector3[] {shoulderLeftPos, shoulderRightPos});
             measurements.ArmLength = LineLength(new Vector3[] {shoulderRightPos, fingertipRightPos});
-            measurements.NippleHeight = poi.IsMale ? (float?)null : Vector3.Distance(nipplePos, Vector3.ProjectOnPlane(nipplePos, rootTransform.up)) - floorDistanceOffset - footOffset;
-            measurements.UnderbustHeight = poi.IsMale ? (float?)null : Vector3.Distance(underbustPos, Vector3.ProjectOnPlane(underbustPos, rootTransform.up)) - floorDistanceOffset - footOffset;
-            measurements.NavelHeight = Vector3.Distance(navelPos, Vector3.ProjectOnPlane(navelPos, rootTransform.up)) - floorDistanceOffset - footOffset;
-            measurements.CrotchHeight = Vector3.Distance(crotchPos, Vector3.ProjectOnPlane(crotchPos, rootTransform.up)) - floorDistanceOffset - footOffset;
-            measurements.KneeHeight = Vector3.Distance(kneePos, Vector3.ProjectOnPlane(kneePos, rootTransform.up)) - floorDistanceOffset - footOffset;
+            measurements.NippleHeight = poi.IsMale ? (float?)null : Vector3.Dot(nipplePos - footPos, rootTransform.up);
+            measurements.UnderbustHeight = poi.IsMale ? (float?)null : Vector3.Dot(underbustPos - footPos, rootTransform.up);
+            measurements.NavelHeight = Vector3.Dot(navelPos - footPos, rootTransform.up);
+            measurements.CrotchHeight = Vector3.Dot(crotchPos - footPos, rootTransform.up);
+            measurements.KneeHeight = Vector3.Dot(kneePos - footPos, rootTransform.up);
             measurements.HeelHeight = 0;
+
+            // SuperController.singleton.ClearMessages();
+            // SuperController.LogMessage($"height={measurements.Height}");
+            // SuperController.LogMessage($"rootPos={rootPos}");
+            // SuperController.LogMessage($"footOffset={footOffset}");
+            // SuperController.LogMessage($"footPos={footPos}");
+            // SuperController.LogMessage($"floor={floor}");
+            // SuperController.LogMessage($"floorDistanceOffset={floorDistanceOffset}");
+
 
             measurements.WaistSize = LineLength(poi.WaistPoints);
             measurements.HipSize = LineLength(poi.HipPoints);

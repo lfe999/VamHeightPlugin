@@ -9,6 +9,7 @@ src/AgeCalculator/AgeGuess.cs
 src/AgeCalculator/Anatomy4SculptersHeadCalculator.cs
 src/AgeCalculator/CdcHeightCalculator.cs
 src/AgeCalculator/IAgeCalculator.cs
+src/AgeCalculator/Quartiles.cs
 src/BustCalculator/ChateLaineCupCalculator.cs
 src/BustCalculator/CupSize.cs
 src/BustCalculator/EvasIntimatesCupCalculator.cs

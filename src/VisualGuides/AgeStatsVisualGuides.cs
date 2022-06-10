@@ -5,25 +5,16 @@ using System.Linq;
 namespace LFE {
     public class AgeStatsVisualGuides : BaseVisualGuides {
 
-        List<LabeledLine> _heightAgeMarkers;
-        List<LabeledLine> _headAgeMarkers;
+        List<List<LabeledLine>> _quartileMarkerRows;
 
         const int minAge = 2;
         const int maxAge = 25;
-        const int maxIndex = maxAge-minAge;
+
+        public Proportions TargetProportion { get; set; }
 
         public void Awake() {
             LineColor = Color.cyan;
-            _heightAgeMarkers = new List<LabeledLine>();
-            _headAgeMarkers = new List<LabeledLine>();
-            for(var i=0; i < maxIndex+1; i++) {
-                _heightAgeMarkers.Add(
-                    CreateLineMarker($"{i+minAge}", LineColor, Vector3.up)
-                );
-                _headAgeMarkers.Add(
-                    CreateLineMarker($"{i+minAge}", LineColor, Vector3.up)
-                );
-            }
+            _quartileMarkerRows = new List<List<LabeledLine>>();
         }
 
         bool _enabledPrev = false; // allows for performant disabling
@@ -40,126 +31,136 @@ namespace LFE {
             }
             _enabledPrev = Enabled;
 
+            var ageFromHeight = Measurements.AgeFromHeight;
+            var ageFromHead = Measurements.AgeFromHead;
+            // if(ageFromHeight == null || ageFromHead == null) {
+            //     Enabled = false;
+            // }
+
+            // hide all exiting markers
+            for(var i=0; i < _quartileMarkerRows.Count; i++){
+                var row = _quartileMarkerRows[i];
+                for(var j=0; j<row.Count; j++) {
+                    row[j].Enabled = false;
+                }
+            }
+
+            // (re)display relevant markers
+            bool showBoxplot = true;
+            if(showBoxplot) {
+                // SuperController.singleton.ClearMessages();
+                var heightQuartiles = ageFromHeight?.Quartiles;
+                var headQuartiles = ageFromHead?.Quartiles;
+                var proportionQuartiles = TargetProportion?.Quartiles;
+
+                var quartiles = new List<Quartiles>() { heightQuartiles, headQuartiles, proportionQuartiles };
+                var overlapQuartiles = Quartiles.GroupOverlapQuartile(quartiles);
+
+                int? minAge = (int?)Quartiles.GroupMin(quartiles);
+                int? maxAge = (int?)Quartiles.GroupMax(quartiles);
+
+                var width = 0.5f;
+
+                int currentRow = 0;
+                var height = UnitUtils.ToUnitString(Measurements.Height??0, UnitDisplay);
+                if(RenderRow(currentRow, heightQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Height Age Guess {heightQuartiles.RangeString} ({height}) From CDC Growth Charts - Caution: UNRELIABLE" : $"Height Age Guess {heightQuartiles.RangeString} ({height})")) {
+                    currentRow++;
+                }
+                var heightInHeads = (Measurements.Height??0) / (Measurements.HeadHeight??1);
+                if(RenderRow(currentRow, headQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Head Proportion Age Guess {headQuartiles.RangeString} ({heightInHeads:0.0} heads) From CDC Growth Charts - Caution: UNRELIABLE" : $"Head Proportion Age Guess {headQuartiles.RangeString} ({heightInHeads:0.0} heads)")) {
+                    currentRow++;
+                }
+                var proportionName = TargetProportion?.ProportionName ?? "none";
+                if(RenderRow(currentRow, proportionQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Body Proportion Age Guess {proportionQuartiles.RangeString} ({proportionName}) From anatomy4sculptors.com Or User Created Custom Proportions - Caution: UNRELIABLE" : $"Body Proportion Age Guess {proportionQuartiles.RangeString} ({proportionName})")) {
+                    currentRow++;
+                }
+                if(RenderRow(currentRow, overlapQuartiles, width, minAge.Value, maxAge.Value, Color.yellow, transform, ShowDocumentation ? $"Age Guess {overlapQuartiles.RangeString} - Caution: UNRELIABLE" : $"Age Guess {overlapQuartiles.RangeString}")) {
+                    currentRow++;
+                }
+            }
+        }
+
+        private bool RenderRow(int rowId, Quartiles quartile, float width, float min, float max, Color lineColor, Transform transform, string description) {
             var parentPos = transform.parent.transform.position;
             var parentRot = transform.parent.transform.rotation;
             var parentRotEuler = Quaternion.Euler(parentRot.eulerAngles);
-            var halfHeadWidth = (Measurements.HeadWidth?? 0) / 2;
-            var halfHeadWidthVector = new Vector3(halfHeadWidth, 0, 0);
 
-            var barThickness = 0.02f;
-            var barPadding   = 0.003f;
-            var columnWidth  = barThickness + barPadding*2;
-            var chartWidth   = _heightAgeMarkers.Count * columnWidth;
+            var lengthPerAge = width/(Mathf.Abs(min - max)+1);
+            var zOffSet = 0.2f + (rowId*0.05f) + (rowId*0.01f);
+            var xOffSet = Mathf.Abs(quartile.Q0 - min) * lengthPerAge;
 
-            var ageFromHeight = Measurements.AgeFromHeight;
-            var ageFromHead = Measurements.AgeFromHead;
-            if(ageFromHeight == null || ageFromHead == null) {
-                Enabled = false;
+            if(quartile == null) {
+                return false;
             }
 
-            // combine and weight confidences (row[0] is weighted, row[1] is height, row[2] is head)
-            var combinedConfidenceByAge = new List<List<float>>();
-            var confidenceMax = 0f;
-            var confidenceMaxIndex = 0;
-
-            // float weightHead = 1f;
-            // float weightHeight = 1f;
-            for(var i = 0; i < maxIndex; i++) {
-                var age = i+minAge;
-
-                var confidenceHeight = ageFromHeight?.ConfidenceForAge(age) ?? 0;
-                var confidenceHead = ageFromHead?.ConfidenceForAge(age) ?? 0;
-                float confidenceWeighted;
-
-                // algorithm 1 - add things and weight them
-                // var confidenceHeightW = confidenceHeight * weightHeight / (weightHead + weightHeight) / 2;
-                // var confidenceHeadW = confidenceHead * weightHead / (weightHead + weightHeight) / 2;
-                // var confidenceWeighted = confidenceHeadW + confidenceHeightW;
-
-                // algorithm 2 - just take the max and use that
-                if(confidenceHead > confidenceHeight) {
-                    confidenceHead -= confidenceHeight;
+            while(_quartileMarkerRows.Count <= rowId) {
+                var rowMarkers = new List<LabeledLine>();
+                for(var i = 0; i < 5; i++) {
+                    rowMarkers.Add(
+                        CreateLineMarker($"", lineColor, Vector3.right)
+                    );
                 }
-                else {
-                    confidenceHead = 0;
-                }
-
-                confidenceWeighted = confidenceHead + confidenceHeight;
-                if(confidenceWeighted > confidenceMax) {
-                    confidenceMax = confidenceWeighted;
-                    confidenceMaxIndex = i;
-                }
-
-                combinedConfidenceByAge.Add(new List<float>() {confidenceWeighted, confidenceHeight, confidenceHead});
+                _quartileMarkerRows.Add(rowMarkers);
             }
 
-            // display things
-            int firstNonZeroIndex = -1;
-            for(var i = 0; i < maxIndex; i++) {
-                var age = i+minAge;
-                var confidenceCombined = combinedConfidenceByAge[i][0];
-                var confidenceHeight = combinedConfidenceByAge[i][1];
-                var confidenceHead = combinedConfidenceByAge[i][2];
+            var markers = _quartileMarkerRows[rowId];
 
-                if(firstNonZeroIndex < 0 && confidenceCombined > 0) {
-                    firstNonZeroIndex = i;
-                }
+            // thin 0-25 quartile
+            markers[0].Color = lineColor;
+            markers[0].Enabled = Enabled;
+            markers[0].Length = Mathf.Abs(quartile.Q0 - quartile.Q25) * lengthPerAge;
+            markers[0].Thickness = 0.003f;
+            markers[0].transform.position = parentRotEuler * (Offset + new Vector3((width/2) - xOffSet - (Mathf.Abs(quartile.Q0 - quartile.Q25)*lengthPerAge), (Measurements.Height ?? 0) + zOffSet, 0)) + parentPos;
+            markers[0].Label = quartile.Q0.ToString();
+            markers[0].LabelEnabled = Enabled;
 
-                if(firstNonZeroIndex < 0) {
-                    _heightAgeMarkers[i].Enabled = false;
-                    _headAgeMarkers[i].Enabled = false;
-                    continue;
-                }
+            // thick 25-75 quartile
+            markers[1].Color = lineColor;
+            markers[1].Enabled = Enabled;
+            markers[1].Length = (Mathf.Abs(quartile.Q25 - quartile.Q75) + 1) * lengthPerAge;
+            markers[1].Thickness = 0.05f;
+            markers[1].transform.position = parentRotEuler * (Offset + new Vector3((width/2) - xOffSet - ((Mathf.Abs(quartile.Q0 - quartile.Q75)+1)*lengthPerAge), (Measurements.Height ?? 0) + zOffSet, 0)) + parentPos;
 
-                var lineHeightForHeight = confidenceHeight == 0 ? 0.002f : confidenceHeight / 5f;
-                var lineHeightForHead = confidenceHead == 0 ? 0.002f : confidenceHead / 5f;
+            // // median vertical
+            // markers[2].Enabled = Enabled;
+            // markers[2].Length = lengthPerAge;
+            // markers[2].Thickness = 0.05f;
+            // markers[2].transform.position = parentRotEuler * (Offset + new Vector3((width/2) - xOffSet - ((Mathf.Abs(heightQuartiles.Q0 - heightQuartiles.Q50)+1) * lengthPerAge), (Measurements.Height ?? 0) + zOffSet, 0.001f)) + parentPos;
+            // markers[2].Color = Color.yellow;
+            // markers[2].Label = heightQuartiles.Q50.ToString();
+            // markers[2].LabelEnabled = Enabled;
+            // markers[2].LabelOffsetX = 24f;
+            // markers[2].LabelOffsetY = -25f;
 
-                // render height bars
-                SetMainMarkerProperties(_heightAgeMarkers[i], lineHeightForHeight);
-                _heightAgeMarkers[i].Label = age < 18 && i == confidenceMaxIndex ? $"{age}yo\nWARNING!" : $"{age}yo";
-                _heightAgeMarkers[i].LabelEnabled = i == firstNonZeroIndex || i == maxIndex - 1 || i == confidenceMaxIndex;
-                if(i != confidenceMaxIndex) {
-                    _heightAgeMarkers[i].Color = LineColor;
-                }
-                else {
-                    _heightAgeMarkers[i].Color = (age < 18 ? Color.red : Color.yellow);
-                }
-                _heightAgeMarkers[i].Enabled = _heightAgeMarkers[i].Enabled && Enabled;
-                _heightAgeMarkers[i].Length = lineHeightForHeight;
-                _heightAgeMarkers[i].Thickness = barThickness;
-                _heightAgeMarkers[i].transform.position = parentRotEuler * (Offset + new Vector3(-1*(columnWidth*(i-confidenceMaxIndex)), (Measurements.Height ?? 0) + 0.2f, 0)) + parentPos;
+            // thin 0-25 quartile
+            markers[3].Color = lineColor;
+            markers[3].Enabled = Enabled;
+            markers[3].Length = Mathf.Abs(quartile.Q75 - quartile.Q100) * lengthPerAge;
+            markers[3].Thickness = 0.003f;
+            markers[3].transform.position = parentRotEuler * (Offset + new Vector3((width/2) - xOffSet - ((Mathf.Abs(quartile.Q0 - quartile.Q75)+1) * lengthPerAge), (Measurements.Height ?? 0) + zOffSet, 0)) + parentPos;
+            markers[3].Label = quartile.Q100.ToString();
+            markers[3].LineDirection = Vector3.left;
+            markers[3].LabelEnabled = Mathf.Abs(quartile.Q0 - quartile.Q100) > 0 ? Enabled : false;
 
-                // render height bars (stacked)
-                SetMainMarkerProperties(_headAgeMarkers[i], lineHeightForHead);
-                if(i != confidenceMaxIndex) {
-                    _headAgeMarkers[i].Color = LineColor + Color.grey;
-                }
-                else {
-                    _headAgeMarkers[i].Color = (age < 18 ? Color.red : Color.yellow) + Color.grey;
-                }
-                _headAgeMarkers[i].Enabled = _headAgeMarkers[i].Enabled && Enabled;
-                _headAgeMarkers[i].Label = $""; // TODO
-                _headAgeMarkers[i].Length = lineHeightForHead;
-                _headAgeMarkers[i].Thickness = barThickness;
-                _headAgeMarkers[i].LabelEnabled = false; // TODO
-                _headAgeMarkers[i].transform.position = parentRotEuler * (Offset + new Vector3(-1*(columnWidth*(i-confidenceMaxIndex)), (Measurements.Height ?? 0) + 0.2f + lineHeightForHeight, 0)) + parentPos;
-
-                
+            // description
+            if(description != null && description != string.Empty) {
+                markers[4].Color = lineColor;
+                markers[4].Enabled = Enabled;
+                markers[4].Length = 0f;
+                markers[4].Thickness = 0.003f;
+                markers[4].transform.position = parentRotEuler * (Offset + new Vector3((width/2) - width - 3*lengthPerAge, (Measurements.Height ?? 0) + zOffSet, 0)) + parentPos;
+                markers[4].Label = description;
+                markers[4].LineDirection = Vector3.left;
+                markers[4].LabelEnabled = Enabled;
             }
+
+            return true;
         }
 
         public void OnDestroy() {
             foreach(var go in _lineMarkerGameObjects) {
                 Destroy(go);
             }
-        }
-
-        private void SetMainMarkerProperties(LabeledLine marker, float? measurement) {
-            marker.transform.rotation = transform.parent.transform.rotation;
-            marker.Enabled = measurement != null && Enabled;
-            marker.LabelEnabled = LabelsEnabled;
-            marker.Thickness = LineThickness * 0.001f;
-            marker.Color = LineColor;
         }
 
         private readonly List<GameObject> _lineMarkerGameObjects = new List<GameObject>();

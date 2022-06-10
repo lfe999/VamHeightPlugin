@@ -1,3 +1,4 @@
+// #define LFE_EXPERIMENTAL
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,6 +28,8 @@ namespace LFE {
 
         private readonly HeightMeasurePlugin _plugin;
 
+        public JSONStorableBool experimentalModeStorable;
+
         // measurement storables
         public JSONStorableFloat fullHeightStorable;
         public JSONStorableFloat headSizeHeightStorable;
@@ -50,6 +53,9 @@ namespace LFE {
         public JSONStorableFloat penisLength;
         public JSONStorableFloat penisWidth;
         public JSONStorableFloat penisGirth;
+
+
+        public JSONStorableBool showAgeMarkersStorable;
 
         public JSONStorableFloat ageFromHeadStorable;
         public JSONStorableFloat ageFromHeightStorable;
@@ -126,6 +132,17 @@ namespace LFE {
         private bool _creatingProportion = false;
         private Proportions _preEditProportion;
         private void InitStorables() {
+
+#if LFE_EXPERIMENTAL
+            experimentalModeStorable = new JSONStorableBool("Enable Experiments", true);
+#else
+            experimentalModeStorable = new JSONStorableBool("Enable Experiments", false);
+#endif
+            experimentalModeStorable.setCallbackFunction = (bool value) => {
+                experimentalModeStorable.valNoCallback = value;
+                Draw();
+            };
+            _plugin.RegisterBool(experimentalModeStorable);
 
             //////////////////////////////////////
             // UI related
@@ -413,6 +430,23 @@ namespace LFE {
             penisGirth.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(penisGirth);
 
+            if(experimentalModeStorable.val) {
+                showAgeMarkersStorable = new JSONStorableBool("Age Markers", true, (bool value) => {
+                    showAgeMarkersStorable.valNoCallback = value;
+                    Draw();
+                });
+                showAgeMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
+                _plugin.RegisterBool(showAgeMarkersStorable);
+            }
+            else {
+                showAgeMarkersStorable = new JSONStorableBool("Age Markers", false, (bool value) => {
+                    showAgeMarkersStorable.valNoCallback = value;
+                    Draw();
+                });
+                showAgeMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
+                _plugin.RegisterBool(showAgeMarkersStorable);
+            }
+
             ageFromHeadStorable = new JSONStorableFloat("ageFromHead", 0, 0, 100);
             ageFromHeadStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(ageFromHeadStorable);
@@ -523,6 +557,8 @@ namespace LFE {
         private UIDynamicSlider _proportionEditLegs;
         private UIDynamicSlider _proportionEditKnee;
         private UIDynamicSlider _proportionEditHeel;
+        private UIDynamicSlider _proportionEditAgeMin;
+        private UIDynamicSlider _proportionEditAgeMax;
 
         private UIDynamicButton _proportionEditButton;
         private UIDynamicButton _proportionDeleteButton;
@@ -541,6 +577,8 @@ namespace LFE {
         private UIDynamicSlider _markerLeftRight;
         private UIDynamicSlider _markerUpDown;
         private UIDynamicToggle _hideDocs;
+
+        private UIDynamicToggle _ageMarkerToggle;
 
         private UIDynamicToggle _manualMarkerToggle;
         private UIDynamicToggle _copyManualMarkers;
@@ -728,6 +766,32 @@ namespace LFE {
                                 selectedProportion.FigureBottomOfKneesToHeels = value;
                             }, 0, 10));
 
+                        if(experimentalModeStorable.val || showAgeMarkersStorable.val){
+                            JSONStorableFloat minStorable = new JSONStorableFloat("Age Estimage Min", selectedProportion.EstimatedAgeRangeMin, 0, 100);
+                            minStorable.setCallbackFunction = (value) => {
+                                selectedProportion.EstimatedAgeRangeMin = (int)Math.Floor(value);
+                                if(selectedProportion.EstimatedAgeRangeMin > selectedProportion.EstimatedAgeRangeMax) {
+                                    selectedProportion.EstimatedAgeRangeMin = selectedProportion.EstimatedAgeRangeMax;
+                                }
+                                if(minStorable != null) {
+                                    minStorable.valNoCallback = (float)selectedProportion.EstimatedAgeRangeMin;
+                                }
+                            };
+                            _proportionEditAgeMin = _plugin.CreateSlider(minStorable);
+
+                            JSONStorableFloat maxStorable = new JSONStorableFloat("Age Estimage Max", selectedProportion.EstimatedAgeRangeMax, 0, 100);
+                            maxStorable.setCallbackFunction = (value) => {
+                                selectedProportion.EstimatedAgeRangeMax = (int)Math.Floor(value);
+                                if(selectedProportion.EstimatedAgeRangeMax < selectedProportion.EstimatedAgeRangeMin) {
+                                    selectedProportion.EstimatedAgeRangeMax = selectedProportion.EstimatedAgeRangeMin;
+                                }
+                                if(maxStorable != null) {
+                                    maxStorable.valNoCallback = (float)selectedProportion.EstimatedAgeRangeMax;
+                                }
+                            };
+                            _proportionEditAgeMax = _plugin.CreateSlider(maxStorable);
+                        }
+
                         _proportionCancelButton = _plugin.CreateButton("Cancel");
                         _proportionCancelButton.buttonColor = Color.red;
                         _proportionCancelButton.button.onClick.AddListener(() => {
@@ -745,6 +809,8 @@ namespace LFE {
                                     selectedProportion.FigureLengthOfLowerLimb = _preEditProportion.FigureLengthOfLowerLimb;
                                     selectedProportion.FigureLengthOfUpperLimb = _preEditProportion.FigureLengthOfUpperLimb;
                                     selectedProportion.FigureBottomOfKneesToHeels = _preEditProportion.FigureBottomOfKneesToHeels;
+                                    selectedProportion.EstimatedAgeRangeMin = _preEditProportion.EstimatedAgeRangeMin;
+                                    selectedProportion.EstimatedAgeRangeMax = _preEditProportion.EstimatedAgeRangeMax;
                                 }
 
                                 if(_creatingProportion) {
@@ -848,8 +914,15 @@ namespace LFE {
             _markerUpDown = _plugin.CreateSlider(markerUpDownStorable, rightSide: false);
             _hideDocs = _plugin.CreateToggle(hideDocsStorable, rightSide: false);
 
+            if(experimentalModeStorable.val || showAgeMarkersStorable.val) {
+                CreateStandardDivider(rightSide: true);
+                _ageMarkerToggle = _plugin.CreateToggle(showAgeMarkersStorable, rightSide: true);
+                _ageMarkerToggle.backgroundColor = HEADER_COLOR;
+            }
+
             CreateStandardDivider(rightSide: true);
             _manualMarkerToggle = _plugin.CreateToggle(showManualMarkersStorable, rightSide: true);
+            _manualMarkerToggle.backgroundColor = HEADER_COLOR;
             if(showManualMarkersStorable.val) {
                 if(_plugin.containingAtom.type == "Person") {
                     _copyManualMarkers = _plugin.CreateToggle(manualMarkersCopy, rightSide: true);
@@ -881,6 +954,9 @@ namespace LFE {
             }
             foreach(var spacer in _spacerLinesList) {
                 _plugin.RemoveTextField(spacer);
+            }
+            if(_ageMarkerToggle) {
+                _plugin.RemoveToggle(_ageMarkerToggle);
             }
             if(_manualMarkerToggle) {
                 _plugin.RemoveToggle(_manualMarkerToggle);
@@ -1022,6 +1098,12 @@ namespace LFE {
             }
             if(_proportionEditHeel) {
                 _plugin.RemoveSlider(_proportionEditHeel);
+            }
+            if(_proportionEditAgeMin) {
+                _plugin.RemoveSlider(_proportionEditAgeMin);
+            }
+            if(_proportionEditAgeMax) {
+                _plugin.RemoveSlider(_proportionEditAgeMax);
             }
 
             if(_targetHeadRatioToggle) {
