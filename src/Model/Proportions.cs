@@ -16,6 +16,7 @@ public class Proportions {
             FigureShoulderToNipples = 0.8f,
             FigureShoulderToNavel = 1.5f,
             FigureShoulderToCrotch = 2.1f,
+            FigureLengthOfUpperLimb = 3.1f,
             FigureLengthOfLowerLimb = 3.5f,
             FigureCrotchToBottomOfKnees = 1.8f,
             FigureBottomOfKneesToHeels = 1.7f,
@@ -31,6 +32,7 @@ public class Proportions {
             FigureShoulderToNipples = 0.8f,
             FigureShoulderToNavel = 1.8f,
             FigureShoulderToCrotch = 3f,
+            FigureLengthOfUpperLimb = 3.5f,
             FigureLengthOfLowerLimb = 3.6f,
             FigureCrotchToBottomOfKnees = 1.7f,
             FigureBottomOfKneesToHeels = 2f,
@@ -46,6 +48,7 @@ public class Proportions {
             FigureShoulderToNipples = 0.6f,
             FigureShoulderToNavel = 1.6f,
             FigureShoulderToCrotch = 2.7f,
+            FigureLengthOfUpperLimb = 3.1f,
             FigureLengthOfLowerLimb = 3.5f,
             FigureCrotchToBottomOfKnees = 1.7f,
             FigureBottomOfKneesToHeels = 1.8f,
@@ -61,6 +64,7 @@ public class Proportions {
             FigureShoulderToNipples = 0.6f,
             FigureShoulderToNavel = 1.3f,
             FigureShoulderToCrotch = 2.3f,
+            FigureLengthOfUpperLimb = 2.7f,
             FigureLengthOfLowerLimb = 3.3f,
             FigureCrotchToBottomOfKnees = 1.5f,
             FigureBottomOfKneesToHeels = 1.8f,
@@ -76,6 +80,7 @@ public class Proportions {
             FigureShoulderToNipples = 0.6f,
             FigureShoulderToNavel = 1.5f,
             FigureShoulderToCrotch = 2.1f,
+            FigureLengthOfUpperLimb = 3.1f,
             FigureLengthOfLowerLimb = 3.5f,
             FigureCrotchToBottomOfKnees = 1.8f,
             FigureBottomOfKneesToHeels = 1.7f,
@@ -91,6 +96,7 @@ public class Proportions {
             FigureShoulderToNipples = 0.66f,
             FigureShoulderToNavel = 1.65f,
             FigureShoulderToCrotch = 2.6f,
+            FigureLengthOfUpperLimb = 3.5f,
             FigureLengthOfLowerLimb = 4f,
             FigureCrotchToBottomOfKnees = 2f,
             FigureBottomOfKneesToHeels = 2f,
@@ -106,6 +112,7 @@ public class Proportions {
             FigureShoulderToNipples = 0.6f,
             FigureShoulderToNavel = 1.5f,
             FigureShoulderToCrotch = 2.4f,
+            FigureLengthOfUpperLimb = 3.1f,
             FigureLengthOfLowerLimb = 3.7f,
             FigureCrotchToBottomOfKnees = 1.9f,
             FigureBottomOfKneesToHeels = 1.8f,
@@ -121,6 +128,7 @@ public class Proportions {
             FigureShoulderToNipples = 0.6f,
             FigureShoulderToNavel = 1.3f,
             FigureShoulderToCrotch = 2.3f,
+            FigureLengthOfUpperLimb = 2.7f,
             FigureLengthOfLowerLimb = 3.3f,
             FigureCrotchToBottomOfKnees = 1.5f,
             FigureBottomOfKneesToHeels = 1.8f,
@@ -255,7 +263,7 @@ public class Proportions {
                 + $"    FigureShoulderToNavel={r(FigureShoulderToNavel)}\n"
                 + $"    FigureShoulderToCrotch={r(FigureShoulderToCrotch)}\n"
                 + $"    FigureLengthOfLowerLimb={r(FigureLengthOfLowerLimb)}\n"
-                + $"    FigureLengthOfUpperLimb={r(FigureLengthOfLowerLimb)}\n"
+                + $"    FigureLengthOfUpperLimb={r(FigureLengthOfUpperLimb)}\n"
                 + $"    FigureCrotchToBottomOfKnees={r(FigureCrotchToBottomOfKnees)}\n"
                 + $"    FigureBottomOfKneesToHeels={r(FigureBottomOfKneesToHeels)}";
     }

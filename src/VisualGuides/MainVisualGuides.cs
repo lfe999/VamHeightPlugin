@@ -88,14 +88,14 @@ namespace LFE {
             _markerShoulderWidth.Label = "";
             SetMainMarkerProperties(_markerShoulderWidth, Measurements.ShoulderWidth);
             _markerShoulderWidth.Length = shoulderWidth;
-            _markerShoulderWidth.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(-1*shoulderWidth/2, Offset.y, Offset.z + 0.04f)) + parentPos;
+            _markerShoulderWidth.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(Offset.x + OffsetSpread.x - shoulderWidth/2, Offset.y, Offset.z + 0.04f)) + parentPos;
             _markerShoulderWidth.LineDirection = Vector3.right;
 
             var armLength = Measurements.ArmLength ?? 0;
             _markerArmLength.Label = $"Arm - {UnitUtils.ToUnitString(armLength, UnitDisplay)}";
             SetMainMarkerProperties(_markerArmLength, armLength);
             _markerArmLength.Length = armLength;
-            _markerArmLength.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0)) + new Vector3(shoulderWidth/2 + 0.15f, Offset.y, Offset.z) + parentPos;
+            _markerArmLength.transform.position = parentRotEuler * new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(Offset.x + OffsetSpread.x + shoulderWidth/2 + 0.15f, Offset.y, Offset.z) + parentPos;
             _markerArmLength.LineDirection = Vector3.down;
 
             if(Measurements.BustSize == null || Measurements.BustSize == 0) {

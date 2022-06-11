@@ -13,6 +13,7 @@ namespace LFE {
         public Vector3 ShoulderHeight => Vector3.Lerp(RoughVertex(11110), RoughVertex(182), 0.5f);
         public Vector3 ShoulderLeftSide => RoughVertex(182);
         public Vector3 ShoulderRightSide => RoughVertex(11110);
+        public float ShoulderColliderRadius => _rightShoulderCollider.radius;
         public Vector3 FingerTipRightSide => _handRightMidTipCollider.transform.position;
         public Vector3 FingerTipLeftSide => _handLeftMidTipCollider.transform.position;
         public Vector3 BustHeight => RoughVertex(10939);
@@ -188,6 +189,7 @@ namespace LFE {
         CapsuleCollider _footLeftCollider;
         CapsuleCollider _handRightMidTipCollider;
         CapsuleCollider _handLeftMidTipCollider;
+        CapsuleCollider _rightShoulderCollider;
 
         public Atom Person {
             get {
@@ -203,6 +205,17 @@ namespace LFE {
                 _footLeftCollider = _person?.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("lFoot/_Collider1")) ?? null; 
                 _handLeftMidTipCollider = _person?.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("lMid3/_Collider")) ?? null; 
                 _handRightMidTipCollider = _person?.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("rMid3/_Collider")) ?? null; 
+                _rightShoulderCollider = _person?.GetComponentsInChildren<CapsuleCollider>().FirstOrDefault(c => ColliderName(c).Equals("rShldr")) ?? null; 
+
+                // if(_person!=null) {
+                //     SuperController.singleton.ClearMessages();
+                //     foreach(var c in _person.GetComponentsInChildren<CapsuleCollider>()) {
+                //         var n = ColliderName(c);
+                //         if(n.Contains("rShldr")) {
+                //             SuperController.LogMessage(n);
+                //         }
+                //     }
+                // }
             }
         }
 

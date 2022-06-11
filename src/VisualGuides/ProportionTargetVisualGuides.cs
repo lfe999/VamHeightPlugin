@@ -9,6 +9,7 @@ namespace LFE {
         LabeledLine _markerChin;
         LabeledLine _markerShoulder;
         LabeledLine _markerShoulderWidth;
+        LabeledLine _markerArmLength;
         LabeledLine _markerNipple;
         LabeledLine _markerNavel;
         LabeledLine _markerGroin;
@@ -23,6 +24,7 @@ namespace LFE {
             _markerChin = CreateLineMarker("Chin", LineColor);
             _markerShoulder = CreateLineMarker("Shoulder", LineColor);
             _markerShoulderWidth = CreateLineMarker("ShoulderWidth", LineColor);
+            _markerArmLength = CreateLineMarker("ArmLength", LineColor);
             _markerNipple = CreateLineMarker("Nipple", LineColor);
             _markerNavel = CreateLineMarker("Navel", LineColor);
             _markerGroin = CreateLineMarker("Crotch", LineColor);
@@ -89,15 +91,23 @@ namespace LFE {
             var shoulderHeight = chinHeight - (targetProportion.FigureChinToShoulder * unitsPerHead);
             var shoulderWidth = targetProportion.FigureShoulderWidth * unitsPerHead;
             var shoulderLineBuffer = Mathf.Abs(Offset.x) < Mathf.Abs(shoulderWidth/2) ? shoulderWidth/2 + 0.02f : 0;
-            _markerShoulder.Label = $"Chin To Shoulder - Target {targetProportion.FigureChinToShoulder} h.u. Width Target {targetProportion.FigureShoulderWidth}";
+            _markerShoulder.Label = $"Chin To Shoulder - Target {targetProportion.FigureChinToShoulder} h.u. Width Target {targetProportion.FigureShoulderWidth} h.u.";
             SetMainMarkerProperties(_markerShoulder, shoulderHeight);
             _markerShoulder.transform.position = parentRotEuler * (new Vector3(0, shoulderHeight, 0) + new Vector3(Offset.x - shoulderLineBuffer, Offset.y, Offset.z)) + parentPos;
             _markerShoulder.Length = _markerChin.Length - shoulderLineBuffer;
 
             _markerShoulderWidth.Label = "";
             SetMainMarkerProperties(_markerShoulderWidth, shoulderWidth);
-            _markerShoulderWidth.transform.position = parentRotEuler * (new Vector3(0, shoulderHeight, 0) + new Vector3(shoulderWidth/2, Offset.y, Offset.z + 0.04f)) + parentPos;
+            _markerShoulderWidth.transform.position = parentRotEuler * (new Vector3(0, shoulderHeight, 0) + new Vector3(Offset.x + OffsetSpread.x + shoulderWidth/2, Offset.y, Offset.z + 0.04f)) + parentPos;
             _markerShoulderWidth.Length = shoulderWidth;
+
+            var armLength = targetProportion.FigureLengthOfUpperLimb * unitsPerHead;
+            var actualShoulderWidth = Measurements.ShoulderWidth ?? 0;
+            _markerArmLength.Label = $"Arm - Target {targetProportion.FigureLengthOfUpperLimb} h.u.";
+            SetMainMarkerProperties(_markerArmLength, armLength);
+            _markerArmLength.Length = armLength;
+            _markerArmLength.transform.position = parentRotEuler * new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(Offset.x + OffsetSpread.x + actualShoulderWidth/2 + 0.20f, Offset.y, Offset.z) + parentPos;
+            _markerArmLength.LineDirection = Vector3.down;
 
             var nippleHeight = shoulderHeight - (targetProportion.FigureShoulderToNipples * unitsPerHead);
             _markerNipple.Label = $"Shoulder To Nipple - Target {targetProportion.FigureShoulderToNipples} h.u.";

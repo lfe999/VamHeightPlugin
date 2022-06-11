@@ -103,6 +103,7 @@ namespace LFE
                             FigureShoulderToNavel = pj["figureShoulderToNavel"]?.AsFloat ?? 0,
                             FigureShoulderToCrotch = pj["figureShoulderToCrotch"]?.AsFloat ?? 0,
                             FigureCrotchToBottomOfKnees = pj["figureCrotchToBottomOfKnees"]?.AsFloat ?? 0,
+                            FigureLengthOfUpperLimb = pj["figureLengthOfUpperLimb"]?.AsFloat ?? 0,
                             FigureLengthOfLowerLimb = pj["figureLengthOfLowerLimb"]?.AsFloat ?? 0,
                             FigureBottomOfKneesToHeels = pj["figureBottomOfKneesToHeels"]?.AsFloat ?? 0,
                             EstimatedAgeRangeMin = pj["estimatedAgeRangeMin"]?.AsInt ?? 0,
@@ -134,6 +135,7 @@ namespace LFE
                 pJson["figureShoulderToNavel"].AsFloat = p.FigureShoulderToNavel;
                 pJson["figureShoulderToCrotch"].AsFloat = p.FigureShoulderToCrotch;
                 pJson["figureCrotchToBottomOfKnees"].AsFloat = p.FigureCrotchToBottomOfKnees;
+                pJson["figureLengthOfUpperLimb"].AsFloat = p.FigureLengthOfUpperLimb;
                 pJson["figureLengthOfLowerLimb"].AsFloat = p.FigureLengthOfLowerLimb;
                 pJson["figureBottomOfKneesToHeels"].AsFloat = p.FigureBottomOfKneesToHeels;
                 pJson["estimatedAgeRangeMin"].AsInt = p.EstimatedAgeRangeMin;
@@ -383,6 +385,7 @@ namespace LFE
                 _mainGuides.LineThickness = _ui.lineThicknessFigureStorable.val;
                 _mainGuides.UnitDisplay = _ui.unitsStorable.val;
                 _mainGuides.Offset = pos - spreadVector;
+                _mainGuides.OffsetSpread = spreadVector;
 
                 // auto head height guide
                 _headGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
@@ -392,6 +395,8 @@ namespace LFE
                 _headGuides.LineThickness = _ui.lineThicknessHeadStorable.val;
                 _headGuides.UnitDisplay = _ui.unitsStorable.val;
                 _headGuides.Offset = pos + spreadVector;
+                _headGuides.OffsetSpread = spreadVector;
+
 
                 // auto face guide
                 _faceGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
@@ -401,6 +406,7 @@ namespace LFE
                 _faceGuides.LineThickness = _ui.lineThicknessFaceStorable.val;
                 _faceGuides.UnitDisplay = _ui.unitsStorable.val;
                 _faceGuides.Offset = pos + new Vector3(0, 0, -0.03f);
+                _faceGuides.OffsetSpread = spreadVector;
 
                 // bust guide
                 _bustGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
@@ -410,6 +416,7 @@ namespace LFE
                 _bustGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
                 _bustGuides.UnitDisplay = _ui.unitsStorable.val;
                 _bustGuides.Offset = pos;
+                _bustGuides.OffsetSpread = spreadVector;
                 _bustGuides.Points = _autoMeasurements.POI?.BustPoints ?? new Vector3[0];
 
                 // underbust guide
@@ -420,6 +427,7 @@ namespace LFE
                 _underbustGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
                 _underbustGuides.UnitDisplay = _ui.unitsStorable.val;
                 _underbustGuides.Offset = pos;
+                _underbustGuides.OffsetSpread = spreadVector;
                 _underbustGuides.Points = _autoMeasurements.POI?.UnderbustPoints ?? new Vector3[0];
 
                 // waist guide
@@ -430,6 +438,7 @@ namespace LFE
                 _waistGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
                 _waistGuides.UnitDisplay = _ui.unitsStorable.val;
                 _waistGuides.Offset = pos;
+                _waistGuides.OffsetSpread = spreadVector;
                 _waistGuides.Points = _autoMeasurements.POI?.WaistPoints ?? new Vector3[0];
 
                 // hip guide
@@ -440,6 +449,7 @@ namespace LFE
                 _hipGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
                 _hipGuides.UnitDisplay = _ui.unitsStorable.val;
                 _hipGuides.Offset = pos;
+                _hipGuides.OffsetSpread = spreadVector;
                 _hipGuides.Points = _autoMeasurements.POI?.HipPoints ?? new Vector3[0];
 
                 var proportionClosestMatch = _autoMeasurements.Proportions.ClostestMatch(_ui.ProportionTemplates);
@@ -452,6 +462,7 @@ namespace LFE
                 _ageGuides.LineThickness = 2.0f; // TODO
                 _ageGuides.UnitDisplay = _ui.unitsStorable.val;
                 _ageGuides.Offset = pos;
+                _ageGuides.OffsetSpread = spreadVector;
                 _ageGuides.TargetProportion = proportionClosestMatch;
 
                 // proportion guide
@@ -462,7 +473,7 @@ namespace LFE
                 _proportionGuides.LineThickness = _ui.lineThicknessProportionStorable.val;
                 _proportionGuides.UnitDisplay = _ui.unitsStorable.val;
                 _proportionGuides.Offset = pos - spreadVector - new Vector3(0, 0, 0.004f); // put these just a bit behind the auto guides
-
+                _proportionGuides.OffsetSpread = spreadVector;
                 _proportionGuides.TargetProportion = _ui.ProportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(_ui.proportionSelectionStorable.val)) ?? proportionClosestMatch;
             }
 
@@ -474,6 +485,7 @@ namespace LFE
             _mainGuidesManual.LineThickness = _ui.lineThicknessManualStorable.val;
             _mainGuidesManual.UnitDisplay = _ui.unitsStorable.val;
             _mainGuidesManual.Offset = pos - spreadVector - new Vector3(0, 0, 0.002f); // put these just a bit behind the auto guides
+            _mainGuidesManual.OffsetSpread = spreadVector;
 
             // manual head height guide
             _headGuidesManual.ShowDocumentation = !_ui.hideDocsStorable.val;
@@ -483,6 +495,7 @@ namespace LFE
             _headGuidesManual.LineThickness = _ui.lineThicknessManualStorable.val;
             _headGuidesManual.UnitDisplay = _ui.unitsStorable.val;
             _headGuidesManual.Offset = pos + spreadVector - new Vector3(0, 0, 0.002f); // put these just a bit behind the auto guides
+            _headGuidesManual.OffsetSpread = spreadVector;
         }
 
         private float LineLength(Vector3[] vertices) {
@@ -636,7 +649,7 @@ namespace LFE
             measurements.ChinHeight = Vector3.Dot(chinPos - footPos, rootTransform.up);
             measurements.HeadWidth = Vector3.Distance(poi.CraniumLeftSide, poi.CraniumRightSide);
             measurements.ShoulderHeight = Vector3.Dot(shoulderPos - footPos, rootTransform.up);
-            measurements.ShoulderWidth = LineLength(new Vector3[] {shoulderLeftPos, shoulderRightPos});
+            measurements.ShoulderWidth = LineLength(new Vector3[] {shoulderLeftPos, shoulderRightPos}) + poi.ShoulderColliderRadius;
             measurements.ArmLength = LineLength(new Vector3[] {shoulderRightPos, fingertipRightPos});
             measurements.NippleHeight = poi.IsMale ? (float?)null : Vector3.Dot(nipplePos - footPos, rootTransform.up);
             measurements.UnderbustHeight = poi.IsMale ? (float?)null : Vector3.Dot(underbustPos - footPos, rootTransform.up);
