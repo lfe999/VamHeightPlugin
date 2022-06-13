@@ -386,6 +386,16 @@ namespace LFE
                 _mainGuides.UnitDisplay = _ui.unitsStorable.val;
                 _mainGuides.Offset = pos - spreadVector;
                 _mainGuides.OffsetSpread = spreadVector;
+                _mainGuides.ShowHeight = _ui.showFeatureMarkerLineHeight.val;
+                _mainGuides.ShowChin = _ui.showFeatureMarkerLineChin.val;
+                _mainGuides.ShowShoulder = _ui.showFeatureMarkerLineShoulder.val;
+                _mainGuides.ShowArm = _ui.showFeatureMarkerLineArm.val;
+                _mainGuides.ShowBust = _ui.showFeatureMarkerLineBust.val;
+                _mainGuides.ShowUnderbust = _ui.showFeatureMarkerLineUnderbust.val;
+                _mainGuides.ShowNavel = _ui.showFeatureMarkerLineNavel.val;
+                _mainGuides.ShowCrotch = _ui.showFeatureMarkerLineCrotch.val;
+                _mainGuides.ShowKnee = _ui.showFeatureMarkerLineKnee.val;
+                _mainGuides.ShowHeel = _ui.showFeatureMarkerLineHeel.val;
 
                 // auto head height guide
                 _headGuides.ShowDocumentation = !_ui.hideDocsStorable.val;

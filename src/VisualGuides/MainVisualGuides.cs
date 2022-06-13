@@ -16,6 +16,17 @@ namespace LFE {
         LabeledLine _markerKnee;
         LabeledLine _markerHeel;
 
+        public bool ShowHeight { get; set; } = true;
+        public bool ShowChin { get; set; } = true;
+        public bool ShowBust { get; set; } = true;
+        public bool ShowUnderbust { get; set; } = true;
+        public bool ShowNavel { get; set; } = true;
+        public bool ShowCrotch { get; set; } = true;
+        public bool ShowKnee { get; set; } = true;
+        public bool ShowHeel { get; set; } = true;
+        public bool ShowShoulder { get; set; } = true;
+        public bool ShowArm { get; set; } = true;
+
         public void Awake() {
 
             _markerHead = CreateLineMarker("Head", LineColor);
@@ -67,6 +78,7 @@ namespace LFE {
             _markerHead.Label = $"Height - {UnitUtils.ToUnitString(Measurements.Height ?? 0, UnitDisplay)}";
             SetMainMarkerProperties(_markerHead, Measurements.Height);
             _markerHead.transform.position = parentRotEuler * (new Vector3(0, Measurements.Height ?? 0, 0) + Offset) + parentPos;
+            _markerHead.Enabled = _markerHead.Enabled && ShowHeight;
 
             var headWidth = Measurements.HeadWidth ?? 0;
             _markerChin.Label = $"Head - Height {UnitUtils.ToUnitString(Measurements.HeadHeight ?? 0, UnitDisplay)}";
@@ -75,6 +87,7 @@ namespace LFE {
             }
             SetMainMarkerProperties(_markerChin, Measurements.ChinHeight);
             _markerChin.transform.position = parentRotEuler * (new Vector3(0, Measurements.ChinHeight ?? 0, 0) + Offset) + parentPos;
+            _markerChin.Enabled = _markerChin.Enabled && ShowChin;
 
             var chinToShoulder = (Measurements.ChinHeight ?? 0) - (Measurements.ShoulderHeight ?? 0);
             var shoulderWidth = Measurements.ShoulderWidth ?? 0;
@@ -84,12 +97,14 @@ namespace LFE {
             SetMainMarkerProperties(_markerShoulder, Measurements.ShoulderHeight);
             _markerShoulder.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(Offset.x - shoulderLineBuffer, Offset.y, Offset.z)) + parentPos;
             _markerShoulder.Length = _markerChin.Length - shoulderLineBuffer;
+            _markerShoulder.Enabled = _markerShoulder.Enabled && ShowShoulder;
 
             _markerShoulderWidth.Label = "";
             SetMainMarkerProperties(_markerShoulderWidth, Measurements.ShoulderWidth);
             _markerShoulderWidth.Length = shoulderWidth;
             _markerShoulderWidth.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(Offset.x + OffsetSpread.x - shoulderWidth/2, Offset.y, Offset.z + 0.04f)) + parentPos;
             _markerShoulderWidth.LineDirection = Vector3.right;
+            _markerShoulderWidth.Enabled = _markerShoulderWidth.Enabled && ShowShoulder;
 
             var armLength = Measurements.ArmLength ?? 0;
             _markerArmLength.Label = $"Arm - {UnitUtils.ToUnitString(armLength, UnitDisplay)}";
@@ -97,6 +112,7 @@ namespace LFE {
             _markerArmLength.Length = armLength;
             _markerArmLength.transform.position = parentRotEuler * new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(Offset.x + OffsetSpread.x + shoulderWidth/2 + 0.15f, Offset.y, Offset.z) + parentPos;
             _markerArmLength.LineDirection = Vector3.down;
+            _markerArmLength.Enabled = _markerArmLength.Enabled && ShowArm;
 
             if(Measurements.BustSize == null || Measurements.BustSize == 0) {
                 _markerNipple.Label = $"Bust";
@@ -106,6 +122,7 @@ namespace LFE {
             }
             SetMainMarkerProperties(_markerNipple, Measurements.NippleHeight);
             _markerNipple.transform.position = parentRotEuler * (new Vector3(0, Measurements.NippleHeight ?? 0, 0) + Offset) + parentPos;
+            _markerNipple.Enabled = _markerNipple.Enabled && ShowBust;
 
             if(Measurements.UnderbustSize == null || Measurements.UnderbustSize == 0) {
                 _markerUnderbust.Label = "Underbust";
@@ -115,6 +132,7 @@ namespace LFE {
             }
             SetMainMarkerProperties(_markerUnderbust, Measurements.UnderbustHeight);
             _markerUnderbust.transform.position = parentRotEuler * (new Vector3(0, Measurements.UnderbustHeight ?? 0, 0) + Offset) + parentPos;
+            _markerUnderbust.Enabled = _markerUnderbust.Enabled && ShowUnderbust;
 
             var waist = Measurements.WaistSize ?? 0;
             var shoulderToNavel = (Measurements.ShoulderHeight?? 0) - (Measurements.NavelHeight ?? 0);
@@ -125,6 +143,7 @@ namespace LFE {
             _markerNavel.Label += $"\nShoulder to Navel - {UnitUtils.ToUnitString(shoulderToNavel, UnitDisplay)}";
             SetMainMarkerProperties(_markerNavel, Measurements.NavelHeight);
             _markerNavel.transform.position = parentRotEuler * (new Vector3(0, Measurements.NavelHeight ?? 0, 0) + Offset) + parentPos;
+            _markerNavel.Enabled = _markerNavel.Enabled && ShowNavel;
 
             var hip = Measurements.HipSize ?? 0;
             var shoulderToCrotch = (Measurements.ShoulderHeight ?? 0) - (Measurements.CrotchHeight ?? 0);
@@ -142,17 +161,20 @@ namespace LFE {
             _markerGroin.Label = _markerGroin.Label + $"Shoulder to Crotch - {UnitUtils.ToUnitString(shoulderToCrotch, UnitDisplay)}";
             SetMainMarkerProperties(_markerGroin, Measurements.CrotchHeight);
             _markerGroin.transform.position = parentRotEuler * (new Vector3(0, Measurements.CrotchHeight ?? 0, 0) + Offset) + parentPos;
+            _markerGroin.Enabled = _markerGroin.Enabled && ShowCrotch;
 
             var crotchToKnee = (Measurements.CrotchHeight ?? 0) - (Measurements.KneeHeight ?? 0);
             _markerKnee.Label = $"Knee - Crotch to Knee {UnitUtils.ToUnitString(crotchToKnee, UnitDisplay)}";
             SetMainMarkerProperties(_markerKnee, Measurements.KneeHeight);
             _markerKnee.transform.position = parentRotEuler * (new Vector3(0, Measurements.KneeHeight ?? 0, 0) + Offset) + parentPos;
+            _markerKnee.Enabled = _markerKnee.Enabled && ShowKnee;
 
             var kneeToHeel = (Measurements.KneeHeight ?? 0) - (Measurements.HeelHeight ?? 0);
             _markerHeel.Label = $"Heel - Knee to Heel {UnitUtils.ToUnitString(kneeToHeel, UnitDisplay)}";
             SetMainMarkerProperties(_markerHeel, Measurements.HeelHeight);
             _markerHeel.Enabled = Measurements.HeelHeight != null && Enabled;
             _markerHeel.transform.position = parentRotEuler * (new Vector3(0, Measurements.HeelHeight ?? 0, 0) + Offset) + parentPos;
+            _markerHeel.Enabled = _markerHeel.Enabled && ShowHeel;
 
         }
 

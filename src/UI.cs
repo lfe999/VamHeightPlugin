@@ -23,7 +23,6 @@ namespace LFE {
             set { _proportionTemplates = value ?? new List<Proportions>(); Draw(); }
         }
 
-        private static Color HEADER_COLOR = new Color(0, 0, 0, 0.25f);
         private static Color OPTIONS_COLOR = new Color(1, 1, 1, 0.10f);
         private static Color SPACER_COLOR = new Color(0, 0, 0, 0.5f);
 
@@ -83,6 +82,18 @@ namespace LFE {
         public JSONStorableColor featureMarkerColor;
         public JSONStorableFloat lineThicknessFigureStorable;
         public JSONStorableBool showFeatureMarkerLabelsStorable;
+        public JSONStorableBool showFeatureMarkerLineHeight;
+        public JSONStorableBool showFeatureMarkerLineChin;
+        public JSONStorableBool showFeatureMarkerLineBust;
+        public JSONStorableBool showFeatureMarkerLineUnderbust;
+        public JSONStorableBool showFeatureMarkerLineNavel;
+        public JSONStorableBool showFeatureMarkerLineCrotch;
+        public JSONStorableBool showFeatureMarkerLineKnee;
+        public JSONStorableBool showFeatureMarkerLineHeel;
+        public JSONStorableBool showFeatureMarkerLineShoulder;
+        public JSONStorableBool showFeatureMarkerLineArm;
+
+
 
         public JSONStorableBool showHeadHeightMarkersStorable;
         public JSONStorableColor headMarkerColor;
@@ -175,6 +186,46 @@ namespace LFE {
             });
             showFeatureMarkerLabelsStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLabelsStorable);
+
+            showFeatureMarkerLineHeight = new JSONStorableBool("Show Feature Line - Height", true);
+            showFeatureMarkerLineHeight.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showFeatureMarkerLineHeight);
+
+            showFeatureMarkerLineChin = new JSONStorableBool("Show Feature Line - Chin", true);
+            showFeatureMarkerLineChin.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showFeatureMarkerLineChin);
+
+            showFeatureMarkerLineBust = new JSONStorableBool("Show Feature Line - Bust", true);
+            showFeatureMarkerLineBust.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showFeatureMarkerLineBust);
+
+            showFeatureMarkerLineUnderbust = new JSONStorableBool("Show Feature Line - Underbust", true);
+            showFeatureMarkerLineUnderbust.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showFeatureMarkerLineUnderbust);
+
+            showFeatureMarkerLineNavel = new JSONStorableBool("Show Feature Line - Navel", true);
+            showFeatureMarkerLineNavel.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showFeatureMarkerLineNavel);
+
+            showFeatureMarkerLineCrotch = new JSONStorableBool("Show Feature Line - Crotch", true);
+            showFeatureMarkerLineCrotch.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showFeatureMarkerLineCrotch);
+
+            showFeatureMarkerLineKnee = new JSONStorableBool("Show Feature Line - Knee", true);
+            showFeatureMarkerLineKnee.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showFeatureMarkerLineKnee);
+
+            showFeatureMarkerLineHeel = new JSONStorableBool("Show Feature Line - Heel", true);
+            showFeatureMarkerLineHeel.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showFeatureMarkerLineHeel);
+
+            showFeatureMarkerLineShoulder = new JSONStorableBool("Show Feature Line - Shoulder", true);
+            showFeatureMarkerLineShoulder.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showFeatureMarkerLineShoulder);
+
+            showFeatureMarkerLineArm = new JSONStorableBool("Show Feature Line - Arm", true);
+            showFeatureMarkerLineArm.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showFeatureMarkerLineArm);
 
             //////////////////
 
@@ -593,6 +644,7 @@ namespace LFE {
         private List<UIDynamicSlider> _manualSliders = new List<UIDynamicSlider>();
 
         private List<UIDynamicButton> _buttons = new List<UIDynamicButton>();
+        private List<UIDynamicToggle> _featureLineToggles = new List<UIDynamicToggle>();
 
         private bool _showHeadMarkerOptions = false;
         private bool _showFeatureMarkerOptions = false;
@@ -611,7 +663,6 @@ namespace LFE {
             if(_plugin.containingAtom.type == "Person") {
                 // Head Height Guides
                 _headMarkerToggle = _plugin.CreateToggle(showHeadHeightMarkersStorable, rightSide: false);
-                // _headMarkerToggle.backgroundColor = HEADER_COLOR;
                 if(showHeadHeightMarkersStorable.val) {
                     _buttons.Add(_plugin.CreateButton(_showHeadMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
                     _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
@@ -651,7 +702,6 @@ namespace LFE {
                 CreateStandardDivider(rightSide: false);
                 CreateStandardDivider(rightSide: true);
                 _featureMarkerToggle = _plugin.CreateToggle(showFeatureMarkersStorable, rightSide: false);
-                // _featureMarkerToggle.backgroundColor = HEADER_COLOR;
                 if(showFeatureMarkersStorable.val) {
                     _buttons.Add(_plugin.CreateButton(_showFeatureMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
                     _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
@@ -672,13 +722,25 @@ namespace LFE {
                         _featureMarkerLineThickness = _plugin.CreateSlider(lineThicknessFigureStorable, rightSide: false);
                         _featureMarkerToggleLabels = _plugin.CreateToggle(showFeatureMarkerLabelsStorable, rightSide: false);
 
+                        _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineHeight, rightSide: true));
+                        _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineChin, rightSide: true));
+                        _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineShoulder, rightSide: true));
+                        _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineArm, rightSide: true));
+                        _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineBust, rightSide: true));
+                        _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineUnderbust, rightSide: true));
+                        _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineNavel, rightSide: true));
+                        _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineCrotch, rightSide: true));
+                        _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineKnee, rightSide: true));
+                        _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineHeel, rightSide: true));
                         CreateStandardSpacer(defaultButtonHeight, rightSide: false);
-                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
 
-                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
-                        CreateStandardSpacer(defaultSliderHeight, rightSide: true);
-                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
-
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                        CreateStandardSpacer(defaultButtonHeight + 5, rightSide: true);
                     }
                     CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
                 }
@@ -692,7 +754,6 @@ namespace LFE {
                 CreateStandardDivider(rightSide: false);
                 CreateStandardDivider(rightSide: true);
                 _faceMarkerToggle = _plugin.CreateToggle(showFaceMarkersStorable, rightSide: false);
-                // _faceMarkerToggle.backgroundColor = HEADER_COLOR;
                 if(showFaceMarkersStorable.val) {
                     _buttons.Add(_plugin.CreateButton(_showFaceMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
                     _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
@@ -729,7 +790,6 @@ namespace LFE {
                 CreateStandardDivider(rightSide: false);
                 CreateStandardDivider(rightSide: true);
                 _circumferenceMarkerToggle = _plugin.CreateToggle(showCircumferenceMarkersStorable, rightSide: false);
-                // _circumferenceMarkerToggle.backgroundColor = HEADER_COLOR;
                 if(showCircumferenceMarkersStorable.val) {
                     _buttons.Add(_plugin.CreateButton(_showCircumferenceMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
                     _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
@@ -772,7 +832,6 @@ namespace LFE {
                 CreateStandardDivider(rightSide: false);
                 CreateStandardDivider(rightSide: true);
                 _proportionMarkerToggle = _plugin.CreateToggle(showProportionMarkersStorable, rightSide: false);
-                // _proportionMarkerToggle.backgroundColor = HEADER_COLOR;
                 if(showProportionMarkersStorable.val) {
                     _buttons.Add(_plugin.CreateButton(_showProportionMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
                     _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
@@ -1093,6 +1152,11 @@ namespace LFE {
                 _plugin.RemoveButton(b);
             }
             _buttons = new List<UIDynamicButton>();
+
+            foreach(var t in _featureLineToggles) {
+                _plugin.RemoveToggle(t);
+            }
+            _featureLineToggles = new List<UIDynamicToggle>();
 
             foreach(var spacer in _spacerList) {
                 _plugin.RemoveSpacer(spacer);
