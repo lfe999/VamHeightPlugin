@@ -24,6 +24,7 @@ namespace LFE {
         }
 
         private static Color HEADER_COLOR = new Color(0, 0, 0, 0.25f);
+        private static Color OPTIONS_COLOR = new Color(1, 1, 1, 0.10f);
         private static Color SPACER_COLOR = new Color(0, 0, 0, 0.5f);
 
         private readonly HeightMeasurePlugin _plugin;
@@ -277,7 +278,11 @@ namespace LFE {
 
             //////////////////
 
-            showTargetHeadRatioStorable = new JSONStorableBool("Enable Auto Head Ratio Targeting", false);
+            showTargetHeadRatioStorable = new JSONStorableBool("Enable Auto Head Ratio Targeting", false, (bool value) => {
+                showTargetHeadRatioStorable.valNoCallback = value;
+                Draw();
+
+            });
             showTargetHeadRatioStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showTargetHeadRatioStorable);
 
@@ -587,6 +592,15 @@ namespace LFE {
         private UIDynamicSlider _manualMarkerLineThickness;
         private List<UIDynamicSlider> _manualSliders = new List<UIDynamicSlider>();
 
+        private List<UIDynamicButton> _buttons = new List<UIDynamicButton>();
+
+        private bool _showHeadMarkerOptions = false;
+        private bool _showFeatureMarkerOptions = false;
+        private bool _showFaceMarkerOptions = false;
+        private bool _showCircumferenceMarkerOptions = false;
+        private bool _showProportionMarkerOptions = false;
+        private bool _showManualMarkerOptions = false;
+
         public void Draw() {
             Clear();
 
@@ -596,359 +610,490 @@ namespace LFE {
 
             if(_plugin.containingAtom.type == "Person") {
                 // Head Height Guides
-                CreateStandardDivider(rightSide: false);
                 _headMarkerToggle = _plugin.CreateToggle(showHeadHeightMarkersStorable, rightSide: false);
-                _headMarkerToggle.backgroundColor = HEADER_COLOR;
+                // _headMarkerToggle.backgroundColor = HEADER_COLOR;
                 if(showHeadHeightMarkersStorable.val) {
-                    _headMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: false);
-                    _headMarkerColorButton.buttonColor = _plugin.HSVToColor(headMarkerColor.val);
-                    _headMarkerColorButton.button.onClick.AddListener(() => {
-                        _choosingHeadColor = !_choosingHeadColor;
+                    _buttons.Add(_plugin.CreateButton(_showHeadMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
+                    _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
+                        _showHeadMarkerOptions = !_showHeadMarkerOptions;
                         Draw();
                     });
-                    if(_choosingHeadColor) {
-                        _headMarkerColorPicker = _plugin.CreateColorPicker(headMarkerColor, rightSide: false);
+                    _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
+
+                    if(_showHeadMarkerOptions) {
+                        _headMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: false);
+                        _headMarkerColorButton.buttonColor = _plugin.HSVToColor(headMarkerColor.val);
+                        _headMarkerColorButton.button.onClick.AddListener(() => {
+                            _choosingHeadColor = !_choosingHeadColor;
+                            Draw();
+                        });
+                        if(_choosingHeadColor) {
+                            _headMarkerColorPicker = _plugin.CreateColorPicker(headMarkerColor, rightSide: false);
+                        }
+                        _headMarkerLineThickness = _plugin.CreateSlider(lineThicknessHeadStorable, rightSide: false);
+
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                        CreateStandardSpacer(defaultSliderHeight, rightSide: true);
                     }
-                    _headMarkerLineThickness = _plugin.CreateSlider(lineThicknessHeadStorable, rightSide: false);
-                    CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                    CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
+
                 }
                 else {
-                    // if the right side is expanded, add some height padding
-                    if(showFeatureMarkersStorable.val) {
-                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
-                        CreateStandardSpacer(defaultSliderHeight, rightSide: false);
-                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
-                    }
+                    CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                    CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
                 }
                 CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
 
                 // Feature Guides
+                CreateStandardDivider(rightSide: false);
                 CreateStandardDivider(rightSide: true);
-                _featureMarkerToggle = _plugin.CreateToggle(showFeatureMarkersStorable, rightSide: true);
-                _featureMarkerToggle.backgroundColor = HEADER_COLOR;
+                _featureMarkerToggle = _plugin.CreateToggle(showFeatureMarkersStorable, rightSide: false);
+                // _featureMarkerToggle.backgroundColor = HEADER_COLOR;
                 if(showFeatureMarkersStorable.val) {
-                    _featureMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: true);
-                    _featureMarkerColorButton.buttonColor = _plugin.HSVToColor(featureMarkerColor.val);
-                    _featureMarkerColorButton.button.onClick.AddListener(() => {
-                        _choosingFeatureColor = !_choosingFeatureColor;
+                    _buttons.Add(_plugin.CreateButton(_showFeatureMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
+                    _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
+                        _showFeatureMarkerOptions = !_showFeatureMarkerOptions;
                         Draw();
                     });
-                    if(_choosingFeatureColor) {
-                        _featureMarkerColorPicker = _plugin.CreateColorPicker(featureMarkerColor, rightSide: true);
-                    }
-                    _featureMarkerLineThickness = _plugin.CreateSlider(lineThicknessFigureStorable, rightSide: true);
-                    _featureMarkerToggleLabels = _plugin.CreateToggle(showFeatureMarkerLabelsStorable, rightSide: true);
-                }
-                else {
-                    // if the left side is expanded, add some height padding
-                    if(showHeadHeightMarkersStorable.val) {
+                    _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
+                    if(_showFeatureMarkerOptions) {
+                        _featureMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: false);
+                        _featureMarkerColorButton.buttonColor = _plugin.HSVToColor(featureMarkerColor.val);
+                        _featureMarkerColorButton.button.onClick.AddListener(() => {
+                            _choosingFeatureColor = !_choosingFeatureColor;
+                            Draw();
+                        });
+                        if(_choosingFeatureColor) {
+                            _featureMarkerColorPicker = _plugin.CreateColorPicker(featureMarkerColor, rightSide: false);
+                        }
+                        _featureMarkerLineThickness = _plugin.CreateSlider(lineThicknessFigureStorable, rightSide: false);
+                        _featureMarkerToggleLabels = _plugin.CreateToggle(showFeatureMarkerLabelsStorable, rightSide: false);
+
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+
                         CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                         CreateStandardSpacer(defaultSliderHeight, rightSide: true);
                         CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+
                     }
+                    CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
                 }
-                CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
+                else {
+                    CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                    CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
+                }
+                CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
 
                 // Face Guides
                 CreateStandardDivider(rightSide: false);
+                CreateStandardDivider(rightSide: true);
                 _faceMarkerToggle = _plugin.CreateToggle(showFaceMarkersStorable, rightSide: false);
-                _faceMarkerToggle.backgroundColor = HEADER_COLOR;
+                // _faceMarkerToggle.backgroundColor = HEADER_COLOR;
                 if(showFaceMarkersStorable.val) {
-                    _faceMarkerColorButton = _plugin.CreateButton("Set Line Color");
-                    _faceMarkerColorButton.buttonColor = _plugin.HSVToColor(faceMarkerColor.val);
-                    _faceMarkerColorButton.button.onClick.AddListener(() => {
-                        _choosingFaceColor = !_choosingFaceColor;
+                    _buttons.Add(_plugin.CreateButton(_showFaceMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
+                    _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
+                        _showFaceMarkerOptions = !_showFaceMarkerOptions;
                         Draw();
                     });
-                    if(_choosingFaceColor) {
-                        _faceMarkerColorPicker = _plugin.CreateColorPicker(faceMarkerColor, rightSide: false);
+                    _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
+                    if(_showFaceMarkerOptions) {
+                        _faceMarkerColorButton = _plugin.CreateButton("Set Line Color");
+                        _faceMarkerColorButton.buttonColor = _plugin.HSVToColor(faceMarkerColor.val);
+                        _faceMarkerColorButton.button.onClick.AddListener(() => {
+                            _choosingFaceColor = !_choosingFaceColor;
+                            Draw();
+                        });
+                        if(_choosingFaceColor) {
+                            _faceMarkerColorPicker = _plugin.CreateColorPicker(faceMarkerColor, rightSide: false);
+                        }
+                        _faceMarkerLineThickness = _plugin.CreateSlider(lineThicknessFaceStorable, rightSide: false);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                        CreateStandardSpacer(defaultSliderHeight, rightSide: true);
                     }
-                    _faceMarkerLineThickness = _plugin.CreateSlider(lineThicknessFaceStorable, rightSide: false);
-                    CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                    CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
                 }
                 else {
-                    // if right side is expanded
-                    if(showCircumferenceMarkersStorable.val) {
-                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
-                        CreateStandardSpacer(defaultSliderHeight, rightSide: false);
-                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
-                    }
+                    CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                    CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
                 }
                 CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
 
                 // Circumference Guides
+                CreateStandardDivider(rightSide: false);
                 CreateStandardDivider(rightSide: true);
-                _circumferenceMarkerToggle = _plugin.CreateToggle(showCircumferenceMarkersStorable, rightSide: true);
-                _circumferenceMarkerToggle.backgroundColor = HEADER_COLOR;
+                _circumferenceMarkerToggle = _plugin.CreateToggle(showCircumferenceMarkersStorable, rightSide: false);
+                // _circumferenceMarkerToggle.backgroundColor = HEADER_COLOR;
                 if(showCircumferenceMarkersStorable.val) {
-                    _circumferenceMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: true);
-                    _circumferenceMarkerColorButton.buttonColor = _plugin.HSVToColor(circumferenceMarkerColor.val);
-                    _circumferenceMarkerColorButton.button.onClick.AddListener(() => {
-                        _choosingCircumferenceColor = !_choosingCircumferenceColor;
+                    _buttons.Add(_plugin.CreateButton(_showCircumferenceMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
+                    _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
+                        _showCircumferenceMarkerOptions = !_showCircumferenceMarkerOptions;
                         Draw();
                     });
-                    if(_choosingCircumferenceColor) {
-                        _circumferenceMarkerColorPicker = _plugin.CreateColorPicker(circumferenceMarkerColor, rightSide: true);
-                    }
-                    _circumferenceMarkerLineThickness = _plugin.CreateSlider(lineThicknessCircumferenceStorable, rightSide: true);
-                    CreateStandardSpacer(defaultButtonHeight, rightSide: true);
-                }
-                else {
-                    // if the left side is expanded, add some height padding
-                    if(showFaceMarkersStorable.val) {
+                    _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
+                    if(_showCircumferenceMarkerOptions) {
+                        _circumferenceMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: false);
+                        _circumferenceMarkerColorButton.buttonColor = _plugin.HSVToColor(circumferenceMarkerColor.val);
+                        _circumferenceMarkerColorButton.button.onClick.AddListener(() => {
+                            _choosingCircumferenceColor = !_choosingCircumferenceColor;
+                            Draw();
+                        });
+                        if(_choosingCircumferenceColor) {
+                            _circumferenceMarkerColorPicker = _plugin.CreateColorPicker(circumferenceMarkerColor, rightSide: false);
+                        }
+                        _circumferenceMarkerLineThickness = _plugin.CreateSlider(lineThicknessCircumferenceStorable, rightSide: false);
                         CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                         CreateStandardSpacer(defaultSliderHeight, rightSide: true);
-                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                     }
+                    CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
                 }
-                CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
+                else {
+                    CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                    CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
+                }
+                CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
+
+                // Age Guides
+                if(experimentalModeStorable.val || showAgeMarkersStorable.val) {
+                    CreateStandardDivider(rightSide: true);
+                    CreateStandardDivider(rightSide: false);
+                    _ageMarkerToggle = _plugin.CreateToggle(showAgeMarkersStorable, rightSide: false);
+                    CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                }
+
 
                 // Proportion Guides
                 CreateStandardDivider(rightSide: false);
+                CreateStandardDivider(rightSide: true);
                 _proportionMarkerToggle = _plugin.CreateToggle(showProportionMarkersStorable, rightSide: false);
-                _proportionMarkerToggle.backgroundColor = HEADER_COLOR;
+                // _proportionMarkerToggle.backgroundColor = HEADER_COLOR;
                 if(showProportionMarkersStorable.val) {
-                    var selectedProportion = ProportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(proportionSelectionStorable.val));
+                    _buttons.Add(_plugin.CreateButton(_showProportionMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
+                    _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
+                        _showProportionMarkerOptions = !_showProportionMarkerOptions;
+                        Draw();
+                    });
+                    _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
+                    if(_showProportionMarkerOptions) {
+                        var selectedProportion = ProportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(proportionSelectionStorable.val));
 
-                    proportionSelectionStorable.choices = ProportionTemplateNames();
-                    proportionSelectionStorable.displayChoices = proportionSelectionStorable.choices;
-                    proportionSelectionStorable.val = selectedProportion?.ProportionName ?? "Auto Detect";
+                        proportionSelectionStorable.choices = ProportionTemplateNames();
+                        proportionSelectionStorable.displayChoices = proportionSelectionStorable.choices;
+                        proportionSelectionStorable.val = selectedProportion?.ProportionName ?? "Auto Detect";
 
 
-                    if(_editingProportion || _creatingProportion) {
-                        if(_preEditProportion == null) {
-                            _preEditProportion = selectedProportion.Clone();
-                        }
-                        _proportionEditName =
-                            CreateTextInput(new JSONStorableString("Name", selectedProportion.ProportionName));
-                        _proportionEditIsFemale =
-                            _plugin.CreateToggle(new JSONStorableBool("Female?", selectedProportion.IsFemale, (value) => {
-                                selectedProportion.IsFemale = value;
-                            }));
-                        _proportionEditHeight = 
-                            _plugin.CreateSlider(new JSONStorableFloat("Height in Heads", selectedProportion.FigureHeightInHeads, (value) => {
-                                selectedProportion.FigureHeightInHeads = value;
-                            }, 0, 10));
-                        _proportionEditChin = 
-                            _plugin.CreateSlider(new JSONStorableFloat("Chin to Shoulder", selectedProportion.FigureChinToShoulder, (value) => {
-                                selectedProportion.FigureChinToShoulder = value;
-                            }, 0, 10));
-                        _proportionEditShoulderWidth = 
-                            _plugin.CreateSlider(new JSONStorableFloat("Shoulder Width", selectedProportion.FigureShoulderWidth, (value) => {
-                                selectedProportion.FigureShoulderWidth = value;
-                            }, 0, 10));
-                        _proportionEditArms = 
-                             _plugin.CreateSlider(new JSONStorableFloat("Full Arm Length", selectedProportion.FigureLengthOfUpperLimb, (value) => {
-                                selectedProportion.FigureLengthOfUpperLimb = value;
-                            }, 0, 10));
-                        _proportionEditNipples = 
-                            _plugin.CreateSlider(new JSONStorableFloat("Shoulder to Nipples", selectedProportion.FigureShoulderToNipples, (value) => {
-                                selectedProportion.FigureShoulderToNipples = value;
-                            }, 0, 10));
-                        _proportionEditNavel = 
-                            _plugin.CreateSlider(new JSONStorableFloat("Shoulder to Navel", selectedProportion.FigureShoulderToNavel, (value) => {
-                                selectedProportion.FigureShoulderToNavel = value;
-                            }, 0, 10));
-                        _proportionEditCrotch =
-                            _plugin.CreateSlider(new JSONStorableFloat("Shoulder to Crotch", selectedProportion.FigureShoulderToCrotch, (value) => {
-                                selectedProportion.FigureShoulderToCrotch = value;
-                            }, 0, 10));
-                        _proportionEditLegs = 
-                             _plugin.CreateSlider(new JSONStorableFloat("Full Leg Length", selectedProportion.FigureLengthOfLowerLimb, (value) => {
-                                selectedProportion.FigureLengthOfLowerLimb = value;
-                            }, 0, 10));
-                        _proportionEditKnee = 
-                            _plugin.CreateSlider(new JSONStorableFloat("Crotch to Knee", selectedProportion.FigureCrotchToBottomOfKnees, (value) => {
-                                selectedProportion.FigureCrotchToBottomOfKnees = value;
-                            }, 0, 10));
-                        _proportionEditHeel = 
-                            _plugin.CreateSlider(new JSONStorableFloat("Knee to Heel", selectedProportion.FigureBottomOfKneesToHeels, (value) => {
-                                selectedProportion.FigureBottomOfKneesToHeels = value;
-                            }, 0, 10));
+                        if(_editingProportion || _creatingProportion) {
+                            if(_preEditProportion == null) {
+                                _preEditProportion = selectedProportion.Clone();
+                            }
+                            _proportionEditName =
+                                CreateTextInput(new JSONStorableString("Name", selectedProportion.ProportionName));
+                            CreateStandardSpacer(_proportionEditName.height, rightSide: true);
+                            _proportionEditIsFemale =
+                                _plugin.CreateToggle(new JSONStorableBool("Female?", selectedProportion.IsFemale, (value) => {
+                                    selectedProportion.IsFemale = value;
+                                }));
+                            CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                            _proportionEditHeight = 
+                                _plugin.CreateSlider(new JSONStorableFloat("Height in Heads", selectedProportion.FigureHeightInHeads, (value) => {
+                                    selectedProportion.FigureHeightInHeads = value;
+                                }, 0, 10));
+                            CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                            _proportionEditChin = 
+                                _plugin.CreateSlider(new JSONStorableFloat("Chin to Shoulder", selectedProportion.FigureChinToShoulder, (value) => {
+                                    selectedProportion.FigureChinToShoulder = value;
+                                }, 0, 10));
+                            CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                            _proportionEditShoulderWidth = 
+                                _plugin.CreateSlider(new JSONStorableFloat("Shoulder Width", selectedProportion.FigureShoulderWidth, (value) => {
+                                    selectedProportion.FigureShoulderWidth = value;
+                                }, 0, 10));
+                            CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                            _proportionEditArms = 
+                                _plugin.CreateSlider(new JSONStorableFloat("Full Arm Length", selectedProportion.FigureLengthOfUpperLimb, (value) => {
+                                    selectedProportion.FigureLengthOfUpperLimb = value;
+                                }, 0, 10));
+                            CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                            _proportionEditNipples = 
+                                _plugin.CreateSlider(new JSONStorableFloat("Shoulder to Nipples", selectedProportion.FigureShoulderToNipples, (value) => {
+                                    selectedProportion.FigureShoulderToNipples = value;
+                                }, 0, 10));
+                            CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                            _proportionEditNavel = 
+                                _plugin.CreateSlider(new JSONStorableFloat("Shoulder to Navel", selectedProportion.FigureShoulderToNavel, (value) => {
+                                    selectedProportion.FigureShoulderToNavel = value;
+                                }, 0, 10));
+                            CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                            _proportionEditCrotch =
+                                _plugin.CreateSlider(new JSONStorableFloat("Shoulder to Crotch", selectedProportion.FigureShoulderToCrotch, (value) => {
+                                    selectedProportion.FigureShoulderToCrotch = value;
+                                }, 0, 10));
+                            CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                            _proportionEditLegs = 
+                                _plugin.CreateSlider(new JSONStorableFloat("Full Leg Length", selectedProportion.FigureLengthOfLowerLimb, (value) => {
+                                    selectedProportion.FigureLengthOfLowerLimb = value;
+                                }, 0, 10));
+                            CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                            _proportionEditKnee = 
+                                _plugin.CreateSlider(new JSONStorableFloat("Crotch to Knee", selectedProportion.FigureCrotchToBottomOfKnees, (value) => {
+                                    selectedProportion.FigureCrotchToBottomOfKnees = value;
+                                }, 0, 10));
+                            CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                            _proportionEditHeel = 
+                                _plugin.CreateSlider(new JSONStorableFloat("Knee to Heel", selectedProportion.FigureBottomOfKneesToHeels, (value) => {
+                                    selectedProportion.FigureBottomOfKneesToHeels = value;
+                                }, 0, 10));
+                            CreateStandardSpacer(defaultSliderHeight, rightSide: true);
 
-                        if(experimentalModeStorable.val || showAgeMarkersStorable.val){
-                            JSONStorableFloat minStorable = new JSONStorableFloat("Age Estimage Min", selectedProportion.EstimatedAgeRangeMin, 0, 100);
-                            minStorable.setCallbackFunction = (value) => {
-                                selectedProportion.EstimatedAgeRangeMin = (int)Math.Floor(value);
-                                if(selectedProportion.EstimatedAgeRangeMin > selectedProportion.EstimatedAgeRangeMax) {
-                                    selectedProportion.EstimatedAgeRangeMin = selectedProportion.EstimatedAgeRangeMax;
+                            if(experimentalModeStorable.val || showAgeMarkersStorable.val){
+                                JSONStorableFloat minStorable = new JSONStorableFloat("Age Estimage Min", selectedProportion.EstimatedAgeRangeMin, 0, 100);
+                                minStorable.setCallbackFunction = (value) => {
+                                    selectedProportion.EstimatedAgeRangeMin = (int)Math.Floor(value);
+                                    if(selectedProportion.EstimatedAgeRangeMin > selectedProportion.EstimatedAgeRangeMax) {
+                                        selectedProportion.EstimatedAgeRangeMin = selectedProportion.EstimatedAgeRangeMax;
+                                    }
+                                    if(minStorable != null) {
+                                        minStorable.valNoCallback = (float)selectedProportion.EstimatedAgeRangeMin;
+                                    }
+                                };
+                                _proportionEditAgeMin = _plugin.CreateSlider(minStorable);
+                                CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+
+                                JSONStorableFloat maxStorable = new JSONStorableFloat("Age Estimage Max", selectedProportion.EstimatedAgeRangeMax, 0, 100);
+                                maxStorable.setCallbackFunction = (value) => {
+                                    selectedProportion.EstimatedAgeRangeMax = (int)Math.Floor(value);
+                                    if(selectedProportion.EstimatedAgeRangeMax < selectedProportion.EstimatedAgeRangeMin) {
+                                        selectedProportion.EstimatedAgeRangeMax = selectedProportion.EstimatedAgeRangeMin;
+                                    }
+                                    if(maxStorable != null) {
+                                        maxStorable.valNoCallback = (float)selectedProportion.EstimatedAgeRangeMax;
+                                    }
+                                };
+                                _proportionEditAgeMax = _plugin.CreateSlider(maxStorable);
+                                CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                            }
+
+                            _proportionCancelButton = _plugin.CreateButton("Cancel");
+                            _proportionCancelButton.buttonColor = Color.red;
+                            _proportionCancelButton.button.onClick.AddListener(() => {
+                                try {
+                                    if(_editingProportion) {
+                                        selectedProportion.ProportionName = _preEditProportion.ProportionName;
+                                        selectedProportion.IsFemale = _preEditProportion.IsFemale;
+                                        selectedProportion.FigureHeightInHeads = _preEditProportion.FigureHeightInHeads;
+                                        selectedProportion.FigureChinToShoulder = _preEditProportion.FigureChinToShoulder;
+                                        selectedProportion.FigureShoulderWidth = _preEditProportion.FigureShoulderWidth;
+                                        selectedProportion.FigureShoulderToNipples = _preEditProportion.FigureShoulderToNipples;
+                                        selectedProportion.FigureShoulderToNavel = _preEditProportion.FigureShoulderToNavel;
+                                        selectedProportion.FigureShoulderToCrotch = _preEditProportion.FigureShoulderToCrotch;
+                                        selectedProportion.FigureCrotchToBottomOfKnees = _preEditProportion.FigureCrotchToBottomOfKnees;
+                                        selectedProportion.FigureLengthOfLowerLimb = _preEditProportion.FigureLengthOfLowerLimb;
+                                        selectedProportion.FigureLengthOfUpperLimb = _preEditProportion.FigureLengthOfUpperLimb;
+                                        selectedProportion.FigureBottomOfKneesToHeels = _preEditProportion.FigureBottomOfKneesToHeels;
+                                        selectedProportion.EstimatedAgeRangeMin = _preEditProportion.EstimatedAgeRangeMin;
+                                        selectedProportion.EstimatedAgeRangeMax = _preEditProportion.EstimatedAgeRangeMax;
+                                    }
+
+                                    if(_creatingProportion) {
+                                        proportionSelectionStorable.val = "Auto Detect"; // select auto
+                                        _proportionTemplates = ProportionTemplates.Where(p => !p.ProportionName.Equals("-- New --")).ToList(); // do not trigger a Draw using the public property
+                                    }
+
+                                    _editingProportion = false;
+                                    _creatingProportion = false;
+                                    _preEditProportion = (Proportions)null;
+                                    Draw();
                                 }
-                                if(minStorable != null) {
-                                    minStorable.valNoCallback = (float)selectedProportion.EstimatedAgeRangeMin;
+                                catch(Exception e) {
+                                    SuperController.LogError($"{e}");
                                 }
-                            };
-                            _proportionEditAgeMin = _plugin.CreateSlider(minStorable);
+                            });
+                            CreateStandardSpacer(defaultButtonHeight, rightSide: true);
 
-                            JSONStorableFloat maxStorable = new JSONStorableFloat("Age Estimage Max", selectedProportion.EstimatedAgeRangeMax, 0, 100);
-                            maxStorable.setCallbackFunction = (value) => {
-                                selectedProportion.EstimatedAgeRangeMax = (int)Math.Floor(value);
-                                if(selectedProportion.EstimatedAgeRangeMax < selectedProportion.EstimatedAgeRangeMin) {
-                                    selectedProportion.EstimatedAgeRangeMax = selectedProportion.EstimatedAgeRangeMin;
+                            _proportionSaveButton = _plugin.CreateButton(_creatingProportion ? "Create" : "Save");
+                            _proportionSaveButton.buttonColor = Color.green;
+                            _proportionSaveButton.button.onClick.AddListener(() => {
+                                if(_preEditProportion != null) {
+                                    selectedProportion.ProportionName = _proportionEditName.text;
+                                    proportionSelectionStorable.val = selectedProportion.ProportionName;
                                 }
-                                if(maxStorable != null) {
-                                    maxStorable.valNoCallback = (float)selectedProportion.EstimatedAgeRangeMax;
-                                }
-                            };
-                            _proportionEditAgeMax = _plugin.CreateSlider(maxStorable);
-                        }
-
-                        _proportionCancelButton = _plugin.CreateButton("Cancel");
-                        _proportionCancelButton.buttonColor = Color.red;
-                        _proportionCancelButton.button.onClick.AddListener(() => {
-                            try {
-                                if(_editingProportion) {
-                                    selectedProportion.ProportionName = _preEditProportion.ProportionName;
-                                    selectedProportion.IsFemale = _preEditProportion.IsFemale;
-                                    selectedProportion.FigureHeightInHeads = _preEditProportion.FigureHeightInHeads;
-                                    selectedProportion.FigureChinToShoulder = _preEditProportion.FigureChinToShoulder;
-                                    selectedProportion.FigureShoulderWidth = _preEditProportion.FigureShoulderWidth;
-                                    selectedProportion.FigureShoulderToNipples = _preEditProportion.FigureShoulderToNipples;
-                                    selectedProportion.FigureShoulderToNavel = _preEditProportion.FigureShoulderToNavel;
-                                    selectedProportion.FigureShoulderToCrotch = _preEditProportion.FigureShoulderToCrotch;
-                                    selectedProportion.FigureCrotchToBottomOfKnees = _preEditProportion.FigureCrotchToBottomOfKnees;
-                                    selectedProportion.FigureLengthOfLowerLimb = _preEditProportion.FigureLengthOfLowerLimb;
-                                    selectedProportion.FigureLengthOfUpperLimb = _preEditProportion.FigureLengthOfUpperLimb;
-                                    selectedProportion.FigureBottomOfKneesToHeels = _preEditProportion.FigureBottomOfKneesToHeels;
-                                    selectedProportion.EstimatedAgeRangeMin = _preEditProportion.EstimatedAgeRangeMin;
-                                    selectedProportion.EstimatedAgeRangeMax = _preEditProportion.EstimatedAgeRangeMax;
-                                }
-
-                                if(_creatingProportion) {
-                                    proportionSelectionStorable.val = "Auto Detect"; // select auto
-                                    _proportionTemplates = ProportionTemplates.Where(p => !p.ProportionName.Equals("-- New --")).ToList(); // do not trigger a Draw using the public property
-                                }
-
                                 _editingProportion = false;
                                 _creatingProportion = false;
                                 _preEditProportion = (Proportions)null;
                                 Draw();
-                            }
-                            catch(Exception e) {
-                                SuperController.LogError($"{e}");
-                            }
-                        });
+                            });
+                            CreateStandardSpacer(defaultButtonHeight, rightSide: true);
 
-                        _proportionSaveButton = _plugin.CreateButton(_creatingProportion ? "Create" : "Save");
-                        _proportionSaveButton.buttonColor = Color.green;
-                        _proportionSaveButton.button.onClick.AddListener(() => {
-                            if(_preEditProportion != null) {
-                                selectedProportion.ProportionName = _proportionEditName.text;
-                                proportionSelectionStorable.val = selectedProportion.ProportionName;
-                            }
-                            _editingProportion = false;
-                            _creatingProportion = false;
-                            _preEditProportion = (Proportions)null;
-                            Draw();
-                        });
+                            CreateStandardSpacer(14, rightSide: true);
 
-                    }
-                    else {
-                        _proportionMarkerColorButton = _plugin.CreateButton("Set Line Color");
-                        _proportionMarkerColorButton.buttonColor = _plugin.HSVToColor(proportionMarkerColor.val);
-                        _proportionMarkerColorButton.button.onClick.AddListener(() => {
-                            _choosingProportionColor = !_choosingProportionColor;
-                            Draw();
-                        });
-                        if(_choosingProportionColor) {
-                            _proportionMarkerColorPicker = _plugin.CreateColorPicker(proportionMarkerColor, rightSide: false);
                         }
-                        _proportionMarkerLineThickness = _plugin.CreateSlider(lineThicknessProportionStorable, rightSide: false);
-
-                        _proportionSelection = _plugin.CreateScrollablePopup(proportionSelectionStorable, rightSide: false);
-                        _proportionSelection.popup.onValueChangeHandlers += (e) => {
-                            Draw();
-                        };
-
-                        // proportion action buttons
-                        if(selectedProportion != null) {
-                            _proportionEditButton = _plugin.CreateButton("Edit Selected Proportions", rightSide: false);
-                            _proportionEditButton.button.onClick.AddListener(() => {
-                                _creatingProportion = false;
-                                _editingProportion = true;
+                        else {
+                            _proportionMarkerColorButton = _plugin.CreateButton("Set Line Color");
+                            _proportionMarkerColorButton.buttonColor = _plugin.HSVToColor(proportionMarkerColor.val);
+                            _proportionMarkerColorButton.button.onClick.AddListener(() => {
+                                _choosingProportionColor = !_choosingProportionColor;
                                 Draw();
                             });
-                        }
-                        if(selectedProportion != null) {
-                            _proportionDeleteButton = _plugin.CreateButton("Delete Selected Proportions", rightSide: false);
-                            _proportionDeleteButton.buttonColor = Color.red;
-                            _proportionDeleteButton.button.onClick.AddListener(() => {
-                                proportionSelectionStorable.val = "Auto Detect"; // select auto
-                                ProportionTemplates = ProportionTemplates.Where(p => !p.ProportionName.Equals(selectedProportion.ProportionName)).ToList();
+                            CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+
+                            if(_choosingProportionColor) {
+                                _proportionMarkerColorPicker = _plugin.CreateColorPicker(proportionMarkerColor, rightSide: false);
+                                CreateStandardSpacer(_proportionMarkerColorPicker.height, rightSide: true);
+                            }
+                            _proportionMarkerLineThickness = _plugin.CreateSlider(lineThicknessProportionStorable, rightSide: false);
+                            CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+
+                            _proportionSelection = _plugin.CreateScrollablePopup(proportionSelectionStorable, rightSide: false);
+                            _proportionSelection.popup.onValueChangeHandlers += (e) => {
+                                Draw();
+                            };
+                            CreateStandardSpacer(_proportionSelection.height, rightSide: true);
+
+                            // proportion action buttons
+                            if(selectedProportion != null) {
+                                _proportionEditButton = _plugin.CreateButton("Edit Selected Proportions", rightSide: false);
+                                _proportionEditButton.button.onClick.AddListener(() => {
+                                    _creatingProportion = false;
+                                    _editingProportion = true;
+                                    Draw();
+                                });
+                                CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                            }
+                            if(selectedProportion != null) {
+                                _proportionDeleteButton = _plugin.CreateButton("Delete Selected Proportions", rightSide: false);
+                                _proportionDeleteButton.buttonColor = Color.red;
+                                _proportionDeleteButton.button.onClick.AddListener(() => {
+                                    proportionSelectionStorable.val = "Auto Detect"; // select auto
+                                    ProportionTemplates = ProportionTemplates.Where(p => !p.ProportionName.Equals(selectedProportion.ProportionName)).ToList();
+                                    Draw();
+                                });
+                                CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                            }
+                            _proportionAddButton = _plugin.CreateButton("New Proportions", rightSide: false);
+                            _proportionAddButton.button.onClick.AddListener(() => {
+                                var newName = "-- New --";
+                                var newProportion = selectedProportion ?? ProportionTemplates.First() ?? new Proportions(); // copy selected, or the first one, or start over
+                                newProportion.ProportionName = newName;
+
+                                ProportionTemplates = ProportionTemplates.Concat(new List<Proportions>{ newProportion }).ToList();
+                                proportionSelectionStorable.val = newName;
+
+                                _creatingProportion = true;
+                                _editingProportion = false;
                                 Draw();
                             });
+                            CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                         }
-                        _proportionAddButton = _plugin.CreateButton("New Proportions", rightSide: false);
-                        _proportionAddButton.button.onClick.AddListener(() => {
-                            var newName = "-- New --";
-                            var newProportion = selectedProportion ?? ProportionTemplates.First() ?? new Proportions(); // copy selected, or the first one, or start over
-                            newProportion.ProportionName = newName;
-
-                            ProportionTemplates = ProportionTemplates.Concat(new List<Proportions>{ newProportion }).ToList();
-                            proportionSelectionStorable.val = newName;
-
-                            _creatingProportion = true;
-                            _editingProportion = false;
-                            Draw();
-                        });
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                     }
-                    CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                 }
-                CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
+                else {
+                    CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                }
+            }
+
+            CreateStandardDivider(rightSide: true);
+            CreateStandardDivider(rightSide: false);
+            _manualMarkerToggle = _plugin.CreateToggle(showManualMarkersStorable, rightSide: false);
+            if(showManualMarkersStorable.val) {
+                _buttons.Add(_plugin.CreateButton(_showManualMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
+                _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
+                    _showManualMarkerOptions = !_showManualMarkerOptions;
+                    Draw();
+                });
+                _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
+
+                if(_showManualMarkerOptions) {
+                    if(_plugin.containingAtom.type == "Person") {
+                        _copyManualMarkers = _plugin.CreateToggle(manualMarkersCopy, rightSide: false);
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                    }
+                    _manualMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: false);
+                    _manualMarkerColorButton.buttonColor = _plugin.HSVToColor(manualMarkerColor.val);
+                    _manualMarkerColorButton.button.onClick.AddListener(() => {
+                        _choosingManualColor = !_choosingManualColor;
+                        Draw();
+                    });
+                    CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                    if(_choosingManualColor) {
+                        _manualMarkerColorPicker = _plugin.CreateColorPicker(manualMarkerColor, rightSide: false);
+                        CreateStandardSpacer(_manualMarkerColorPicker.height, rightSide: true);
+                    }
+                    _manualMarkerLineThickness = _plugin.CreateSlider(lineThicknessManualStorable, rightSide: false);
+                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    _manualSliders.Add(_plugin.CreateSlider(manualHeightStorable, rightSide: false));
+                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    _manualSliders.Add(_plugin.CreateSlider(manualChinHeightStorable, rightSide: false));
+                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    _manualSliders.Add(_plugin.CreateSlider(manualShoulderHeightStorable, rightSide: false));
+                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    _manualSliders.Add(_plugin.CreateSlider(manualNippleHeightStorable, rightSide: false));
+                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    _manualSliders.Add(_plugin.CreateSlider(manualUnderbustHeightStorable, rightSide: false));
+                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    _manualSliders.Add(_plugin.CreateSlider(manualNavelHeightStorable, rightSide: false));
+                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    _manualSliders.Add(_plugin.CreateSlider(manualCrotchHeightStorable, rightSide: false));
+                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    _manualSliders.Add(_plugin.CreateSlider(manualKneeBottomHeightStorable, rightSide: false));
+                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                }
+            }
+            else {
+                CreateStandardSpacer(defaultButtonHeight, rightSide: true);
             }
 
             if(_plugin.containingAtom.type == "Person") {
                 CreateStandardDivider(rightSide: false);
+                CreateStandardDivider(rightSide: true);
+                CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                 _targetHeadRatioToggle = _plugin.CreateToggle(showTargetHeadRatioStorable, rightSide: false);
-                _targetHeadRatioSlider = _plugin.CreateSlider(targetHeadRatioStorable, rightSide: false);
-                _targetHeadRatioMorph = _plugin.CreateScrollablePopup(targetHeadRatioMorphStorable, rightSide: false);
+                if(showTargetHeadRatioStorable.val) {
+                    _targetHeadRatioSlider = _plugin.CreateSlider(targetHeadRatioStorable, rightSide: false);
+                    _targetHeadRatioMorph = _plugin.CreateScrollablePopup(targetHeadRatioMorphStorable, rightSide: true);
+                    CreateStandardSpacer(5, rightSide: true);
+                }
+            }
+
+
+            CreateStandardDivider(rightSide: false);
+            CreateStandardDivider(rightSide: true);
+
+            if(_plugin.containingAtom.type == "Person") {
+                _cupAlgorithm = _plugin.CreateScrollablePopup(cupAlgorithmStorable, rightSide: false);
+                _units = _plugin.CreateScrollablePopup(unitsStorable, rightSide: true);
             }
 
             CreateStandardDivider(rightSide: false);
-            if(_plugin.containingAtom.type == "Person") {
-                _cupAlgorithm = _plugin.CreateScrollablePopup(cupAlgorithmStorable, rightSide: false);
-                _units = _plugin.CreateScrollablePopup(unitsStorable, rightSide: false);
-            }
-            _markerSpread = _plugin.CreateSlider(markerSpreadStorable, rightSide: false);
-            _markerFrontBack = _plugin.CreateSlider(markerFrontBackStorable, rightSide: false);
-            _markerLeftRight = _plugin.CreateSlider(markerLeftRightStorable, rightSide: false);
-            _markerUpDown = _plugin.CreateSlider(markerUpDownStorable, rightSide: false);
-            _hideDocs = _plugin.CreateToggle(hideDocsStorable, rightSide: false);
-
-            if(experimentalModeStorable.val || showAgeMarkersStorable.val) {
-                CreateStandardDivider(rightSide: true);
-                _ageMarkerToggle = _plugin.CreateToggle(showAgeMarkersStorable, rightSide: true);
-                _ageMarkerToggle.backgroundColor = HEADER_COLOR;
-            }
-
             CreateStandardDivider(rightSide: true);
-            _manualMarkerToggle = _plugin.CreateToggle(showManualMarkersStorable, rightSide: true);
-            _manualMarkerToggle.backgroundColor = HEADER_COLOR;
-            if(showManualMarkersStorable.val) {
-                if(_plugin.containingAtom.type == "Person") {
-                    _copyManualMarkers = _plugin.CreateToggle(manualMarkersCopy, rightSide: true);
-                }
-                _manualMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: true);
-                _manualMarkerColorButton.buttonColor = _plugin.HSVToColor(manualMarkerColor.val);
-                _manualMarkerColorButton.button.onClick.AddListener(() => {
-                    _choosingManualColor = !_choosingManualColor;
-                    Draw();
-                });
-                if(_choosingManualColor) {
-                    _manualMarkerColorPicker = _plugin.CreateColorPicker(manualMarkerColor, rightSide: true);
-                }
-                _manualMarkerLineThickness = _plugin.CreateSlider(lineThicknessManualStorable, rightSide: true);
-                _manualSliders.Add(_plugin.CreateSlider(manualHeightStorable, rightSide: true));
-                _manualSliders.Add(_plugin.CreateSlider(manualChinHeightStorable, rightSide: true));
-                _manualSliders.Add(_plugin.CreateSlider(manualShoulderHeightStorable, rightSide: true));
-                _manualSliders.Add(_plugin.CreateSlider(manualNippleHeightStorable, rightSide: true));
-                _manualSliders.Add(_plugin.CreateSlider(manualUnderbustHeightStorable, rightSide: true));
-                _manualSliders.Add(_plugin.CreateSlider(manualNavelHeightStorable, rightSide: true));
-                _manualSliders.Add(_plugin.CreateSlider(manualCrotchHeightStorable, rightSide: true));
-                _manualSliders.Add(_plugin.CreateSlider(manualKneeBottomHeightStorable, rightSide: true));
-            }
+
+
+            _markerSpread = _plugin.CreateSlider(markerSpreadStorable, rightSide: false);
+            _markerFrontBack = _plugin.CreateSlider(markerFrontBackStorable, rightSide: true);
+            _markerLeftRight = _plugin.CreateSlider(markerLeftRightStorable, rightSide: false);
+            _markerUpDown = _plugin.CreateSlider(markerUpDownStorable, rightSide: true);
+
+            CreateStandardDivider(rightSide: false);
+            CreateStandardDivider(rightSide: true);
+
+            _hideDocs = _plugin.CreateToggle(hideDocsStorable, rightSide: false);
+            CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+
         }
 
         public void Clear() {
+            foreach(var b in _buttons) {
+                _plugin.RemoveButton(b);
+            }
+            _buttons = new List<UIDynamicButton>();
+
             foreach(var spacer in _spacerList) {
                 _plugin.RemoveSpacer(spacer);
             }
