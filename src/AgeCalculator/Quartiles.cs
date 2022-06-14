@@ -143,7 +143,7 @@ public class Quartiles {
                 }
             }
             catch(Exception e) {
-                SuperController.LogMessage($"{e}");
+                SuperController.LogError($"Failed to calculate combined age score: {e}");
             }
         }
         return null;
