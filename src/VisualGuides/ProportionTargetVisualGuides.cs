@@ -121,7 +121,7 @@ namespace LFE {
             _markerArmLength.Label = $"Arm - Target {targetProportion.FigureLengthOfUpperLimb} h.u.";
             SetMainMarkerProperties(_markerArmLength, armLength);
             _markerArmLength.Length = armLength;
-            _markerArmLength.transform.position = parentRotEuler * new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(Offset.x + OffsetSpread.x + actualShoulderWidth/2 + 0.20f, Offset.y, Offset.z) + parentPos;
+            _markerArmLength.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(Offset.x + OffsetSpread.x + actualShoulderWidth/2 + 0.20f, Offset.y, Offset.z)) + parentPos;
             _markerArmLength.LineDirection = Vector3.down;
             _markerArmLength.Enabled = _markerArmLength.Enabled && ShowArm;
 
