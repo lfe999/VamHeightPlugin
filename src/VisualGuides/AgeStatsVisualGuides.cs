@@ -52,9 +52,14 @@ namespace LFE {
                 var heightQuartiles = ageFromHeight?.Quartiles;
                 var headQuartiles = ageFromHead?.Quartiles;
                 var proportionQuartiles = TargetProportion?.Quartiles;
+                // SuperController.LogMessage($"{heightQuartiles}");
+                // SuperController.LogMessage($"{headQuartiles}");
+                // SuperController.LogMessage($"{proportionQuartiles}");
 
                 var quartiles = new List<Quartiles>() { heightQuartiles, headQuartiles, proportionQuartiles };
                 var overlapQuartiles = Quartiles.GroupOverlapQuartile(quartiles);
+
+                // SuperController.LogMessage($"{overlapQuartiles}");
 
                 int? minAge = (int?)Quartiles.GroupMin(quartiles);
                 int? maxAge = (int?)Quartiles.GroupMax(quartiles);
@@ -63,20 +68,23 @@ namespace LFE {
 
                 int currentRow = 0;
                 var height = UnitUtils.ToUnitString(Measurements.Height??0, UnitDisplay);
-                if(RenderRow(currentRow, heightQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Height Age Guess {heightQuartiles.RangeString} ({height}) From CDC Growth Charts - Caution: UNRELIABLE" : $"Height Age Guess {heightQuartiles.RangeString} ({height})")) {
+                if(RenderRow(currentRow, heightQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Height Age Guess {heightQuartiles.RangeString} ({height}) - From CDC Growth Charts" : $"Height Age Guess {heightQuartiles.RangeString} ({height})")) {
                     currentRow++;
                 }
                 var heightInHeads = (Measurements.Height??0) / (Measurements.HeadHeight??1);
-                if(RenderRow(currentRow, headQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Head Proportion Age Guess {headQuartiles.RangeString} ({heightInHeads:0.0} heads) From CDC Growth Charts - Caution: UNRELIABLE" : $"Head Proportion Age Guess {headQuartiles.RangeString} ({heightInHeads:0.0} heads)")) {
+                if(RenderRow(currentRow, headQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Head Proportion Age Guess {headQuartiles.RangeString} ({heightInHeads:0.0} heads) - From CDC Growth Charts" : $"Head Proportion Age Guess {headQuartiles.RangeString} ({heightInHeads:0.0} heads)")) {
                     currentRow++;
                 }
                 var proportionName = TargetProportion?.ProportionName ?? "none";
-                if(RenderRow(currentRow, proportionQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Body Proportion Age Guess {proportionQuartiles.RangeString} ({proportionName}) From anatomy4sculptors.com Or User Created Custom Proportions - Caution: UNRELIABLE" : $"Body Proportion Age Guess {proportionQuartiles.RangeString} ({proportionName})")) {
+                if(RenderRow(currentRow, proportionQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Body Proportion Age Guess {proportionQuartiles.RangeString} ({proportionName}) - From anatomy4sculptors.com Or User Created Custom Proportions" : $"Body Proportion Age Guess {proportionQuartiles.RangeString} ({proportionName})")) {
                     currentRow++;
                 }
-                if(RenderRow(currentRow, overlapQuartiles, width, minAge.Value, maxAge.Value, Color.yellow, transform, ShowDocumentation ? $"Age Guess {overlapQuartiles.RangeString} - Caution: UNRELIABLE" : $"Age Guess {overlapQuartiles.RangeString}")) {
-                    currentRow++;
+                if(overlapQuartiles != null) {
+                    if(RenderRow(currentRow, overlapQuartiles, width, minAge.Value, maxAge.Value, Color.yellow, transform, ShowDocumentation ? $"Age Guess {overlapQuartiles.RangeString} - Combined From All Other Guesses" : $"Age Guess {overlapQuartiles.RangeString}")) {
+                        currentRow++;
+                    }
                 }
+
             }
         }
 

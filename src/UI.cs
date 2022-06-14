@@ -23,7 +23,10 @@ namespace LFE {
             set { _proportionTemplates = value ?? new List<Proportions>(); Draw(); }
         }
 
-        private static Color OPTIONS_COLOR = new Color(1, 1, 1, 0.10f);
+        private static Color HEADER_COLOR = new Color(0.5f, 0f, 0.5f, 0.65f);
+        private static Color HEADER_TEXT_COLOR = Color.white;
+        private static Color OPTIONS_COLOR = HEADER_COLOR;
+        private static Color OPTIONS_TEXT_COLOR = HEADER_TEXT_COLOR;
         private static Color SPACER_COLOR = new Color(0, 0, 0, 0.5f);
 
         private readonly HeightMeasurePlugin _plugin;
@@ -663,6 +666,8 @@ namespace LFE {
             if(_plugin.containingAtom.type == "Person") {
                 // Head Height Guides
                 _headMarkerToggle = _plugin.CreateToggle(showHeadHeightMarkersStorable, rightSide: false);
+                _headMarkerToggle.backgroundColor = HEADER_COLOR;
+                _headMarkerToggle.textColor = HEADER_TEXT_COLOR;
                 if(showHeadHeightMarkersStorable.val) {
                     _buttons.Add(_plugin.CreateButton(_showHeadMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
                     _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
@@ -670,6 +675,7 @@ namespace LFE {
                         Draw();
                     });
                     _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
+                    _buttons[_buttons.Count - 1].textColor = OPTIONS_TEXT_COLOR;
 
                     if(_showHeadMarkerOptions) {
                         _headMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: false);
@@ -702,6 +708,8 @@ namespace LFE {
                 CreateStandardDivider(rightSide: false);
                 CreateStandardDivider(rightSide: true);
                 _featureMarkerToggle = _plugin.CreateToggle(showFeatureMarkersStorable, rightSide: false);
+                _featureMarkerToggle.backgroundColor = HEADER_COLOR;
+                _featureMarkerToggle.textColor = HEADER_TEXT_COLOR;
                 if(showFeatureMarkersStorable.val) {
                     _buttons.Add(_plugin.CreateButton(_showFeatureMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
                     _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
@@ -709,6 +717,7 @@ namespace LFE {
                         Draw();
                     });
                     _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
+                    _buttons[_buttons.Count - 1].textColor = OPTIONS_TEXT_COLOR;
                     if(_showFeatureMarkerOptions) {
                         _featureMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: false);
                         _featureMarkerColorButton.buttonColor = _plugin.HSVToColor(featureMarkerColor.val);
@@ -754,6 +763,8 @@ namespace LFE {
                 CreateStandardDivider(rightSide: false);
                 CreateStandardDivider(rightSide: true);
                 _faceMarkerToggle = _plugin.CreateToggle(showFaceMarkersStorable, rightSide: false);
+                _faceMarkerToggle.backgroundColor = HEADER_COLOR;
+                _faceMarkerToggle.textColor = HEADER_TEXT_COLOR;
                 if(showFaceMarkersStorable.val) {
                     _buttons.Add(_plugin.CreateButton(_showFaceMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
                     _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
@@ -761,6 +772,7 @@ namespace LFE {
                         Draw();
                     });
                     _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
+                    _buttons[_buttons.Count - 1].textColor = OPTIONS_TEXT_COLOR;
                     if(_showFaceMarkerOptions) {
                         _faceMarkerColorButton = _plugin.CreateButton("Set Line Color");
                         _faceMarkerColorButton.buttonColor = _plugin.HSVToColor(faceMarkerColor.val);
@@ -790,6 +802,8 @@ namespace LFE {
                 CreateStandardDivider(rightSide: false);
                 CreateStandardDivider(rightSide: true);
                 _circumferenceMarkerToggle = _plugin.CreateToggle(showCircumferenceMarkersStorable, rightSide: false);
+                _circumferenceMarkerToggle.backgroundColor = HEADER_COLOR;
+                _circumferenceMarkerToggle.textColor = HEADER_TEXT_COLOR;
                 if(showCircumferenceMarkersStorable.val) {
                     _buttons.Add(_plugin.CreateButton(_showCircumferenceMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
                     _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
@@ -797,6 +811,7 @@ namespace LFE {
                         Draw();
                     });
                     _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
+                    _buttons[_buttons.Count - 1].textColor = OPTIONS_TEXT_COLOR;
                     if(_showCircumferenceMarkerOptions) {
                         _circumferenceMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: false);
                         _circumferenceMarkerColorButton.buttonColor = _plugin.HSVToColor(circumferenceMarkerColor.val);
@@ -824,6 +839,8 @@ namespace LFE {
                     CreateStandardDivider(rightSide: true);
                     CreateStandardDivider(rightSide: false);
                     _ageMarkerToggle = _plugin.CreateToggle(showAgeMarkersStorable, rightSide: false);
+                    _ageMarkerToggle.backgroundColor = HEADER_COLOR;
+                    _ageMarkerToggle.textColor = HEADER_TEXT_COLOR;
                     CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                 }
 
@@ -832,6 +849,8 @@ namespace LFE {
                 CreateStandardDivider(rightSide: false);
                 CreateStandardDivider(rightSide: true);
                 _proportionMarkerToggle = _plugin.CreateToggle(showProportionMarkersStorable, rightSide: false);
+                _proportionMarkerToggle.backgroundColor = HEADER_COLOR;
+                _proportionMarkerToggle.textColor = HEADER_TEXT_COLOR;
                 if(showProportionMarkersStorable.val) {
                     _buttons.Add(_plugin.CreateButton(_showProportionMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
                     _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
@@ -839,6 +858,7 @@ namespace LFE {
                         Draw();
                     });
                     _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
+                    _buttons[_buttons.Count - 1].textColor = OPTIONS_TEXT_COLOR;
                     if(_showProportionMarkerOptions) {
                         var selectedProportion = ProportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(proportionSelectionStorable.val));
 
@@ -1061,6 +1081,8 @@ namespace LFE {
             CreateStandardDivider(rightSide: true);
             CreateStandardDivider(rightSide: false);
             _manualMarkerToggle = _plugin.CreateToggle(showManualMarkersStorable, rightSide: false);
+            _manualMarkerToggle.backgroundColor = HEADER_COLOR;
+            _manualMarkerToggle.textColor = HEADER_TEXT_COLOR;
             if(showManualMarkersStorable.val) {
                 _buttons.Add(_plugin.CreateButton(_showManualMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
                 _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
@@ -1068,6 +1090,7 @@ namespace LFE {
                     Draw();
                 });
                 _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
+                _buttons[_buttons.Count - 1].textColor = OPTIONS_TEXT_COLOR;
 
                 if(_showManualMarkerOptions) {
                     if(_plugin.containingAtom.type == "Person") {
@@ -1114,6 +1137,8 @@ namespace LFE {
                 CreateStandardDivider(rightSide: true);
                 CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                 _targetHeadRatioToggle = _plugin.CreateToggle(showTargetHeadRatioStorable, rightSide: false);
+                _targetHeadRatioToggle.backgroundColor = HEADER_COLOR;
+                _targetHeadRatioToggle.textColor = HEADER_TEXT_COLOR;
                 if(showTargetHeadRatioStorable.val) {
                     _targetHeadRatioSlider = _plugin.CreateSlider(targetHeadRatioStorable, rightSide: false);
                     _targetHeadRatioMorph = _plugin.CreateScrollablePopup(targetHeadRatioMorphStorable, rightSide: true);
