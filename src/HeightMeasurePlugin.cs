@@ -389,6 +389,7 @@ namespace LFE
                 _mainGuides.ShowHeight = _ui.showFeatureMarkerLineHeight.val;
                 _mainGuides.ShowChin = _ui.showFeatureMarkerLineChin.val;
                 _mainGuides.ShowShoulder = _ui.showFeatureMarkerLineShoulder.val;
+                _mainGuides.ShowShoulderWidth = _ui.showFeatureMarkerLineShoulderWidth.val;
                 _mainGuides.ShowArm = _ui.showFeatureMarkerLineArm.val;
                 _mainGuides.ShowBust = _ui.showFeatureMarkerLineBust.val;
                 _mainGuides.ShowUnderbust = _ui.showFeatureMarkerLineUnderbust.val;
@@ -485,6 +486,16 @@ namespace LFE
                 _proportionGuides.Offset = pos - spreadVector - new Vector3(0, 0, 0.004f); // put these just a bit behind the auto guides
                 _proportionGuides.OffsetSpread = spreadVector;
                 _proportionGuides.TargetProportion = _ui.ProportionTemplates.FirstOrDefault(p => p.ProportionName.Equals(_ui.proportionSelectionStorable.val)) ?? proportionClosestMatch;
+                _proportionGuides.ShowHeight = _ui.showProportionMarkerLineHeight.val;
+                _proportionGuides.ShowChin = _ui.showProportionMarkerLineChin.val;
+                _proportionGuides.ShowShoulder = _ui.showProportionMarkerLineShoulder.val;
+                _proportionGuides.ShowShoulderWidth = _ui.showProportionMarkerLineShoulderWidth.val;
+                _proportionGuides.ShowArm = _ui.showProportionMarkerLineArm.val;
+                _proportionGuides.ShowNipple = _ui.showProportionMarkerLineBust.val;
+                _proportionGuides.ShowNavel = _ui.showProportionMarkerLineNavel.val;
+                _proportionGuides.ShowCrotch = _ui.showProportionMarkerLineCrotch.val;
+                _proportionGuides.ShowKnee = _ui.showProportionMarkerLineKnee.val;
+                _proportionGuides.ShowHeel = _ui.showProportionMarkerLineHeel.val;
             }
 
             // manual feature guide

@@ -25,6 +25,7 @@ namespace LFE {
         public bool ShowKnee { get; set; } = true;
         public bool ShowHeel { get; set; } = true;
         public bool ShowShoulder { get; set; } = true;
+        public bool ShowShoulderWidth { get; set; } = true;
         public bool ShowArm { get; set; } = true;
 
         public void Awake() {
@@ -91,8 +92,8 @@ namespace LFE {
 
             var chinToShoulder = (Measurements.ChinHeight ?? 0) - (Measurements.ShoulderHeight ?? 0);
             var shoulderWidth = Measurements.ShoulderWidth ?? 0;
-            // var shoulderLineBuffer = shoulderWidth/2 + 0.2f;
-            var shoulderLineBuffer = _markerChin.Length;
+            var shoulderLineBuffer = 0;
+            // var shoulderLineBuffer = _markerChin.Length;
             _markerShoulder.Label = $"Chin To Shoulder - {UnitUtils.ToUnitString(chinToShoulder, UnitDisplay)} Width - {UnitUtils.ToUnitString(shoulderWidth, UnitDisplay)}";
             SetMainMarkerProperties(_markerShoulder, Measurements.ShoulderHeight);
             _markerShoulder.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(Offset.x - shoulderLineBuffer, Offset.y, Offset.z)) + parentPos;
@@ -104,7 +105,7 @@ namespace LFE {
             _markerShoulderWidth.Length = shoulderWidth;
             _markerShoulderWidth.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(Offset.x + OffsetSpread.x - shoulderWidth/2, Offset.y, Offset.z + 0.04f)) + parentPos;
             _markerShoulderWidth.LineDirection = Vector3.right;
-            _markerShoulderWidth.Enabled = _markerShoulderWidth.Enabled && ShowShoulder;
+            _markerShoulderWidth.Enabled = _markerShoulderWidth.Enabled && ShowShoulderWidth;
 
             var armLength = Measurements.ArmLength ?? 0;
             _markerArmLength.Label = $"Arm - {UnitUtils.ToUnitString(armLength, UnitDisplay)}";

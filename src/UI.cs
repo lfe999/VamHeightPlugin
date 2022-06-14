@@ -94,6 +94,7 @@ namespace LFE {
         public JSONStorableBool showFeatureMarkerLineKnee;
         public JSONStorableBool showFeatureMarkerLineHeel;
         public JSONStorableBool showFeatureMarkerLineShoulder;
+        public JSONStorableBool showFeatureMarkerLineShoulderWidth;
         public JSONStorableBool showFeatureMarkerLineArm;
 
 
@@ -114,6 +115,16 @@ namespace LFE {
         public JSONStorableColor proportionMarkerColor;
         public JSONStorableFloat lineThicknessProportionStorable;
         public JSONStorableStringChooser proportionSelectionStorable;
+        public JSONStorableBool showProportionMarkerLineHeight;
+        public JSONStorableBool showProportionMarkerLineChin;
+        public JSONStorableBool showProportionMarkerLineBust;
+        public JSONStorableBool showProportionMarkerLineNavel;
+        public JSONStorableBool showProportionMarkerLineCrotch;
+        public JSONStorableBool showProportionMarkerLineKnee;
+        public JSONStorableBool showProportionMarkerLineHeel;
+        public JSONStorableBool showProportionMarkerLineShoulder;
+        public JSONStorableBool showProportionMarkerLineShoulderWidth;
+        public JSONStorableBool showProportionMarkerLineArm;
 
         public JSONStorableBool showTargetHeadRatioStorable;
         public JSONStorableFloat targetHeadRatioStorable;
@@ -190,43 +201,47 @@ namespace LFE {
             showFeatureMarkerLabelsStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLabelsStorable);
 
-            showFeatureMarkerLineHeight = new JSONStorableBool("Show Feature Line - Height", true);
+            showFeatureMarkerLineHeight = new JSONStorableBool("Show Feature - Height", true);
             showFeatureMarkerLineHeight.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLineHeight);
 
-            showFeatureMarkerLineChin = new JSONStorableBool("Show Feature Line - Chin", true);
+            showFeatureMarkerLineChin = new JSONStorableBool("Show Feature - Chin", true);
             showFeatureMarkerLineChin.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLineChin);
 
-            showFeatureMarkerLineBust = new JSONStorableBool("Show Feature Line - Bust", true);
+            showFeatureMarkerLineBust = new JSONStorableBool("Show Feature - Bust", true);
             showFeatureMarkerLineBust.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLineBust);
 
-            showFeatureMarkerLineUnderbust = new JSONStorableBool("Show Feature Line - Underbust", true);
+            showFeatureMarkerLineUnderbust = new JSONStorableBool("Show Feature - Underbust", true);
             showFeatureMarkerLineUnderbust.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLineUnderbust);
 
-            showFeatureMarkerLineNavel = new JSONStorableBool("Show Feature Line - Navel", true);
+            showFeatureMarkerLineNavel = new JSONStorableBool("Show Feature - Navel", true);
             showFeatureMarkerLineNavel.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLineNavel);
 
-            showFeatureMarkerLineCrotch = new JSONStorableBool("Show Feature Line - Crotch", true);
+            showFeatureMarkerLineCrotch = new JSONStorableBool("Show Feature - Crotch", true);
             showFeatureMarkerLineCrotch.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLineCrotch);
 
-            showFeatureMarkerLineKnee = new JSONStorableBool("Show Feature Line - Knee", true);
+            showFeatureMarkerLineKnee = new JSONStorableBool("Show Feature - Knee", true);
             showFeatureMarkerLineKnee.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLineKnee);
 
-            showFeatureMarkerLineHeel = new JSONStorableBool("Show Feature Line - Heel", true);
+            showFeatureMarkerLineHeel = new JSONStorableBool("Show Feature - Heel", true);
             showFeatureMarkerLineHeel.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLineHeel);
 
-            showFeatureMarkerLineShoulder = new JSONStorableBool("Show Feature Line - Shoulder", true);
+            showFeatureMarkerLineShoulder = new JSONStorableBool("Show Feature - Shoulder", true);
             showFeatureMarkerLineShoulder.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLineShoulder);
 
-            showFeatureMarkerLineArm = new JSONStorableBool("Show Feature Line - Arm", true);
+            showFeatureMarkerLineShoulderWidth = new JSONStorableBool("Show Feature - Shoulder Width", true);
+            showFeatureMarkerLineShoulderWidth.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showFeatureMarkerLineShoulderWidth);
+
+            showFeatureMarkerLineArm = new JSONStorableBool("Show Feature - Arm", true);
             showFeatureMarkerLineArm.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLineArm);
 
@@ -328,6 +343,46 @@ namespace LFE {
             );
             proportionSelectionStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterStringChooser(proportionSelectionStorable);
+
+            showProportionMarkerLineHeight = new JSONStorableBool("Show Proportion - Height", true);
+            showProportionMarkerLineHeight.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showProportionMarkerLineHeight);
+
+            showProportionMarkerLineChin = new JSONStorableBool("Show Proportion - Chin", true);
+            showProportionMarkerLineChin.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showProportionMarkerLineChin);
+
+            showProportionMarkerLineBust = new JSONStorableBool("Show Proportion - Nipple", true);
+            showProportionMarkerLineBust.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showProportionMarkerLineBust);
+
+            showProportionMarkerLineNavel = new JSONStorableBool("Show Proportion - Navel", true);
+            showProportionMarkerLineNavel.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showProportionMarkerLineNavel);
+
+            showProportionMarkerLineCrotch = new JSONStorableBool("Show Proportion - Crotch", true);
+            showProportionMarkerLineCrotch.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showProportionMarkerLineCrotch);
+
+            showProportionMarkerLineKnee = new JSONStorableBool("Show Proportion - Knee", true);
+            showProportionMarkerLineKnee.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showProportionMarkerLineKnee);
+
+            showProportionMarkerLineHeel = new JSONStorableBool("Show Proportion - Heel", true);
+            showProportionMarkerLineHeel.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showProportionMarkerLineHeel);
+
+            showProportionMarkerLineShoulder = new JSONStorableBool("Show Proportion - Shoulder", true);
+            showProportionMarkerLineShoulder.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showProportionMarkerLineShoulder);
+
+            showProportionMarkerLineShoulderWidth = new JSONStorableBool("Show Proportion - Shoulder Width", true);
+            showProportionMarkerLineShoulderWidth.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showProportionMarkerLineShoulderWidth);
+
+            showProportionMarkerLineArm = new JSONStorableBool("Show Proportion - Arm", true);
+            showProportionMarkerLineArm.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showProportionMarkerLineArm);
 
 
             //////////////////
@@ -734,6 +789,7 @@ namespace LFE {
                         _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineHeight, rightSide: true));
                         _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineChin, rightSide: true));
                         _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineShoulder, rightSide: true));
+                        _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineShoulderWidth, rightSide: true));
                         _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineArm, rightSide: true));
                         _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineBust, rightSide: true));
                         _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineUnderbust, rightSide: true));
@@ -741,6 +797,7 @@ namespace LFE {
                         _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineCrotch, rightSide: true));
                         _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineKnee, rightSide: true));
                         _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineHeel, rightSide: true));
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                         CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                         CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                         CreateStandardSpacer(defaultButtonHeight, rightSide: false);
@@ -1019,20 +1076,16 @@ namespace LFE {
                                 _choosingProportionColor = !_choosingProportionColor;
                                 Draw();
                             });
-                            CreateStandardSpacer(defaultButtonHeight, rightSide: true);
 
                             if(_choosingProportionColor) {
                                 _proportionMarkerColorPicker = _plugin.CreateColorPicker(proportionMarkerColor, rightSide: false);
-                                CreateStandardSpacer(_proportionMarkerColorPicker.height, rightSide: true);
                             }
                             _proportionMarkerLineThickness = _plugin.CreateSlider(lineThicknessProportionStorable, rightSide: false);
-                            CreateStandardSpacer(defaultSliderHeight, rightSide: true);
 
                             _proportionSelection = _plugin.CreateScrollablePopup(proportionSelectionStorable, rightSide: false);
                             _proportionSelection.popup.onValueChangeHandlers += (e) => {
                                 Draw();
                             };
-                            CreateStandardSpacer(_proportionSelection.height, rightSide: true);
 
                             // proportion action buttons
                             if(selectedProportion != null) {
@@ -1042,7 +1095,6 @@ namespace LFE {
                                     _editingProportion = true;
                                     Draw();
                                 });
-                                CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                             }
                             if(selectedProportion != null) {
                                 _proportionDeleteButton = _plugin.CreateButton("Delete Selected Proportions", rightSide: false);
@@ -1052,7 +1104,6 @@ namespace LFE {
                                     ProportionTemplates = ProportionTemplates.Where(p => !p.ProportionName.Equals(selectedProportion.ProportionName)).ToList();
                                     Draw();
                                 });
-                                CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                             }
                             _proportionAddButton = _plugin.CreateButton("New Proportions", rightSide: false);
                             _proportionAddButton.button.onClick.AddListener(() => {
@@ -1067,10 +1118,29 @@ namespace LFE {
                                 _editingProportion = false;
                                 Draw();
                             });
+
+                            _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineHeight, rightSide: true));
+                            _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineChin, rightSide: true));
+                            _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineShoulder, rightSide: true));
+                            _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineShoulderWidth, rightSide: true));
+                            _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineArm, rightSide: true));
+                            _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineBust, rightSide: true));
+                            _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineNavel, rightSide: true));
+                            _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineCrotch, rightSide: true));
+                            _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineKnee, rightSide: true));
+                            _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineHeel, rightSide: true));
+                            CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                            CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                            CreateStandardSpacer(defaultButtonHeight + 10, rightSide: false);
+
+                            if(selectedProportion == null){
+                                CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                                CreateStandardSpacer(defaultButtonHeight, rightSide: false);
+                            }
+
+                            // CreateStandardSpacer(defaultButtonHeight + 5, rightSide: true);
                             CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                         }
-                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
-                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                     }
                 }
                 else {
