@@ -113,7 +113,7 @@ namespace LFE {
             var shoulderLineBuffer = Mathf.Abs(offset.x) < Mathf.Abs(shoulderWidth/2) ? shoulderWidth/2 + 0.02f : 0;
             _markerShoulder.Label = $"Chin To Shoulder - Target {targetProportion.FigureChinToShoulder} h.u. Width Target {targetProportion.FigureShoulderWidth} h.u.";
             SetMainMarkerProperties(_markerShoulder, shoulderHeight);
-            _markerShoulder.transform.position = parentRotEuler * (new Vector3(0, shoulderHeight, 0) + new Vector3(offset.x - shoulderLineBuffer, offset.y, offset.z)) + parentPos;
+            _markerShoulder.transform.position = parentRotEuler * (new Vector3(0, shoulderHeight, 0) + new Vector3(offset.x - (shoulderLineBuffer * (FlipDirection ? -1 : 1)), offset.y, offset.z)) + parentPos;
             _markerShoulder.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerShoulder.Length = _markerChin.Length - shoulderLineBuffer;
             _markerShoulder.Enabled = _markerShoulder.Enabled && ShowShoulder;
