@@ -10,6 +10,17 @@ namespace LFE {
         const int minAge = 2;
         const int maxAge = 25;
 
+        public bool HeightAgeVisuals { get; set; } = true;
+        public bool HeadAgeVisuals { get; set; } = true;
+        public bool ProportionAgeVisuals { get; set; } = true;
+
+        public bool WarnUnderage { get; set; } = true;
+
+        public bool HeightAgeOverlapInclude { get; set; } = true;
+        public bool HeadAgeOverlapInclude { get; set; } = true;
+        public bool ProportionAgeOverlapInclude { get; set; } = true;
+
+
         public Proportions TargetProportion { get; set; }
 
         public void Awake() {
@@ -57,7 +68,17 @@ namespace LFE {
                 // SuperController.LogMessage($"{proportionQuartiles}");
 
                 var quartiles = new List<Quartiles>() { heightQuartiles, headQuartiles, proportionQuartiles };
-                var overlapQuartiles = Quartiles.GroupOverlapQuartile(quartiles);
+                var includedInOverlap = new List<Quartiles>();
+                if(HeadAgeOverlapInclude) {
+                    includedInOverlap.Add(headQuartiles);
+                }
+                if(HeightAgeOverlapInclude) {
+                    includedInOverlap.Add(headQuartiles);
+                }
+                if(ProportionAgeOverlapInclude) {
+                    includedInOverlap.Add(proportionQuartiles);
+                }
+                var overlapQuartiles = Quartiles.GroupOverlapQuartile(includedInOverlap);
 
                 // SuperController.LogMessage($"{overlapQuartiles}");
 
@@ -68,17 +89,26 @@ namespace LFE {
 
                 int currentRow = 0;
                 var height = UnitUtils.ToUnitString(Measurements.Height??0, UnitDisplay);
-                if(RenderRow(currentRow, heightQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Height Age Guess {heightQuartiles.RangeString} ({height}) - From CDC Growth Charts" : $"Height Age Guess {heightQuartiles.RangeString} ({height})")) {
-                    currentRow++;
+                if(HeightAgeVisuals) {
+                    if(RenderRow(currentRow, heightQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, $"Height Age Guess {heightQuartiles.RangeString} ({height})")) {
+                        currentRow++;
+                    }
                 }
-                var heightInHeads = (Measurements.Height??0) / (Measurements.HeadHeight??1);
-                if(RenderRow(currentRow, headQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Head Proportion Age Guess {headQuartiles.RangeString} ({heightInHeads:0.0} heads) - From CDC Growth Charts" : $"Head Proportion Age Guess {headQuartiles.RangeString} ({heightInHeads:0.0} heads)")) {
-                    currentRow++;
+
+                if(HeadAgeVisuals) {
+                    var heightInHeads = (Measurements.Height??0) / (Measurements.HeadHeight??1);
+                    if(RenderRow(currentRow, headQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, $"Head Proportion Age Guess {headQuartiles.RangeString} ({heightInHeads:0.0} heads)")) {
+                        currentRow++;
+                    }
                 }
-                var proportionName = TargetProportion?.ProportionName ?? "none";
-                if(RenderRow(currentRow, proportionQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, ShowDocumentation ? $"Body Proportion Age Guess {proportionQuartiles.RangeString} ({proportionName}) - From anatomy4sculptors.com Or User Created Custom Proportions" : $"Body Proportion Age Guess {proportionQuartiles.RangeString} ({proportionName})")) {
-                    currentRow++;
+
+                if(ProportionAgeVisuals) {
+                    var proportionName = TargetProportion?.ProportionName ?? "none";
+                    if(RenderRow(currentRow, proportionQuartiles, width, minAge.Value, maxAge.Value, LineColor, transform, $"Body Proportion Age Guess {proportionQuartiles.RangeString} ({proportionName})")) {
+                        currentRow++;
+                    }
                 }
+
                 if(overlapQuartiles != null) {
                     if(RenderRow(currentRow, overlapQuartiles, width, minAge.Value, maxAge.Value, Color.yellow, transform, ShowDocumentation ? $"Age Guess {overlapQuartiles.RangeString} - Combined From All Other Guesses" : $"Age Guess {overlapQuartiles.RangeString}")) {
                         currentRow++;
@@ -112,6 +142,17 @@ namespace LFE {
             }
 
             var markers = _quartileMarkerRows[rowId];
+
+            bool maybeUnderage = false;
+            if(quartile.Q75 < 18) {
+                maybeUnderage = true;
+            }
+
+            var warnString = "";
+            if(maybeUnderage && WarnUnderage) {
+                lineColor = Color.red;
+                warnString = $" - WARNING: Oldest likely age is {quartile.Q75}";
+            }
 
             // thin 0-25 quartile
             markers[0].Color = lineColor;
@@ -161,7 +202,7 @@ namespace LFE {
                 markers[4].Thickness = 0.003f;
                 markers[4].transform.position = parentRotEuler * (Offset + new Vector3((width/2) - width - 3*lengthPerAge, (Measurements.Height ?? 0) + zOffSet, 0)) + parentPos;
                 markers[4].transform.rotation = parentRot;
-                markers[4].Label = description;
+                markers[4].Label = $"{description}{warnString}";
                 markers[4].LineDirection = Vector3.left;
                 markers[4].LabelEnabled = Enabled;
             }

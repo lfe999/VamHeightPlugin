@@ -475,6 +475,10 @@ namespace LFE
                 _ageGuides.Offset = pos;
                 _ageGuides.OffsetSpread = spreadVector;
                 _ageGuides.TargetProportion = proportionClosestMatch;
+                _ageGuides.HeadAgeVisuals = _ui.ageMarkerShowHeadVisual.val;
+                _ageGuides.HeightAgeVisuals = _ui.ageMarkerShowHeightVisual.val;
+                _ageGuides.ProportionAgeVisuals = _ui.ageMarkerShowProportionVisual.val;
+                _ageGuides.WarnUnderage = _ui.ageWarnUnderage.val;
 
                 // proportion guide
                 _proportionGuides.ShowDocumentation = !_ui.hideDocsStorable.val;

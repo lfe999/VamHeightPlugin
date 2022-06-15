@@ -21,7 +21,7 @@ public class Quartiles {
             var likely = (int)Q25 != (int)Q75 ? $"{Q25} to {Q75}" : $"{Q25}";
             var maybe  = (int)Q0 != (int)Q100 && !((int)Q0 == (int)Q25 && (int)Q100 == (int)Q75) ? $"{Q0} to {Q100}" : String.Empty; 
             if(maybe != String.Empty) {
-                return $"{maybe}, {likely} More Likely";
+                return $"{likely} ({maybe} less likely)";
             }
             return likely;
         }

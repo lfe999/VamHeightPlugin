@@ -59,6 +59,10 @@ namespace LFE {
 
 
         public JSONStorableBool showAgeMarkersStorable;
+        public JSONStorableBool ageMarkerShowHeadVisual;
+        public JSONStorableBool ageMarkerShowHeightVisual;
+        public JSONStorableBool ageMarkerShowProportionVisual;
+        public JSONStorableBool ageWarnUnderage;
 
         public JSONStorableFloat ageFromHeadStorable;
         public JSONStorableFloat ageFromHeightStorable;
@@ -545,7 +549,7 @@ namespace LFE {
             _plugin.RegisterFloat(penisGirth);
 
             if(experimentalModeStorable.val) {
-                showAgeMarkersStorable = new JSONStorableBool("Age Markers", true, (bool value) => {
+                showAgeMarkersStorable = new JSONStorableBool("Age Markers", false, (bool value) => {
                     showAgeMarkersStorable.valNoCallback = value;
                     Draw();
                 });
@@ -560,6 +564,30 @@ namespace LFE {
                 showAgeMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
                 _plugin.RegisterBool(showAgeMarkersStorable);
             }
+
+            ageMarkerShowHeadVisual = new JSONStorableBool("Show Head Age", true, (bool value) => {
+                Draw();
+            });
+            ageMarkerShowHeadVisual.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(ageMarkerShowHeadVisual);
+
+            ageMarkerShowHeightVisual = new JSONStorableBool("Show Height Age", true, (bool value) => {
+                Draw();
+            });
+            ageMarkerShowHeightVisual.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(ageMarkerShowHeightVisual);
+
+            ageMarkerShowProportionVisual = new JSONStorableBool("Show Proportion Age", true, (bool value) => {
+                Draw();
+            });
+            ageMarkerShowProportionVisual.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(ageMarkerShowProportionVisual);
+
+            ageWarnUnderage = new JSONStorableBool("Warn On Underage", true, (bool value) => {
+                Draw();
+            });
+            ageWarnUnderage.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(ageMarkerShowHeadVisual);
 
             ageFromHeadStorable = new JSONStorableFloat("ageFromHead", 0, 0, 100);
             ageFromHeadStorable.storeType = JSONStorableParam.StoreType.Full;
@@ -693,6 +721,11 @@ namespace LFE {
         private UIDynamicToggle _hideDocs;
 
         private UIDynamicToggle _ageMarkerToggle;
+        private UIDynamicTextField _ageDescription;
+        private UIDynamicToggle _ageMarkerShowHeightToggle;
+        private UIDynamicToggle _ageMarkerShowHeadToggle;
+        private UIDynamicToggle _ageMarkerShowProportionToggle;
+        private UIDynamicToggle _ageWarnUnderageToggle;
 
         private UIDynamicToggle _manualMarkerToggle;
         private UIDynamicToggle _copyManualMarkers;
@@ -710,6 +743,7 @@ namespace LFE {
         private bool _showCircumferenceMarkerOptions = false;
         private bool _showProportionMarkerOptions = false;
         private bool _showManualMarkerOptions = false;
+        private bool _showAgeMarkerOptions = false;
 
         public void Draw() {
             Clear();
@@ -898,7 +932,70 @@ namespace LFE {
                     _ageMarkerToggle = _plugin.CreateToggle(showAgeMarkersStorable, rightSide: false);
                     _ageMarkerToggle.backgroundColor = HEADER_COLOR;
                     _ageMarkerToggle.textColor = HEADER_TEXT_COLOR;
-                    CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+
+
+                    if(showAgeMarkersStorable.val){
+                        _buttons.Add(_plugin.CreateButton(_showAgeMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
+                        _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
+                            _showAgeMarkerOptions = !_showAgeMarkerOptions;
+                            Draw();
+                        });
+                        _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
+                        _buttons[_buttons.Count - 1].textColor = OPTIONS_TEXT_COLOR;
+                        if(_showAgeMarkerOptions) {
+
+                            _ageDescription = _plugin.CreateTextField(new JSONStorableString("age description",
+@"<b>Important:</b>
+
+There is no way to accurately determine age based on simple math functions like these. Your brain is powerful. It is up to you to make sure that your creations conform to VAM community standards and legal requirements of your country.
+
+<b>What are these charts?</b>
+
+Each measurement is visualized as a 'box plots'.  The thick bar is the more likely range (25th to 75th percentile).  The thin lines are the less likely ranges (0-25, 75-100 percentiles).  Search the web for 'box plots' for more technical information.
+
+<b>Main Age Guess</b>
+
+This age calculation combines all of the calculations below.  If a lot of the below calculations agree strongly, then the bar will be thick.  If the below calculations agree weakly, then the bar will be thin.
+
+<b>Head Age Guess</b>
+
+Age from head size is based on proportion information for humans found in research papers and human proportions listed in references by anatomy4sculptors.com.
+
+Changing 'Head big' and 'Head Scale' morphs will affect this heavily.
+
+<b>Height Age Guess</b>
+
+Age from height is based on human growth charts from the Centers for Disease Control (CDC).
+
+Scaling your model from Control & Physics 1 tab will affect this heavily.
+
+<b>Proportion Age Guess</b>
+
+Age from proportions is based on a subset of human proportions found at https://hpc.anatomy4sculptors.com
+
+Adding or editing your own proportions in the 'Proportions Guides' section of this plugin will affect this.
+
+See https://hpc.anatomy4sculptors.com for more proportions or search the web for alternate proportions like 'anime proportions'."
+                            ), rightSide: false);
+                            _ageDescription.backgroundColor = new Color(0, 0, 0, 0);
+                            _ageDescription.height = 700;
+
+                            _ageMarkerShowHeadToggle = _plugin.CreateToggle(ageMarkerShowHeadVisual, rightSide: true);
+                            _ageMarkerShowHeightToggle = _plugin.CreateToggle(ageMarkerShowHeightVisual, rightSide: true);
+                            _ageMarkerShowProportionToggle = _plugin.CreateToggle(ageMarkerShowProportionVisual, rightSide: true);
+
+                            CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+
+                            _ageWarnUnderageToggle = _plugin.CreateToggle(ageWarnUnderage, rightSide: true);
+
+                            CreateStandardSpacer(_ageDescription.height - 325, rightSide: true);
+                        }
+                    }
+                    else {
+                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                    }
+
+
                 }
 
 
@@ -1261,6 +1358,21 @@ namespace LFE {
             }
             if(_ageMarkerToggle) {
                 _plugin.RemoveToggle(_ageMarkerToggle);
+            }
+            if(_ageDescription) {
+                _plugin.RemoveTextField(_ageDescription);
+            }
+            if(_ageMarkerShowHeadToggle){
+                _plugin.RemoveToggle(_ageMarkerShowHeadToggle);
+            }
+            if(_ageMarkerShowHeightToggle){
+                _plugin.RemoveToggle(_ageMarkerShowHeightToggle);
+            }
+            if(_ageMarkerShowProportionToggle){
+                _plugin.RemoveToggle(_ageMarkerShowProportionToggle);
+            }
+            if(_ageWarnUnderageToggle){
+                _plugin.RemoveToggle(_ageWarnUnderageToggle);
             }
             if(_manualMarkerToggle) {
                 _plugin.RemoveToggle(_manualMarkerToggle);
