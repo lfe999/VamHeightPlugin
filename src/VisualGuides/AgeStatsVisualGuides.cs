@@ -73,7 +73,7 @@ namespace LFE {
                     includedInOverlap.Add(headQuartiles);
                 }
                 if(HeightAgeOverlapInclude) {
-                    includedInOverlap.Add(headQuartiles);
+                    includedInOverlap.Add(heightQuartiles);
                 }
                 if(ProportionAgeOverlapInclude) {
                     includedInOverlap.Add(proportionQuartiles);
