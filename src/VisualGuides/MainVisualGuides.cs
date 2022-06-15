@@ -127,7 +127,7 @@ namespace LFE {
                 _markerNipple.Label = $"Bust";
             }
             else {
-                _markerNipple.Label = $"Bust - {UnitUtils.ToUnitString(Measurements.BustSize ?? 0, UnitDisplay)} - ({Measurements.BandSize}{Measurements.CupSize})";
+                _markerNipple.Label = $"Bust Around - {UnitUtils.ToUnitString(Measurements.BustSize ?? 0, UnitDisplay)} - ({Measurements.BandSize}{Measurements.CupSize})";
             }
             SetMainMarkerProperties(_markerNipple, Measurements.NippleHeight);
             _markerNipple.transform.position = parentRotEuler * (new Vector3(0, Measurements.NippleHeight ?? 0, 0) + offset) + parentPos;
@@ -138,7 +138,7 @@ namespace LFE {
                 _markerUnderbust.Label = "Underbust";
             }
             else {
-                _markerUnderbust.Label = $"Underbust - {UnitUtils.ToUnitString(Measurements.UnderbustSize ?? 0, UnitDisplay)}";
+                _markerUnderbust.Label = $"Underbust Around - {UnitUtils.ToUnitString(Measurements.UnderbustSize ?? 0, UnitDisplay)}";
             }
             SetMainMarkerProperties(_markerUnderbust, Measurements.UnderbustHeight);
             _markerUnderbust.transform.position = parentRotEuler * (new Vector3(0, Measurements.UnderbustHeight ?? 0, 0) + offset) + parentPos;
@@ -149,7 +149,7 @@ namespace LFE {
             var shoulderToNavel = (Measurements.ShoulderHeight?? 0) - (Measurements.NavelHeight ?? 0);
             _markerNavel.Label = "Navel";
             if(waist != 0) {
-                _markerNavel.Label += $" - Waist {UnitUtils.ToUnitString(waist, UnitDisplay)}";
+                _markerNavel.Label += $" - Waist Around {UnitUtils.ToUnitString(waist, UnitDisplay)}";
             }
             _markerNavel.Label += $"\nShoulder to Navel - {UnitUtils.ToUnitString(shoulderToNavel, UnitDisplay)}";
             SetMainMarkerProperties(_markerNavel, Measurements.NavelHeight);
@@ -161,7 +161,7 @@ namespace LFE {
             var shoulderToCrotch = (Measurements.ShoulderHeight ?? 0) - (Measurements.CrotchHeight ?? 0);
             _markerGroin.Label = $"Crotch";
             if(hip != 0) {
-                _markerGroin.Label += $" - Hip {UnitUtils.ToUnitString(hip, UnitDisplay)}";
+                _markerGroin.Label += $" - Hip Around {UnitUtils.ToUnitString(hip, UnitDisplay)}";
             }
             _markerGroin.Label += "\n";
             if(Measurements.POI?.IsMale ?? false) {

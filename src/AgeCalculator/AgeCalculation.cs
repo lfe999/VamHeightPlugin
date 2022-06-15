@@ -14,31 +14,35 @@ public class AgeCalculation {
 
     public Quartiles Quartiles {
         get {
-            // build up list of ages expanded by probability
-            var elements = new List<float>();
-            var min = MinAge;
-            var max = MaxAge;
-
-            for(var age = min; age <= max; age++) {
-                var value = (int)((ConfidenceForAge(age) ?? 0)*100);
-                // SuperController.LogMessage($"age={age} conf={value}");
-                for(var i = 0; i < value; i++) {
-                    elements.Add(age);
-                }
-            }
-            // SuperController.LogMessage($"elements.Length={elements.Count}");
-
-            var elementsArray = elements.ToArray();
-            Array.Sort(elementsArray);
-
-            return new Quartiles(
-                Percentile(elementsArray, 0),
-                Percentile(elementsArray, 0.25f),
-                Percentile(elementsArray, 0.50f),
-                Percentile(elementsArray, 0.75f),
-                Percentile(elementsArray, 1f)
-            );
+            return QuartilesWithMinMax(0, 1);
         }
+    }
+
+    public Quartiles QuartilesWithMinMax(float minPercentile = 0, float maxPercentile = 1f) {
+        // build up list of ages expanded by probability
+        var elements = new List<float>();
+        var min = MinAge;
+        var max = MaxAge;
+
+        for(var age = min; age <= max; age++) {
+            var value = (int)((ConfidenceForAge(age) ?? 0)*100);
+            // SuperController.LogMessage($"age={age} conf={value}");
+            for(var i = 0; i < value; i++) {
+                elements.Add(age);
+            }
+        }
+        // SuperController.LogMessage($"elements.Length={elements.Count}");
+
+        var elementsArray = elements.ToArray();
+        Array.Sort(elementsArray);
+
+        return new Quartiles(
+            (float)Math.Round(Percentile(elementsArray, minPercentile)),
+            Percentile(elementsArray, 0.25f),
+            Percentile(elementsArray, 0.50f),
+            Percentile(elementsArray, 0.75f),
+            (float)Math.Round(Percentile(elementsArray, maxPercentile))
+        );
     }
 
     private float Percentile(float[] sequenceSorted, float excelPercentile)
