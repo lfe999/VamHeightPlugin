@@ -76,6 +76,11 @@ namespace LFE {
                 Enabled = false;
             }
 
+            var offset = Offset;
+            if(FlipDirection) {
+                offset = new Vector3(offset.x * -1, offset.y, offset.z);
+            }
+
             var targetHeads = targetProportion.FigureHeightInHeads;
 
             var parentPos = transform.parent.transform.position;
@@ -91,28 +96,32 @@ namespace LFE {
             var title = $"{proportionDisplayName} - Target {targetHeads} h.u.";
             _markerHead.Label = $"{title}";
             SetMainMarkerProperties(_markerHead, height);
-            _markerHead.transform.position = parentRotEuler * (new Vector3(0, height, 0) + Offset) + parentPos;
+            _markerHead.transform.position = parentRotEuler * (new Vector3(0, height, 0) + offset) + parentPos;
+            _markerHead.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerHead.Enabled = _markerHead.Enabled && ShowHeight;
 
             var headHeight = 1 * unitsPerHead;
             var chinHeight = height - headHeight;
             _markerChin.Label = $"Head Size";
             SetMainMarkerProperties(_markerChin, chinHeight);
-            _markerChin.transform.position = parentRotEuler * (new Vector3(0, chinHeight, 0) + Offset) + parentPos;
+            _markerChin.transform.position = parentRotEuler * (new Vector3(0, chinHeight, 0) + offset) + parentPos;
+            _markerChin.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerChin.Enabled = _markerChin.Enabled && ShowChin;
 
             var shoulderHeight = chinHeight - (targetProportion.FigureChinToShoulder * unitsPerHead);
             var shoulderWidth = targetProportion.FigureShoulderWidth * unitsPerHead;
-            var shoulderLineBuffer = Mathf.Abs(Offset.x) < Mathf.Abs(shoulderWidth/2) ? shoulderWidth/2 + 0.02f : 0;
+            var shoulderLineBuffer = Mathf.Abs(offset.x) < Mathf.Abs(shoulderWidth/2) ? shoulderWidth/2 + 0.02f : 0;
             _markerShoulder.Label = $"Chin To Shoulder - Target {targetProportion.FigureChinToShoulder} h.u. Width Target {targetProportion.FigureShoulderWidth} h.u.";
             SetMainMarkerProperties(_markerShoulder, shoulderHeight);
-            _markerShoulder.transform.position = parentRotEuler * (new Vector3(0, shoulderHeight, 0) + new Vector3(Offset.x - shoulderLineBuffer, Offset.y, Offset.z)) + parentPos;
+            _markerShoulder.transform.position = parentRotEuler * (new Vector3(0, shoulderHeight, 0) + new Vector3(offset.x - shoulderLineBuffer, offset.y, offset.z)) + parentPos;
+            _markerShoulder.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerShoulder.Length = _markerChin.Length - shoulderLineBuffer;
             _markerShoulder.Enabled = _markerShoulder.Enabled && ShowShoulder;
 
             _markerShoulderWidth.Label = "";
             SetMainMarkerProperties(_markerShoulderWidth, shoulderWidth);
-            _markerShoulderWidth.transform.position = parentRotEuler * (new Vector3(0, shoulderHeight, 0) + new Vector3(Offset.x + OffsetSpread.x + shoulderWidth/2, Offset.y, Offset.z + 0.04f)) + parentPos;
+            _markerShoulderWidth.transform.position = parentRotEuler * (new Vector3(0, shoulderHeight, 0) + new Vector3(offset.x + (OffsetSpread.x + shoulderWidth/2) * (FlipDirection ? -1 : 1), offset.y, offset.z + 0.04f)) + parentPos;
+            _markerShoulderWidth.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerShoulderWidth.Length = shoulderWidth;
             _markerShoulderWidth.Enabled = _markerShoulderWidth.Enabled && ShowShoulderWidth;
 
@@ -121,38 +130,43 @@ namespace LFE {
             _markerArmLength.Label = $"Arm - Target {targetProportion.FigureLengthOfUpperLimb} h.u.";
             SetMainMarkerProperties(_markerArmLength, armLength);
             _markerArmLength.Length = armLength;
-            _markerArmLength.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(Offset.x + OffsetSpread.x + actualShoulderWidth/2 + 0.20f, Offset.y, Offset.z)) + parentPos;
+            _markerArmLength.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(offset.x + (OffsetSpread.x + actualShoulderWidth/2 + 0.20f) * (FlipDirection ? -1 : 1), offset.y, offset.z)) + parentPos;
             _markerArmLength.LineDirection = Vector3.down;
             _markerArmLength.Enabled = _markerArmLength.Enabled && ShowArm;
 
             var nippleHeight = shoulderHeight - (targetProportion.FigureShoulderToNipples * unitsPerHead);
             _markerNipple.Label = $"Shoulder To Nipple - Target {targetProportion.FigureShoulderToNipples} h.u.";
             SetMainMarkerProperties(_markerNipple, nippleHeight);
-            _markerNipple.transform.position = parentRotEuler * (new Vector3(0, nippleHeight, 0) + Offset) + parentPos;
+            _markerNipple.transform.position = parentRotEuler * (new Vector3(0, nippleHeight, 0) + offset) + parentPos;
+            _markerNipple.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerNipple.Enabled = _markerNipple.Enabled && ShowNipple;
 
             var navelHeight = shoulderHeight - (targetProportion.FigureShoulderToNavel * unitsPerHead);
             _markerNavel.Label = $"Shoulder To Navel - Target {targetProportion.FigureShoulderToNavel} h.u.";
             SetMainMarkerProperties(_markerNavel, navelHeight);
-            _markerNavel.transform.position = parentRotEuler * (new Vector3(0, navelHeight, 0) + Offset) + parentPos;
+            _markerNavel.transform.position = parentRotEuler * (new Vector3(0, navelHeight, 0) + offset) + parentPos;
+            _markerNavel.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerNavel.Enabled = _markerNavel.Enabled && ShowNavel;
 
             var crotchHeight = shoulderHeight - (targetProportion.FigureShoulderToCrotch * unitsPerHead);
             _markerGroin.Label = $"Shoulder To Crotch - Target {targetProportion.FigureShoulderToNavel} h.u.";
             SetMainMarkerProperties(_markerGroin, crotchHeight);
-            _markerGroin.transform.position = parentRotEuler * (new Vector3(0, crotchHeight, 0) + Offset) + parentPos;
+            _markerGroin.transform.position = parentRotEuler * (new Vector3(0, crotchHeight, 0) + offset) + parentPos;
+            _markerGroin.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerGroin.Enabled = _markerGroin.Enabled && ShowCrotch;
 
             var kneeHeight = crotchHeight - (targetProportion.FigureCrotchToBottomOfKnees * unitsPerHead);
             _markerKnee.Label = $"Crotch To Knee - Target {targetProportion.FigureCrotchToBottomOfKnees} h.u.";
             SetMainMarkerProperties(_markerKnee, kneeHeight);
-            _markerKnee.transform.position = parentRotEuler * (new Vector3(0, kneeHeight, 0) + Offset) + parentPos;
+            _markerKnee.transform.position = parentRotEuler * (new Vector3(0, kneeHeight, 0) + offset) + parentPos;
+            _markerKnee.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerKnee.Enabled = _markerKnee.Enabled && ShowKnee;
 
             _markerHeel.Label = $"Knee to Heel - Target {targetProportion.FigureBottomOfKneesToHeels}";
             SetMainMarkerProperties(_markerHeel, Measurements.HeelHeight);
             _markerHeel.Enabled = Measurements.HeelHeight != null && Enabled;
-            _markerHeel.transform.position = parentRotEuler * (new Vector3(0, Measurements.HeelHeight ?? 0, 0) + Offset) + parentPos;
+            _markerHeel.transform.position = parentRotEuler * (new Vector3(0, Measurements.HeelHeight ?? 0, 0) + offset) + parentPos;
+            _markerHeel.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerHeel.Enabled = _markerHeel.Enabled && ShowHeel;
 
         }

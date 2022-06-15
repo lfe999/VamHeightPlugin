@@ -46,6 +46,12 @@ namespace LFE {
                 }
             }
 
+            var offset = Offset;
+
+            if(FlipDirection) {
+                offset = new Vector3(offset.x * -1, offset.y, offset.z);
+            }
+
             for(var i = 0; i < _headMarkers.Count; i++) {
                 var parentPos = transform.parent.transform.position;
                 var parentRot = transform.parent.transform.rotation;
@@ -57,7 +63,7 @@ namespace LFE {
                     marker.LabelEnabled = LabelsEnabled;
                     marker.Thickness = LineThickness * 0.001f;
                     marker.Color = LineColor;
-                    marker.LineDirection = Vector3.right;
+                    marker.LineDirection = FlipDirection ? Vector3.left : Vector3.right;
 
                     marker.transform.rotation = transform.parent.transform.rotation;
 
@@ -77,7 +83,7 @@ namespace LFE {
                             }
                         }
                     }
-                    marker.transform.position = parentRotEuler * (new Vector3(0, lineHeight, 0) + Offset) + parentPos;
+                    marker.transform.position = parentRotEuler * (new Vector3(0, lineHeight, 0) + offset) + parentPos;
                 }
                 else {
                     marker.Enabled = false;

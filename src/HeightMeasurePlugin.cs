@@ -397,6 +397,7 @@ namespace LFE
                 _mainGuides.ShowCrotch = _ui.showFeatureMarkerLineCrotch.val;
                 _mainGuides.ShowKnee = _ui.showFeatureMarkerLineKnee.val;
                 _mainGuides.ShowHeel = _ui.showFeatureMarkerLineHeel.val;
+                _mainGuides.FlipDirection = _ui.flipFeatureMarkerSide.val;
 
                 // auto head height guide
                 _headGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
@@ -407,6 +408,7 @@ namespace LFE
                 _headGuides.UnitDisplay = _ui.unitsStorable.val;
                 _headGuides.Offset = pos + spreadVector;
                 _headGuides.OffsetSpread = spreadVector;
+                _headGuides.FlipDirection = _ui.flipHeadMarkerSide.val;
 
 
                 // auto face guide
@@ -486,6 +488,7 @@ namespace LFE
                 _proportionGuides.LabelsEnabled = true;
                 _proportionGuides.LineColor = HSVToColor(_ui.proportionMarkerColor.val);
                 _proportionGuides.LineThickness = _ui.lineThicknessProportionStorable.val;
+                _proportionGuides.FlipDirection = _ui.flipProportionMarkerSide.val;
                 _proportionGuides.UnitDisplay = _ui.unitsStorable.val;
                 _proportionGuides.Offset = pos - spreadVector - new Vector3(0, 0, 0.004f); // put these just a bit behind the auto guides
                 _proportionGuides.OffsetSpread = spreadVector;

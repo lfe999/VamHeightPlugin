@@ -100,12 +100,14 @@ namespace LFE {
         public JSONStorableBool showFeatureMarkerLineShoulder;
         public JSONStorableBool showFeatureMarkerLineShoulderWidth;
         public JSONStorableBool showFeatureMarkerLineArm;
+        public JSONStorableBool flipFeatureMarkerSide;
 
 
 
         public JSONStorableBool showHeadHeightMarkersStorable;
         public JSONStorableColor headMarkerColor;
         public JSONStorableFloat lineThicknessHeadStorable;
+        public JSONStorableBool flipHeadMarkerSide;
 
         public JSONStorableBool showFaceMarkersStorable;
         public JSONStorableColor faceMarkerColor;
@@ -129,6 +131,7 @@ namespace LFE {
         public JSONStorableBool showProportionMarkerLineShoulder;
         public JSONStorableBool showProportionMarkerLineShoulderWidth;
         public JSONStorableBool showProportionMarkerLineArm;
+        public JSONStorableBool flipProportionMarkerSide;
 
         public JSONStorableBool showTargetHeadRatioStorable;
         public JSONStorableFloat targetHeadRatioStorable;
@@ -205,6 +208,13 @@ namespace LFE {
             showFeatureMarkerLabelsStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLabelsStorable);
 
+
+            flipFeatureMarkerSide = new JSONStorableBool("Feature Guide Flip Side", false, (bool value) => {
+                Draw();
+            });
+            flipFeatureMarkerSide.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(flipFeatureMarkerSide);
+
             showFeatureMarkerLineHeight = new JSONStorableBool("Show Feature - Height", true);
             showFeatureMarkerLineHeight.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLineHeight);
@@ -271,6 +281,12 @@ namespace LFE {
             });
             headMarkerColor.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterColor(headMarkerColor);
+
+            flipHeadMarkerSide = new JSONStorableBool("Head Guide Flip Side", false, (bool value) => {
+                Draw();
+            });
+            flipHeadMarkerSide.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(flipHeadMarkerSide);
 
             //////////////////
 
@@ -387,6 +403,12 @@ namespace LFE {
             showProportionMarkerLineArm = new JSONStorableBool("Show Proportion - Arm", true);
             showProportionMarkerLineArm.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showProportionMarkerLineArm);
+
+            flipProportionMarkerSide = new JSONStorableBool("Proportion Guide Flip Side", false, (bool value) => {
+                Draw();
+            });
+            flipProportionMarkerSide.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(flipProportionMarkerSide);
 
 
             //////////////////
@@ -665,11 +687,13 @@ namespace LFE {
         private UIDynamicColorPicker _featureMarkerColorPicker;
         private UIDynamicSlider _featureMarkerLineThickness;
         private UIDynamicToggle _featureMarkerToggleLabels;
+        private UIDynamicToggle _featureMarkerFlipSide;
 
         private UIDynamicToggle _headMarkerToggle;
         private UIDynamicButton _headMarkerColorButton;
         private UIDynamicColorPicker _headMarkerColorPicker;
         private UIDynamicSlider _headMarkerLineThickness;
+        private UIDynamicToggle _headMarkerFlipSide;
 
         private UIDynamicToggle _faceMarkerToggle;
         private UIDynamicButton _faceMarkerColorButton;
@@ -686,6 +710,7 @@ namespace LFE {
         private UIDynamicColorPicker _proportionMarkerColorPicker;
         private UIDynamicSlider _proportionMarkerLineThickness;
         private UIDynamicPopup _proportionSelection;
+        private UIDynamicToggle _proportionMarkerFlipSide;
 
         private UIDynamicTextField _proportionEditName;
         private UIDynamicToggle _proportionEditIsFemale;
@@ -777,8 +802,8 @@ namespace LFE {
                             _headMarkerColorPicker = _plugin.CreateColorPicker(headMarkerColor, rightSide: false);
                         }
                         _headMarkerLineThickness = _plugin.CreateSlider(lineThicknessHeadStorable, rightSide: false);
+                        _headMarkerFlipSide = _plugin.CreateToggle(flipHeadMarkerSide, rightSide: false);
 
-                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                         CreateStandardSpacer(defaultButtonHeight, rightSide: true);
 
                         CreateStandardSpacer(defaultButtonHeight, rightSide: true);
@@ -819,6 +844,7 @@ namespace LFE {
                         }
                         _featureMarkerLineThickness = _plugin.CreateSlider(lineThicknessFigureStorable, rightSide: false);
                         _featureMarkerToggleLabels = _plugin.CreateToggle(showFeatureMarkerLabelsStorable, rightSide: false);
+                        _featureMarkerFlipSide = _plugin.CreateToggle(flipFeatureMarkerSide, rightSide: false);
 
                         _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineHeight, rightSide: true));
                         _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineChin, rightSide: true));
@@ -839,7 +865,6 @@ namespace LFE {
                         CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                         CreateStandardSpacer(defaultButtonHeight, rightSide: false);
 
-                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                         CreateStandardSpacer(defaultButtonHeight + 5, rightSide: true);
                     }
                     CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
@@ -1178,6 +1203,7 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
                                 _proportionMarkerColorPicker = _plugin.CreateColorPicker(proportionMarkerColor, rightSide: false);
                             }
                             _proportionMarkerLineThickness = _plugin.CreateSlider(lineThicknessProportionStorable, rightSide: false);
+                            _proportionMarkerFlipSide = _plugin.CreateToggle(flipProportionMarkerSide, rightSide: false);
 
                             _proportionSelection = _plugin.CreateScrollablePopup(proportionSelectionStorable, rightSide: false);
                             _proportionSelection.popup.onValueChangeHandlers += (e) => {
@@ -1226,7 +1252,6 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
                             _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineCrotch, rightSide: true));
                             _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineKnee, rightSide: true));
                             _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineHeel, rightSide: true));
-                            CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                             CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                             CreateStandardSpacer(defaultButtonHeight + 10, rightSide: false);
 
@@ -1393,6 +1418,9 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
                 _plugin.RemoveSlider(s);
             }
             _manualSliders = new List<UIDynamicSlider>();
+            if(_featureMarkerFlipSide) {
+                _plugin.RemoveToggle(_featureMarkerFlipSide);
+            }
             if(_featureMarkerToggle) {
                 _plugin.RemoveToggle(_featureMarkerToggle);
             }
@@ -1411,6 +1439,9 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
 
             if(_headMarkerToggle) {
                 _plugin.RemoveToggle(_headMarkerToggle);
+            }
+            if(_headMarkerFlipSide) {
+                _plugin.RemoveToggle(_headMarkerFlipSide);
             }
             if(_headMarkerColorButton) {
                 _plugin.RemoveButton(_headMarkerColorButton);
@@ -1450,6 +1481,9 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
 
             if(_proportionMarkerToggle) {
                 _plugin.RemoveToggle(_proportionMarkerToggle);
+            }
+            if(_proportionMarkerFlipSide) {
+                _plugin.RemoveToggle(_proportionMarkerFlipSide);
             }
             if(_proportionMarkerColorButton) {
                 _plugin.RemoveButton(_proportionMarkerColorButton);
