@@ -21,6 +21,10 @@ jobs:
         mkdir -p publish/Custom/Scripts/LFE/HeightMeasure
         cp -r src publish/Custom/Scripts/LFE/HeightMeasure/
         cp *.cslist publish/Custom/Scripts/LFE/HeightMeasure/
+        mkdir -p publish/Custom/Atom/Person/Pose
+        cp Presets/Pose/* publish/Custom/Atom/Person/Pose/
+        mkdir -p publish/Custom/Atom/Person/Plugins
+        cp Presets/Plugins/* publish/Custom/Atom/Person/Plugins/
         cp meta.json publish/
         sed -i 's/v0.0.0/${{ steps.get_version.outputs.VERSION }}/' publish/meta.json
         cd publish
