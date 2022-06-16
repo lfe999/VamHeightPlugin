@@ -18,6 +18,7 @@
       "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\ChateLaineCupCalculator.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\CupSize.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\EvasIntimatesCupCalculator.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\EvasIntimatesFRCupCalculator.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\ICupCalculator.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\KnixComCupCalculator.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\KSK9404CupCalculator.cs",
