@@ -22,6 +22,7 @@
       "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\KnixComCupCalculator.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\KSK9404CupCalculator.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\SizeChartCupCalculator.cs",
+      "Custom\\Scripts\\LFE\\HeightMeasure\\BustCalculator\\SizeChartFRCupCalculator.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\Model\\CharacterMeasurements.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\Model\\CharacterPointsOfInterest.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\Model\\Proportions.cs",

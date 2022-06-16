@@ -16,6 +16,7 @@ src/BustCalculator/EvasIntimatesCupCalculator.cs
 src/BustCalculator/KnixComCupCalculator.cs
 src/BustCalculator/KSK9404CupCalculator.cs
 src/BustCalculator/SizeChartCupCalculator.cs
+src/BustCalculator/SizeChartFRCupCalculator.cs
 src/BustCalculator/ICupCalculator.cs
 src/VisualGuides/LabeledLine.cs
 src/VisualGuides/BaseVisualGuides.cs
