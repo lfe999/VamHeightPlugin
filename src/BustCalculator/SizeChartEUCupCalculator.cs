@@ -2,10 +2,10 @@ using UnityEngine;
 using System;
 
 namespace LFE {
-    public class SizeChartFRCupCalculator : ICupCalculator {
+    public class SizeChartEUCupCalculator : ICupCalculator {
 
-        // http://www.sizechart.com/brasize/french/index.html
-        public string Name => "sizechart.com (FR)";
+        // http://www.sizechart.com/brasize/european/index.html
+        public string Name => "sizechart.com (EU)";
 
         public CupSize Calculate(float bust, float underbust) {
             // SuperController.singleton.ClearMessages();
@@ -15,14 +15,14 @@ namespace LFE {
 			var band = ToBand(underbustCm);
             var cup = ToCup(bustCm, underbustCm);
 
-            // SuperController.LogMessage($"bustCm={bustCm} underbustCm={underbustCm} bust-underbust={bustCm - underbustCm} band={band} cup={cup}");
+            // SuperController.LogMessage($"bustCm={bustCm} underbustCm={underbustCm} bust-underbustCm={bustCm - underbustCm} band={band} cup={cup}");
 
             return new CupSize { Units = "cm", Cup = cup, Band = band, Bust = bust, Underbust = underbust };
         }
 
         private int ToBand(int underbust) {
             var bandBase = underbust - 64;
-            var minBandSize = 75;
+            var minBandSize = 60;
             var bandIncrement = 5;
             var underbustIncrement = 5;
             if(bandBase < 0) {

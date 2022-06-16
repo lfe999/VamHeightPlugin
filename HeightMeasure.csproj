@@ -84,7 +84,9 @@
     <Compile Include="src/BustCalculator/ICupCalculator.cs" />
     <Compile Include="src/BustCalculator/KnixComCupCalculator.cs" />
     <Compile Include="src/BustCalculator/KSK9404CupCalculator.cs" />
+    <Compile Include="src/BustCalculator/SizeChartAUSCupCalculator.cs" />
     <Compile Include="src/BustCalculator/SizeChartCupCalculator.cs" />
+    <Compile Include="src/BustCalculator/SizeChartEUCupCalculator.cs" />
     <Compile Include="src/BustCalculator/SizeChartFRCupCalculator.cs" />
     <Compile Include="src/Model/CharacterMeasurements.cs" />
     <Compile Include="src/Model/CharacterPointsOfInterest.cs" />
