@@ -35,7 +35,15 @@
       "Custom\\Scripts\\LFE\\HeightMeasure\\VisualGuides\\MainVisualGuides.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\VisualGuides\\ProportionTargetVisualGuides.cs",
       "Custom\\Scripts\\LFE\\HeightMeasure\\UI.cs",
-      "Custom\\Scripts\\LFE\\HeightMeasure\\HeightMeasurePlugin.cs"
+      "Custom\\Scripts\\LFE\\HeightMeasure\\HeightMeasurePlugin.cs",
+      "Custom\\Atom\\Person\\Plugins\\Preset_Height Measure - Enable Beta Features.jpg",
+      "Custom\\Atom\\Person\\Plugins\\Preset_Height Measure - Enable Beta Features.vap",
+      "Custom\\Atom\\Person\\Plugins\\Preset_Height Measure - Proportion Compare.jpg",
+      "Custom\\Atom\\Person\\Plugins\\Preset_Height Measure - Proportion Compare.vap",
+      "Custom\\Atom\\Person\\Plugins\\Preset_Height Measure - Defaults.jpg",
+      "Custom\\Atom\\Person\\Plugins\\Preset_Height Measure - Defaults.vap",
+      "Custom\\Atom\\Person\\Pose\\Preset_HeightMeasure.jpg",
+      "Custom\\Atom\\Person\\Pose\\Preset_HeightMeasure.vap"
    ], 
    "dependencies" : { 
    }
