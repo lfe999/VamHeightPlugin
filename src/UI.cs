@@ -10,6 +10,7 @@ namespace LFE {
 
         private readonly ICupCalculator[] _cupCalculators = new ICupCalculator[] {
             new EvasIntimatesCupCalculator(),
+            new EvasIntimatesFRCupCalculator(),
             new KnixComCupCalculator(),
             new SizeChartAUSCupCalculator(),
             new SizeChartCupCalculator(),

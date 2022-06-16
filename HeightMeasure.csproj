@@ -81,6 +81,7 @@
     <Compile Include="src/BustCalculator/ChateLaineCupCalculator.cs" />
     <Compile Include="src/BustCalculator/CupSize.cs" />
     <Compile Include="src/BustCalculator/EvasIntimatesCupCalculator.cs" />
+    <Compile Include="src/BustCalculator/EvasIntimatesFRCupCalculator.cs" />
     <Compile Include="src/BustCalculator/ICupCalculator.cs" />
     <Compile Include="src/BustCalculator/KnixComCupCalculator.cs" />
     <Compile Include="src/BustCalculator/KSK9404CupCalculator.cs" />

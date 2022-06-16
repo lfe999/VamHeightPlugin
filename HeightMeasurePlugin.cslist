@@ -13,6 +13,7 @@ src/AgeCalculator/Quartiles.cs
 src/BustCalculator/ChateLaineCupCalculator.cs
 src/BustCalculator/CupSize.cs
 src/BustCalculator/EvasIntimatesCupCalculator.cs
+src/BustCalculator/EvasIntimatesFRCupCalculator.cs
 src/BustCalculator/KnixComCupCalculator.cs
 src/BustCalculator/KSK9404CupCalculator.cs
 src/BustCalculator/SizeChartAUSCupCalculator.cs
