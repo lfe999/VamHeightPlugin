@@ -17,14 +17,29 @@ public class Anatomy4SculptersCalculator : IAgeCalculator {
         var response = new List<AgeGuess>();
         
         var rangeSize = 4;
-        var rangeAmount = 0.075f;
-        
+        var rangeAmount = 0.24f;
+
+        AgeGuess previousGuess = null;
         for(var i = rangeSize*-1; i <= rangeSize ; i++) {
             var headSize = y + i*rangeAmount;
             var guess = GuessSingleFemaleAge(headSize);
             if(guess != null) {
-                guess.Confidence = 1.0f / (float)Math.Pow(1 + Math.Abs(i), 1.4);
+                guess.Confidence = 1.0f / (float)Math.Pow(1 + Math.Abs(i)/5f, 1.0001f);
+
+                // fill in any age gaps
+                if(previousGuess != null) {
+                    for(var j = previousGuess.Age+1; j < guess.Age; j++) {
+                        response.Add(new AgeGuess() {
+                            Age = j,
+                            Confidence = previousGuess.Confidence,
+                            Input = previousGuess.Input
+                        });
+                        // SuperController.LogMessage($"f={j} y={y} rangeAmount={rangeAmount} headSize={headSize} guess={j} confidence={previousGuess?.Confidence}");
+                    }
+                }
                 response.Add(guess);
+                // SuperController.LogMessage($"i={i} y={y} rangeAmount={rangeAmount} headSize={headSize} guess={guess?.Age} confidence={guess?.Confidence}");
+                previousGuess = guess;
             }
         }
 

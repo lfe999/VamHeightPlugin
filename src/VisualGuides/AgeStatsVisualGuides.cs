@@ -59,9 +59,8 @@ namespace LFE {
             // (re)display relevant markers
             bool showBoxplot = true;
             if(showBoxplot) {
-                // SuperController.singleton.ClearMessages();
                 var heightQuartiles = ageFromHeight?.Quartiles;
-                var headQuartiles = ageFromHead?.Quartiles;
+                var headQuartiles = ageFromHead?.QuartilesWithMinMax(minPercentile: 0.2f, maxPercentile: 0.8f);
                 var proportionQuartiles = TargetProportion?.Quartiles;
                 // SuperController.LogMessage($"{heightQuartiles}");
                 // SuperController.LogMessage($"{headQuartiles}");
