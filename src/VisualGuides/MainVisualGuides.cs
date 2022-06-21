@@ -186,6 +186,7 @@ namespace LFE {
             var kneeToHeel = (Measurements.KneeHeight ?? 0) - (Measurements.HeelHeight ?? 0);
             _markerHeel.Label = $"Heel - Knee to Heel {UnitUtils.ToUnitString(kneeToHeel, UnitDisplay)}";
             SetMainMarkerProperties(_markerHeel, Measurements.HeelHeight);
+            _markerHeel.Enabled = Enabled; // don't hide heel if it's height is 0!
             _markerHeel.transform.position = parentRotEuler * (new Vector3(0, Measurements.HeelHeight ?? 0, 0) + offset) + parentPos;
             _markerHeel.LineDirection = FlipDirection ? Vector3.right: Vector3.left;
             _markerHeel.Enabled = _markerHeel.Enabled && ShowHeel;
