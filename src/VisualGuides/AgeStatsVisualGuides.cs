@@ -20,6 +20,11 @@ namespace LFE {
         public bool HeadAgeOverlapInclude { get; set; } = true;
         public bool ProportionAgeOverlapInclude { get; set; } = true;
 
+        public float AgeGuessPercentileLowest { get; set; }
+        public float AgeGuessPercentileLowestLikely { get; set; }
+        public float AgeGuessPercentileHighestLikely { get; set; }
+        public float AgeGuessPercentileHighest { get; set; }
+
 
         public Proportions TargetProportion { get; set; }
 
@@ -109,9 +114,19 @@ namespace LFE {
                 }
 
                 if(overlapQuartiles != null) {
+                    AgeGuessPercentileLowest = overlapQuartiles.Q0;
+                    AgeGuessPercentileLowestLikely = overlapQuartiles.Q25;
+                    AgeGuessPercentileHighestLikely = overlapQuartiles.Q75;
+                    AgeGuessPercentileHighest = overlapQuartiles.Q100;
                     if(RenderRow(currentRow, overlapQuartiles, width, minAge.Value, maxAge.Value, Color.yellow, transform, ShowDocumentation ? $"Age Guess {overlapQuartiles.RangeString} - Combined From All Other Guesses" : $"Age Guess {overlapQuartiles.RangeString}")) {
                         currentRow++;
                     }
+                }
+                else {
+                    AgeGuessPercentileLowest = 0f;
+                    AgeGuessPercentileLowestLikely = 0f;
+                    AgeGuessPercentileHighestLikely = 0f;
+                    AgeGuessPercentileHighest = 0f;
                 }
 
             }

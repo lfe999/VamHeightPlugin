@@ -68,8 +68,11 @@ namespace LFE {
         public JSONStorableBool ageMarkerShowProportionVisual;
         public JSONStorableBool ageWarnUnderage;
 
-        public JSONStorableFloat ageFromHeadStorable;
-        public JSONStorableFloat ageFromHeightStorable;
+        public JSONStorableFloat ageGuessLowest;
+        public JSONStorableFloat ageGuessLowestLikely;
+        public JSONStorableFloat ageGuessHighestLikely;
+        public JSONStorableFloat ageGuessHighest;
+
         public JSONStorableString proportionClosestMatch;
 
         // manual heights
@@ -615,13 +618,21 @@ namespace LFE {
             ageWarnUnderage.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(ageMarkerShowHeadVisual);
 
-            ageFromHeadStorable = new JSONStorableFloat("ageFromHead", 0, 0, 100);
-            ageFromHeadStorable.storeType = JSONStorableParam.StoreType.Full;
-            _plugin.RegisterFloat(ageFromHeadStorable);
-
-            ageFromHeightStorable = new JSONStorableFloat("ageFromHeight", 0, 0, 100);
-            ageFromHeightStorable.storeType = JSONStorableParam.StoreType.Full;
-            _plugin.RegisterFloat(ageFromHeightStorable);
+            ageGuessLowest = new JSONStorableFloat("ageGuessLowest", 0, 0, 100);
+            ageGuessLowest.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterFloat(ageGuessLowest);
+            
+            ageGuessLowestLikely = new JSONStorableFloat("ageGuessLowestLikely", 0, 0, 100);
+            ageGuessLowestLikely.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterFloat(ageGuessLowestLikely);
+            
+            ageGuessHighest = new JSONStorableFloat("ageGuessHighest", 0, 0, 100);
+            ageGuessHighest.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterFloat(ageGuessHighest);
+            
+            ageGuessHighestLikely = new JSONStorableFloat("ageGuessHighestLikely", 0, 0, 100);
+            ageGuessHighestLikely.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterFloat(ageGuessHighestLikely);
 
             proportionClosestMatch = new JSONStorableString("proportionMatch", "");
             proportionClosestMatch.storeType = JSONStorableParam.StoreType.Full;
@@ -955,25 +966,21 @@ namespace LFE {
                 CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: false);
 
                 // Age Guides
-                if(experimentalModeStorable.val || showAgeMarkersStorable.val) {
-                    CreateStandardDivider(rightSide: true);
-                    CreateStandardDivider(rightSide: false);
-                    _ageMarkerToggle = _plugin.CreateToggle(showAgeMarkersStorable, rightSide: false);
-                    _ageMarkerToggle.backgroundColor = HEADER_COLOR;
-                    _ageMarkerToggle.textColor = HEADER_TEXT_COLOR;
-
-
-                    if(showAgeMarkersStorable.val){
-                        _buttons.Add(_plugin.CreateButton(_showAgeMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
-                        _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
-                            _showAgeMarkerOptions = !_showAgeMarkerOptions;
-                            Draw();
-                        });
-                        _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
-                        _buttons[_buttons.Count - 1].textColor = OPTIONS_TEXT_COLOR;
-                        if(_showAgeMarkerOptions) {
-
-                            _ageDescription = _plugin.CreateTextField(new JSONStorableString("age description",
+                CreateStandardDivider(rightSide: true);
+                CreateStandardDivider(rightSide: false);
+                _ageMarkerToggle = _plugin.CreateToggle(showAgeMarkersStorable, rightSide: false);
+                _ageMarkerToggle.backgroundColor = HEADER_COLOR;
+                _ageMarkerToggle.textColor = HEADER_TEXT_COLOR;
+                if(showAgeMarkersStorable.val){
+                    _buttons.Add(_plugin.CreateButton(_showAgeMarkerOptions ? "[-] close options" : "[+] show options", rightSide: true));
+                    _buttons[_buttons.Count - 1].button.onClick.AddListener(() => {
+                        _showAgeMarkerOptions = !_showAgeMarkerOptions;
+                        Draw();
+                    });
+                    _buttons[_buttons.Count - 1].buttonColor = OPTIONS_COLOR;
+                    _buttons[_buttons.Count - 1].textColor = OPTIONS_TEXT_COLOR;
+                    if(_showAgeMarkerOptions) {
+                        _ageDescription = _plugin.CreateTextField(new JSONStorableString("age description",
 @"<b>Important:</b>
 
 There is no way to accurately determine age based on simple math functions like these. Your brain is powerful. It is up to you to make sure that your creations conform to VAM community standards and legal requirements of your country.
@@ -1005,28 +1012,24 @@ Age from proportions is based on a subset of human proportions found at https://
 Adding or editing your own proportions in the 'Proportions Guides' section of this plugin will affect this.
 
 See https://hpc.anatomy4sculptors.com for more proportions or search the web for alternate proportions like 'anime proportions'."
-                            ), rightSide: false);
-                            _ageDescription.backgroundColor = new Color(0, 0, 0, 0);
-                            _ageDescription.height = 700;
+                        ), rightSide: false);
+                        _ageDescription.backgroundColor = new Color(0, 0, 0, 0);
+                        _ageDescription.height = 700;
 
-                            _ageMarkerShowHeadToggle = _plugin.CreateToggle(ageMarkerShowHeadVisual, rightSide: true);
-                            _ageMarkerShowHeightToggle = _plugin.CreateToggle(ageMarkerShowHeightVisual, rightSide: true);
-                            _ageMarkerShowProportionToggle = _plugin.CreateToggle(ageMarkerShowProportionVisual, rightSide: true);
+                        _ageMarkerShowHeadToggle = _plugin.CreateToggle(ageMarkerShowHeadVisual, rightSide: true);
+                        _ageMarkerShowHeightToggle = _plugin.CreateToggle(ageMarkerShowHeightVisual, rightSide: true);
+                        _ageMarkerShowProportionToggle = _plugin.CreateToggle(ageMarkerShowProportionVisual, rightSide: true);
 
-                            CreateStandardSpacer(defaultButtonHeight, rightSide: true);
-
-                            _ageWarnUnderageToggle = _plugin.CreateToggle(ageWarnUnderage, rightSide: true);
-
-                            CreateStandardSpacer(_ageDescription.height - 325, rightSide: true);
-                        }
-                    }
-                    else {
                         CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+
+                        _ageWarnUnderageToggle = _plugin.CreateToggle(ageWarnUnderage, rightSide: true);
+
+                        CreateStandardSpacer(_ageDescription.height - 325, rightSide: true);
                     }
-
-
                 }
-
+                else {
+                    CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                }
 
                 // Proportion Guides
                 CreateStandardDivider(rightSide: false);

@@ -326,9 +326,10 @@ namespace LFE
                 _ui.penisWidth.val = _autoMeasurements.PenisWidth ?? 0;
                 _ui.penisGirth.val = _autoMeasurements.PenisGirth ?? 0;
 
-                _ui.ageFromHeadStorable.val = _autoMeasurements.AgeFromHead?.LikelyAge ?? 0;
-                _ui.ageFromHeightStorable.val = _autoMeasurements.AgeFromHeight?.LikelyAge ?? 0;
-                _ui.proportionClosestMatch.val = _autoMeasurements.Proportions?.ClostestMatch(_ui.ProportionTemplates)?.ProportionName ?? "";
+                _ui.ageGuessLowest.val = _ageGuides.AgeGuessPercentileLowest;
+                _ui.ageGuessLowestLikely.val = _ageGuides.AgeGuessPercentileLowestLikely;
+                _ui.ageGuessHighest.val = _ageGuides.AgeGuessPercentileHighest;
+                _ui.ageGuessHighestLikely.val = _ageGuides.AgeGuessPercentileHighestLikely;
 
                 UpdateVisuals();
                 UpdatePenisMarkers();
