@@ -230,21 +230,27 @@ namespace LFE
 
                 bool globalSoftPhysicsEnabled = UserPreferences.singleton.softPhysics;
                 if(!globalSoftPhysicsEnabled) {
-                    SuperController.LogMessage($"forcing soft physics on for Height Measure plugin");
+                    SuperController.LogMessage($"forcing global soft physics on (main User Preferfences) for Height Measure plugin");
                     UserPreferences.singleton.softPhysics = true;
                 }
 
                 var breastPhysics  = containingAtom.GetStorableByID("BreastPhysicsMesh") as DAZPhysicsMesh;
                 if(breastPhysics != null && !breastPhysics.on) {
-                    SuperController.LogMessage($"forcing soft breast physics on for Height Measure plugin");
+                    SuperController.LogMessage($"forcing soft breast physics (F Breast Physics 2 screen) on for Height Measure plugin");
                     breastPhysics.on = true;
 
                 }
 
                 var glutePhysics = containingAtom.GetStorableByID("LowerPhysicsMesh") as DAZPhysicsMesh;
                 if(glutePhysics != null && !glutePhysics.on) {
-                    SuperController.LogMessage($"forcing soft glute physics on for Height Measure plugin");
+                    SuperController.LogMessage($"forcing soft glute physics (F Glute Physics screen) on for Height Measure plugin");
                     glutePhysics.on = true;
+                }
+
+                var physicsMeshesEnable = containingAtom.GetStorableByID("SoftBodyPhysicsEnabler") as DAZPhysicsMeshesEnable;
+                if(physicsMeshesEnable != null && !physicsMeshesEnable.enabledJSON.val) {
+                    SuperController.LogMessage($"forcing soft physics on (Control & Physics 1 screen) for Height Measure plugin");
+                    physicsMeshesEnable.enabledJSON.val = true;
                 }
 
                 bool sexWasChanged = false;
