@@ -182,13 +182,25 @@ namespace LFE
             }
         }
 
-        private DAZMorph GetMorphByName(string name) {
-            JSONStorable geometry = containingAtom.GetStorableByID("geometry");
-            if (geometry == null)  {
-                return null;
-            }
+        private DAZCharacterSelector _dcs;
+        private DAZCharacterSelector GetDCS() {
+            if(_dcs == null) {
+                JSONStorable geometry = containingAtom.GetStorableByID("geometry");
+                if (geometry == null)  {
+                    return null;
+                }
 
-            DAZCharacterSelector dcs = geometry as DAZCharacterSelector;
+                DAZCharacterSelector dcs = geometry as DAZCharacterSelector;
+                if (dcs == null) {
+                    return null;
+                }
+                _dcs = dcs;
+            }
+            return _dcs;
+        }
+
+        private DAZMorph GetMorphByName(string name) {
+            var dcs = GetDCS();
             if (dcs == null) {
                 return null;
             }
@@ -215,6 +227,26 @@ namespace LFE
                 if(_ui == null) {
                     return;
                 }
+
+                bool globalSoftPhysicsEnabled = UserPreferences.singleton.softPhysics;
+                if(!globalSoftPhysicsEnabled) {
+                    SuperController.LogMessage($"forcing soft physics on for Height Measure plugin");
+                    UserPreferences.singleton.softPhysics = true;
+                }
+
+                var breastPhysics  = containingAtom.GetStorableByID("BreastPhysicsMesh") as DAZPhysicsMesh;
+                if(breastPhysics != null && !breastPhysics.on) {
+                    SuperController.LogMessage($"forcing soft breast physics on for Height Measure plugin");
+                    breastPhysics.on = true;
+
+                }
+
+                var glutePhysics = containingAtom.GetStorableByID("LowerPhysicsMesh") as DAZPhysicsMesh;
+                if(glutePhysics != null && !glutePhysics.on) {
+                    SuperController.LogMessage($"forcing soft glute physics on for Height Measure plugin");
+                    glutePhysics.on = true;
+                }
+
                 bool sexWasChanged = false;
                 bool targetHeadMorphChanged = false;
                 if(_autoMeasurements != null) {
