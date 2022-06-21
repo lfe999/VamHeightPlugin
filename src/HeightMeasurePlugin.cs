@@ -203,9 +203,6 @@ namespace LFE
         int _lastSex = 0; // 0 female - 1 male
         public void Update() {
             try {
-                if(SuperController.singleton.freezeAnimation) {
-                    return;
-                }
 
                 // allows for performant disabling with OnEnable/Disable
                 // if disabling, the Update should still try and shut off
