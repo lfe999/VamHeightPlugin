@@ -612,7 +612,7 @@ namespace LFE {
             ageMarkerShowProportionVisual.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(ageMarkerShowProportionVisual);
 
-            ageWarnUnderage = new JSONStorableBool("Warn On Underage", true, (bool value) => {
+            ageWarnUnderage = new JSONStorableBool("Warn On Under 18 Guess", true, (bool value) => {
                 Draw();
             });
             ageWarnUnderage.storeType = JSONStorableParam.StoreType.Full;
@@ -983,7 +983,7 @@ namespace LFE {
                         _ageDescription = _plugin.CreateTextField(new JSONStorableString("age description",
 @"<b>Important:</b>
 
-There is no way to accurately determine age based on simple math functions like these. Your brain is powerful. It is up to you to make sure that your creations conform to VAM community standards and legal requirements of your country.
+There is no great way to truly determine age based on simple math functions. Especially when there is some subjectivity involved. Your brain is powerful and this plugin can not replace its use. It is always up to you to make sure that your creations conform to VAM community standards.
 
 <b>What are these charts?</b>
 
