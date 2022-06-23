@@ -130,6 +130,7 @@ namespace LFE {
             marker.transform.rotation = transform.parent.transform.rotation;
             marker.Enabled = measurement != null && Enabled;
             marker.LabelEnabled = LabelsEnabled;
+            marker.LineEnabled = LinesEnabled;
             marker.Thickness = LineThickness * 0.001f;
             marker.Color = LineColor;
         }

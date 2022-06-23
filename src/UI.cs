@@ -96,6 +96,7 @@ namespace LFE {
         public JSONStorableColor featureMarkerColor;
         public JSONStorableFloat lineThicknessFigureStorable;
         public JSONStorableBool showFeatureMarkerLabelsStorable;
+        public JSONStorableBool showFeatureMarkerLinesStorable;
         public JSONStorableBool showFeatureMarkerLineHeight;
         public JSONStorableBool showFeatureMarkerLineChin;
         public JSONStorableBool showFeatureMarkerLineBust;
@@ -214,6 +215,12 @@ namespace LFE {
             });
             showFeatureMarkerLabelsStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showFeatureMarkerLabelsStorable);
+
+            showFeatureMarkerLinesStorable = new JSONStorableBool("Feature Guide Lines", true, (bool value) => {
+                Draw();
+            });
+            showFeatureMarkerLinesStorable.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showFeatureMarkerLinesStorable);
 
 
             flipFeatureMarkerSide = new JSONStorableBool("Feature Guide Flip Side", false, (bool value) => {
@@ -702,6 +709,7 @@ namespace LFE {
         private UIDynamicColorPicker _featureMarkerColorPicker;
         private UIDynamicSlider _featureMarkerLineThickness;
         private UIDynamicToggle _featureMarkerToggleLabels;
+        private UIDynamicToggle _featureMarkerToggleLines;
         private UIDynamicToggle _featureMarkerFlipSide;
 
         private UIDynamicToggle _headMarkerToggle;
@@ -823,6 +831,9 @@ namespace LFE {
 
                         CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                         CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                        if(_choosingHeadColor) {
+                            CreateStandardSpacer(_headMarkerColorPicker.height, rightSide: true);
+                        }
                     }
                     CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
 
@@ -859,6 +870,7 @@ namespace LFE {
                         }
                         _featureMarkerLineThickness = _plugin.CreateSlider(lineThicknessFigureStorable, rightSide: false);
                         _featureMarkerToggleLabels = _plugin.CreateToggle(showFeatureMarkerLabelsStorable, rightSide: false);
+                        _featureMarkerToggleLines = _plugin.CreateToggle(showFeatureMarkerLinesStorable, rightSide: false);
                         _featureMarkerFlipSide = _plugin.CreateToggle(flipFeatureMarkerSide, rightSide: false);
 
                         _featureLineToggles.Add(_plugin.CreateToggle(showFeatureMarkerLineHeight, rightSide: true));
@@ -878,9 +890,11 @@ namespace LFE {
                         CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                         CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                         CreateStandardSpacer(defaultButtonHeight, rightSide: false);
-                        CreateStandardSpacer(defaultButtonHeight, rightSide: false);
 
                         CreateStandardSpacer(defaultButtonHeight + 5, rightSide: true);
+                        if(_choosingFeatureColor) {
+                            CreateStandardSpacer(_featureMarkerColorPicker.height, rightSide: true);
+                        }
                     }
                     CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
                 }
@@ -920,6 +934,9 @@ namespace LFE {
 
                         CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                         CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                        if(_choosingFaceColor) {
+                            CreateStandardSpacer(_faceMarkerColorPicker.height, rightSide: true);
+                        }
                     }
                     CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
                 }
@@ -956,6 +973,9 @@ namespace LFE {
                         _circumferenceMarkerLineThickness = _plugin.CreateSlider(lineThicknessCircumferenceStorable, rightSide: false);
                         CreateStandardSpacer(defaultButtonHeight, rightSide: true);
                         CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                        if(_choosingCircumferenceColor) {
+                            CreateStandardSpacer(_circumferenceMarkerColorPicker.height, rightSide: true);
+                        }
                     }
                     CreateStandardSpacer(defaultSectionSpacerHeight, rightSide: true);
                 }
@@ -1269,6 +1289,9 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
 
                             // CreateStandardSpacer(defaultButtonHeight + 5, rightSide: true);
                             CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                            if(_choosingProportionColor) {
+                                CreateStandardSpacer(_proportionMarkerColorPicker.height, rightSide: true);
+                            }
                         }
                     }
                 }
@@ -1442,6 +1465,9 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
             }
             if(_featureMarkerToggleLabels) {
                 _plugin.RemoveToggle(_featureMarkerToggleLabels);
+            }
+            if(_featureMarkerToggleLines) {
+                _plugin.RemoveToggle(_featureMarkerToggleLines);
             }
 
             if(_headMarkerToggle) {

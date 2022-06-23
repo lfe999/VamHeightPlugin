@@ -417,6 +417,7 @@ namespace LFE
                 _mainGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _mainGuides.Enabled = _ui.showFeatureMarkersStorable.val;
                 _mainGuides.LabelsEnabled = _ui.showFeatureMarkerLabelsStorable.val;
+                _mainGuides.LinesEnabled = _ui.showFeatureMarkerLinesStorable.val;
                 _mainGuides.LineColor = HSVToColor(_ui.featureMarkerColor.val);
                 _mainGuides.LineThickness = _ui.lineThicknessFigureStorable.val;
                 _mainGuides.UnitDisplay = _ui.unitsStorable.val;
@@ -439,6 +440,7 @@ namespace LFE
                 _headGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _headGuides.Enabled = _ui.showHeadHeightMarkersStorable.val;
                 _headGuides.LabelsEnabled = true;
+                _headGuides.LinesEnabled = true;
                 _headGuides.LineColor = HSVToColor(_ui.headMarkerColor.val);
                 _headGuides.LineThickness = _ui.lineThicknessHeadStorable.val;
                 _headGuides.UnitDisplay = _ui.unitsStorable.val;
@@ -451,6 +453,7 @@ namespace LFE
                 _faceGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _faceGuides.Enabled = _ui.showFaceMarkersStorable.val;
                 _faceGuides.LabelsEnabled = true;
+                _faceGuides.LinesEnabled = true;
                 _faceGuides.LineColor = HSVToColor(_ui.faceMarkerColor.val);
                 _faceGuides.LineThickness = _ui.lineThicknessFaceStorable.val;
                 _faceGuides.UnitDisplay = _ui.unitsStorable.val;
@@ -461,6 +464,7 @@ namespace LFE
                 _bustGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _bustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
                 _bustGuides.LabelsEnabled = false;
+                _bustGuides.LinesEnabled = true;
                 _bustGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
                 _bustGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
                 _bustGuides.UnitDisplay = _ui.unitsStorable.val;
@@ -472,6 +476,7 @@ namespace LFE
                 _underbustGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _underbustGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
                 _underbustGuides.LabelsEnabled = false;
+                _underbustGuides.LinesEnabled = true;
                 _underbustGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
                 _underbustGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
                 _underbustGuides.UnitDisplay = _ui.unitsStorable.val;
@@ -483,6 +488,7 @@ namespace LFE
                 _waistGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _waistGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
                 _waistGuides.LabelsEnabled = false;
+                _waistGuides.LinesEnabled = true;
                 _waistGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
                 _waistGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
                 _waistGuides.UnitDisplay = _ui.unitsStorable.val;
@@ -494,6 +500,7 @@ namespace LFE
                 _hipGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _hipGuides.Enabled = _ui.showCircumferenceMarkersStorable.val && !isMale;
                 _hipGuides.LabelsEnabled = false;
+                _hipGuides.LinesEnabled = true;
                 _hipGuides.LineColor = HSVToColor(_ui.circumferenceMarkerColor.val);
                 _hipGuides.LineThickness = _ui.lineThicknessCircumferenceStorable.val;
                 _hipGuides.UnitDisplay = _ui.unitsStorable.val;
@@ -507,6 +514,7 @@ namespace LFE
                 _ageGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _ageGuides.Enabled = _ui.showAgeMarkersStorable.val;
                 _ageGuides.LabelsEnabled = true;
+                _ageGuides.LinesEnabled = true;
                 _ageGuides.LineColor = Color.cyan;
                 _ageGuides.LineThickness = 2.0f; // TODO
                 _ageGuides.UnitDisplay = _ui.unitsStorable.val;
@@ -522,6 +530,7 @@ namespace LFE
                 _proportionGuides.ShowDocumentation = !_ui.hideDocsStorable.val;
                 _proportionGuides.Enabled = _ui.showProportionMarkersStorable.val;
                 _proportionGuides.LabelsEnabled = true;
+                _proportionGuides.LinesEnabled = true;
                 _proportionGuides.LineColor = HSVToColor(_ui.proportionMarkerColor.val);
                 _proportionGuides.LineThickness = _ui.lineThicknessProportionStorable.val;
                 _proportionGuides.FlipDirection = _ui.flipProportionMarkerSide.val;
@@ -545,6 +554,7 @@ namespace LFE
             _mainGuidesManual.ShowDocumentation = !_ui.hideDocsStorable.val;
             _mainGuidesManual.Enabled = _ui.showManualMarkersStorable.val;
             _mainGuidesManual.LabelsEnabled = _ui.showManualMarkersStorable.val && _mainGuidesManual.Measurements.Height > 0;
+            _mainGuidesManual.LinesEnabled = true;
             _mainGuidesManual.LineColor = HSVToColor(_ui.manualMarkerColor.val);
             _mainGuidesManual.LineThickness = _ui.lineThicknessManualStorable.val;
             _mainGuidesManual.UnitDisplay = _ui.unitsStorable.val;
@@ -555,6 +565,7 @@ namespace LFE
             _headGuidesManual.ShowDocumentation = !_ui.hideDocsStorable.val;
             _headGuidesManual.Enabled = _ui.showManualMarkersStorable.val && _headGuidesManual.Measurements.Height > 0;
             _headGuidesManual.LabelsEnabled = true;
+            _headGuidesManual.LinesEnabled = true;
             _headGuidesManual.LineColor = HSVToColor(_ui.manualMarkerColor.val);
             _headGuidesManual.LineThickness = _ui.lineThicknessManualStorable.val;
             _headGuidesManual.UnitDisplay = _ui.unitsStorable.val;

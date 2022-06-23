@@ -177,6 +177,7 @@ namespace LFE {
             markers[0].transform.rotation = parentRot;
             markers[0].Label = quartile.Q0.ToString();
             markers[0].LabelEnabled = Enabled;
+            markers[0].LineEnabled = LinesEnabled;
 
             // thick 25-75 quartile
             markers[1].Color = lineColor;
@@ -185,6 +186,7 @@ namespace LFE {
             markers[1].Thickness = 0.05f;
             markers[1].transform.position = parentRotEuler * (Offset + new Vector3((width/2) - xOffSet - ((Mathf.Abs(quartile.Q0 - quartile.Q75)+1)*lengthPerAge), (Measurements.Height ?? 0) + zOffSet, 0)) + parentPos;
             markers[1].transform.rotation = parentRot;
+            markers[1].LineEnabled = LinesEnabled;
 
             // // median vertical
             // markers[2].Enabled = Enabled;
@@ -207,6 +209,7 @@ namespace LFE {
             markers[3].Label = quartile.Q100.ToString();
             markers[3].LineDirection = Vector3.left;
             markers[3].LabelEnabled = Mathf.Abs(quartile.Q0 - quartile.Q100) > 0 ? Enabled : false;
+            markers[3].LineEnabled = LinesEnabled;
 
             // description
             if(description != null && description != string.Empty) {
@@ -219,6 +222,7 @@ namespace LFE {
                 markers[4].Label = $"{description}{warnString}";
                 markers[4].LineDirection = Vector3.left;
                 markers[4].LabelEnabled = Enabled;
+                markers[4].LineEnabled = LinesEnabled;
             }
 
             return true;

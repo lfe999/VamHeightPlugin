@@ -61,6 +61,7 @@ namespace LFE {
                 if(i <= heightInHeadsRoundedUp) {
                     marker.Enabled = Enabled;
                     marker.LabelEnabled = LabelsEnabled;
+                    marker.LineEnabled = LinesEnabled;
                     marker.Thickness = LineThickness * 0.001f;
                     marker.Color = LineColor;
                     marker.LineDirection = FlipDirection ? Vector3.left : Vector3.right;

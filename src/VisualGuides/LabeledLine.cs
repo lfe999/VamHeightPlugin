@@ -12,6 +12,7 @@ namespace LFE {
         public Vector3 LineDirection { get; set; } = Vector3.left;
         public bool Enabled { get; set; } = false;
         public bool LabelEnabled { get; set; } = false;
+        public bool LineEnabled { get; set; } = false;
         public float LabelOffsetX { get; set; } = 0f;
         public float LabelOffsetY { get; set; } = 0f;
 
@@ -58,7 +59,7 @@ namespace LFE {
                 Vector3.zero,
                 CalculateEndpoint(Vector3.zero)
             });
-            _lineRenderer.gameObject.SetActive(enabled);
+            _lineRenderer.gameObject.SetActive(enabled && LineEnabled);
             _canvas.gameObject.SetActive(_lineRenderer.gameObject.activeInHierarchy);
             if(enabled) {
                 var text = _canvas.GetComponentInChildren<Text>();
