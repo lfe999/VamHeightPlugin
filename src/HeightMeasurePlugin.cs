@@ -213,6 +213,7 @@ namespace LFE
         bool _enabledPrev = false; // allows for performant disabling
         DAZMorph _headScaleMorph = null;
         int _lastSex = 0; // 0 female - 1 male
+        float _prevScale = 0;
         public void Update() {
             try {
 
@@ -310,6 +311,14 @@ namespace LFE
                         }
                     }
                 }
+
+                // adjust manual markers if scale of the containing atom has changed
+                var currScale = GetScale();
+                bool shouldScaleManualMarkers = _prevScale != 0 && _prevScale != currScale;
+                if(shouldScaleManualMarkers) {
+                    ScaleStaticMeasurements(_ui, _prevScale, currScale);
+                }
+                _prevScale = currScale;
 
             }
             catch(Exception e) {
@@ -665,6 +674,35 @@ namespace LFE
             return Color.HSVToRGB(hsv.H, hsv.S, hsv.V);
         }
 
+        private JSONStorableFloat _scaleStorable;
+        private JSONStorableFloat GetScaleStorable() {
+            if(_scaleStorable == null) {
+                JSONStorable scaleStorable = containingAtom.GetStorableByID("rescaleObject") ?? containingAtom.GetStorableByID("scale");
+                if(scaleStorable != null) {
+                    JSONStorableFloat scale = scaleStorable.GetFloatJSONParam("scale");
+                    if(scale != null) {
+                        _scaleStorable = scale;
+                    }
+                }
+            }
+            return _scaleStorable;
+        }
+
+        private float GetScale() {
+            var scale = GetScaleStorable();
+            if(scale != null) {
+                return scale.val;
+            }
+            return 0;
+        }
+
+        private void SetScale(float x) {
+            var scale = GetScaleStorable();
+            if(scale != null) {
+                scale.val = x;
+            }
+        }
+
 
         // LineRenderer _debugLine;
         public CharacterMeasurements AutoMeasurements(UI ui, Atom atom) {
@@ -802,6 +840,25 @@ namespace LFE
             measurements.POI = poi;
 
             return measurements;
+        }
+
+        public void ScaleStaticMeasurements(UI ui, float fromScale, float toScale) {
+            if(fromScale == toScale) {
+                return;
+            }
+            if(ui.manualHeightStorable.val <= 0) {
+                return;
+            }
+            var changePercentage = toScale/fromScale;
+            ui.manualHeightStorable.val *= changePercentage;
+            ui.manualChinHeightStorable.val *= changePercentage;
+            ui.manualShoulderHeightStorable.val *= changePercentage;
+            ui.manualNippleHeightStorable.val *= changePercentage;
+            ui.manualUnderbustHeightStorable.val *= changePercentage;
+            ui.manualNavelHeightStorable.val *= changePercentage;
+            ui.manualCrotchHeightStorable.val *= changePercentage;
+            ui.manualKneeBottomHeightStorable.val *= changePercentage;
+            ui.markerUpDownStorable.val *= changePercentage;
         }
 
         public static CharacterMeasurements StaticMeasurements(UI ui) {

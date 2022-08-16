@@ -469,22 +469,22 @@ namespace LFE {
             _plugin.RegisterStringChooser(unitsStorable);
 
             // Float: How far apart markers are spread apart
-            markerSpreadStorable = new JSONStorableFloat("Spread Guides", 0.25f, -1, 1);
+            markerSpreadStorable = new JSONStorableFloat("Spread Guides", 0.25f, -1, 1, constrain: false);
             markerSpreadStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(markerSpreadStorable);
 
             // Float: Move markers forward or backward relative to center depth of the head
-            markerFrontBackStorable = new JSONStorableFloat("Move Guides Forward/Backward", 0, -5, 5);
+            markerFrontBackStorable = new JSONStorableFloat("Move Guides Forward/Backward", 0, -5, 5, constrain: false);
             markerFrontBackStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(markerFrontBackStorable);
 
             // Float: Move markers left or right 
-            markerLeftRightStorable = new JSONStorableFloat("Move Guides Left/Right", 0, -5, 5);
+            markerLeftRightStorable = new JSONStorableFloat("Move Guides Left/Right", 0, -5, 5, constrain: false);
             markerLeftRightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(markerLeftRightStorable);
 
             // Float: Move markers forward or backward relative to center depth of the head
-            markerUpDownStorable = new JSONStorableFloat("Move Guides Up/Down", 0, -5, 5);
+            markerUpDownStorable = new JSONStorableFloat("Move Guides Up/Down", 0, -5, 5, constrain: false);
             markerUpDownStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(markerUpDownStorable);
 
@@ -671,35 +671,35 @@ namespace LFE {
             manualMarkerColor.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterColor(manualMarkerColor);
 
-            manualHeightStorable = new JSONStorableFloat("Height", 0, 0, 300);
+            manualHeightStorable = new JSONStorableFloat("Height", 0, 0, 300, constrain: false);
             manualHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualHeightStorable);
 
-            manualChinHeightStorable = new JSONStorableFloat("Chin Height", 0, 0, 300);
+            manualChinHeightStorable = new JSONStorableFloat("Chin Height", 0, 0, 300, constrain: false);
             manualChinHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualChinHeightStorable);
 
-            manualShoulderHeightStorable = new JSONStorableFloat("Shoulder Height", 0, 0, 300);
+            manualShoulderHeightStorable = new JSONStorableFloat("Shoulder Height", 0, 0, 300, constrain: false);
             manualShoulderHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualShoulderHeightStorable);
 
-            manualNippleHeightStorable = new JSONStorableFloat("Bust Height", 0, 0, 300);
+            manualNippleHeightStorable = new JSONStorableFloat("Bust Height", 0, 0, 300, constrain: false);
             manualNippleHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualNippleHeightStorable);
 
-            manualUnderbustHeightStorable = new JSONStorableFloat("Underbust Height", 0, 0, 300);
+            manualUnderbustHeightStorable = new JSONStorableFloat("Underbust Height", 0, 0, 300, constrain: false);
             manualUnderbustHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualUnderbustHeightStorable);
 
-            manualNavelHeightStorable = new JSONStorableFloat("Navel Height", 0, 0, 300);
+            manualNavelHeightStorable = new JSONStorableFloat("Navel Height", 0, 0, 300, constrain: false);
             manualNavelHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualNavelHeightStorable);
 
-            manualCrotchHeightStorable = new JSONStorableFloat("Crotch Height", 0, 0, 300);
+            manualCrotchHeightStorable = new JSONStorableFloat("Crotch Height", 0, 0, 300, constrain: false);
             manualCrotchHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualCrotchHeightStorable);
 
-            manualKneeBottomHeightStorable = new JSONStorableFloat("Knee Height", 0, 0, 300);
+            manualKneeBottomHeightStorable = new JSONStorableFloat("Knee Height", 0, 0, 300, constrain: false);
             manualKneeBottomHeightStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterFloat(manualKneeBottomHeightStorable);
         }
@@ -1375,6 +1375,10 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
             if(_plugin.containingAtom.type == "Person") {
                 _cupAlgorithm = _plugin.CreateScrollablePopup(cupAlgorithmStorable, rightSide: false);
                 _units = _plugin.CreateScrollablePopup(unitsStorable, rightSide: true);
+            }
+            else {
+                _units = _plugin.CreateScrollablePopup(unitsStorable, rightSide: true);
+                CreateStandardSpacer(_units.height, rightSide: false);
             }
 
             CreateStandardDivider(rightSide: false);
