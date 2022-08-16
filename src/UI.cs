@@ -77,7 +77,8 @@ namespace LFE {
 
         // manual heights
         public JSONStorableBool showManualMarkersStorable;
-        public JSONStorableBool manualMarkersCopy;
+        public JSONStorableStringChooser manualMarkersCopyFrom;
+        public JSONStorableBool manualMarkersCopyRelative;
         public JSONStorableColor manualMarkerColor;
         public JSONStorableFloat lineThicknessManualStorable;
 
@@ -653,9 +654,20 @@ namespace LFE {
             showManualMarkersStorable.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(showManualMarkersStorable);
 
-            manualMarkersCopy = new JSONStorableBool("Copy Markers From Person", false);
-            manualMarkersCopy.storeType = JSONStorableParam.StoreType.Full;
-            _plugin.RegisterBool(manualMarkersCopy);
+            var atomsWithPlugin = AtomsWithHeightMeasurePlugin();
+            atomsWithPlugin.Insert(0, String.Empty);
+            manualMarkersCopyFrom = new JSONStorableStringChooser(
+                "Copy Atom",
+                atomsWithPlugin,
+                String.Empty,
+                "Copy Atom"
+            );
+            manualMarkersCopyFrom.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterStringChooser(manualMarkersCopyFrom);
+
+            manualMarkersCopyRelative = new JSONStorableBool("Copy Proportionally", true);
+            manualMarkersCopyRelative.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(manualMarkersCopyRelative);
 
             lineThicknessManualStorable = new JSONStorableFloat("Manual Guide Line Width", 2, 1, 10, constrain: true);
             lineThicknessManualStorable.storeType = JSONStorableParam.StoreType.Full;
@@ -776,7 +788,8 @@ namespace LFE {
         private UIDynamicToggle _ageWarnUnderageToggle;
 
         private UIDynamicToggle _manualMarkerToggle;
-        private UIDynamicToggle _copyManualMarkers;
+        private UIDynamicPopup _copyManualMarkersFrom;
+        private UIDynamicToggle _copyManualMarkersRelative;
         private UIDynamicButton _manualMarkerColorButton;
         private UIDynamicColorPicker _manualMarkerColorPicker;
         private UIDynamicSlider _manualMarkerLineThickness;
@@ -1316,8 +1329,14 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
 
                 if(_showManualMarkerOptions) {
                     if(_plugin.containingAtom.type == "Person") {
-                        _copyManualMarkers = _plugin.CreateToggle(manualMarkersCopy, rightSide: false);
-                        CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+                        _copyManualMarkersFrom = _plugin.CreatePopup(manualMarkersCopyFrom, rightSide: true);
+                        _copyManualMarkersFrom.popup.onOpenPopupHandlers += () => {
+                            var choices = new List<string>() { String.Empty };
+                            choices.AddRange(AtomsWithHeightMeasurePlugin());
+                            manualMarkersCopyFrom.choices = choices;
+                        };
+
+                        _copyManualMarkersRelative = _plugin.CreateToggle(manualMarkersCopyRelative, rightSide: true);
                     }
                     _manualMarkerColorButton = _plugin.CreateButton("Set Line Color", rightSide: false);
                     _manualMarkerColorButton.buttonColor = _plugin.HSVToColor(manualMarkerColor.val);
@@ -1331,23 +1350,29 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
                         CreateStandardSpacer(_manualMarkerColorPicker.height, rightSide: true);
                     }
                     _manualMarkerLineThickness = _plugin.CreateSlider(lineThicknessManualStorable, rightSide: false);
-                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
                     _manualSliders.Add(_plugin.CreateSlider(manualHeightStorable, rightSide: false));
-                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
                     _manualSliders.Add(_plugin.CreateSlider(manualChinHeightStorable, rightSide: false));
-                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
                     _manualSliders.Add(_plugin.CreateSlider(manualShoulderHeightStorable, rightSide: false));
-                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
                     _manualSliders.Add(_plugin.CreateSlider(manualNippleHeightStorable, rightSide: false));
-                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
                     _manualSliders.Add(_plugin.CreateSlider(manualUnderbustHeightStorable, rightSide: false));
-                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
                     _manualSliders.Add(_plugin.CreateSlider(manualNavelHeightStorable, rightSide: false));
-                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
                     _manualSliders.Add(_plugin.CreateSlider(manualCrotchHeightStorable, rightSide: false));
-                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
                     _manualSliders.Add(_plugin.CreateSlider(manualKneeBottomHeightStorable, rightSide: false));
+
                     CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    if(_plugin.containingAtom.type == "Person") {
+                        CreateStandardSpacer(defaultSliderHeight + defaultSliderHeight - 10, rightSide: true);
+                    }
+                    else {
+                        CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                        CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                        CreateStandardSpacer(defaultSliderHeight, rightSide: true);
+                    }
                 }
             }
             else {
@@ -1436,8 +1461,11 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
             if(_manualMarkerToggle) {
                 _plugin.RemoveToggle(_manualMarkerToggle);
             }
-            if(_copyManualMarkers) {
-                _plugin.RemoveToggle(_copyManualMarkers);
+            if(_copyManualMarkersFrom) {
+                _plugin.RemovePopup(_copyManualMarkersFrom);
+            }
+            if(_copyManualMarkersRelative) {
+                _plugin.RemoveToggle(_copyManualMarkersRelative);
             }
             if(_manualMarkerColorButton) {
                 _plugin.RemoveButton(_manualMarkerColorButton);
@@ -1665,6 +1693,20 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
             input.lineType = inputFieldType; input.textComponent.resizeTextMaxSize = 30; input.textComponent.resizeTextForBestFit = true; jss.inputField = input; 
             return (textfield);
         } 
+
+        private List<string> AtomsWithHeightMeasurePlugin() {
+            var results = new List<string>();
+            foreach(var a in SuperController.singleton.GetAtoms()) {
+                var heightMeasurePlugin = _plugin.GetHeightMeasurePluginForAtom(a);
+                if(heightMeasurePlugin != null) {
+                    results.Add(a.uid);
+                }
+            }
+            if(!results.Contains(_plugin.containingAtom.uid)) {
+                results.Insert(0, _plugin.containingAtom.uid);
+            }
+            return results;
+        }
 
     }
 }

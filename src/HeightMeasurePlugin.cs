@@ -314,7 +314,7 @@ namespace LFE
 
                 // adjust manual markers if scale of the containing atom has changed
                 var currScale = GetScale();
-                bool shouldScaleManualMarkers = _prevScale != 0 && _prevScale != currScale;
+                bool shouldScaleManualMarkers = _prevScale != 0 && _prevScale != currScale && _ui.manualMarkersCopyFrom.val == String.Empty;
                 if(shouldScaleManualMarkers) {
                     ScaleStaticMeasurements(_ui, _prevScale, currScale);
                 }
@@ -333,16 +333,7 @@ namespace LFE
                 _manualMeasurements = StaticMeasurements(_ui);
                 _manualMeasurements.HeelToFloorOffset = _autoMeasurements.HeelToFloorOffset;
 
-                if(containingAtom.type == "Person" && _ui.manualMarkersCopy.val) {
-                    _ui.manualHeightStorable.val = (_autoMeasurements.Height ?? 0) * 100;
-                    _ui.manualChinHeightStorable.val = (_autoMeasurements.ChinHeight ?? 0) * 100;
-                    _ui.manualShoulderHeightStorable.val = (_autoMeasurements.ShoulderHeight ?? 0) * 100;
-                    _ui.manualNippleHeightStorable.val = (_autoMeasurements.NippleHeight ?? 0) * 100;
-                    _ui.manualUnderbustHeightStorable.val = (_autoMeasurements.UnderbustHeight ?? 0) * 100;
-                    _ui.manualNavelHeightStorable.val = (_autoMeasurements.NavelHeight ?? 0) * 100;
-                    _ui.manualCrotchHeightStorable.val = (_autoMeasurements.CrotchHeight ?? 0) * 100;
-                    _ui.manualKneeBottomHeightStorable.val = (_autoMeasurements.KneeHeight ?? 0) * 100;
-                }
+                ManualMarkersCopyFrom(_ui.manualMarkersCopyFrom.val);
 
                 _ui.headSizeHeightStorable.val = _autoMeasurements.HeadHeight ?? 0;
                 _ui.headSizeWidthStorable.val = _autoMeasurements.HeadWidth ?? 0;
@@ -674,6 +665,60 @@ namespace LFE
             return Color.HSVToRGB(hsv.H, hsv.S, hsv.V);
         }
 
+        private string _copyFromUidPrev;
+
+        private JSONStorableFloat _copyHeightStorable;
+        private JSONStorableFloat _copyChinStorable;
+        private JSONStorableFloat _copyShoulderStorable;
+        private JSONStorableFloat _copyNippleStorable;
+        private JSONStorableFloat _copyUnderbustStorable;
+        private JSONStorableFloat _copyNavelStorable;
+        private JSONStorableFloat _copyCrotchStorable;
+        private JSONStorableFloat _copyKneeStorable;
+
+        private Atom _copyFromAtom;
+        public void ManualMarkersCopyFrom(string uid) {
+            if(uid == String.Empty || uid == null) {
+                _copyFromUidPrev = uid;
+                return;
+            }
+
+            bool isPerson = _copyFromAtom?.type == "Person";
+            if(_copyFromUidPrev == null || _copyFromUidPrev != uid) {
+                _copyFromAtom = SuperController.singleton.GetAtomByUid(uid);
+                isPerson = _copyFromAtom?.type == "Person";
+                var plugin = GetHeightMeasurePluginForAtom(_copyFromAtom);
+                _copyHeightStorable = plugin?.GetFloatJSONParam(isPerson ? "figureHeight" : "Height");
+                _copyChinStorable = plugin?.GetFloatJSONParam(isPerson ? "chinHeight" : "Chin Height");
+                _copyShoulderStorable = plugin?.GetFloatJSONParam(isPerson ? "shoulderHeight" : "Shoulder Height");
+                _copyNippleStorable = plugin?.GetFloatJSONParam(isPerson ? "nippleHeight" : "Bust Height");
+                _copyUnderbustStorable = plugin?.GetFloatJSONParam(isPerson ? "underbustHeight" : "Underbust Height");
+                _copyNavelStorable = plugin?.GetFloatJSONParam(isPerson ? "navelHeight" : "Navel Height");
+                _copyCrotchStorable = plugin?.GetFloatJSONParam(isPerson ? "crotchHeight" : "Crotch Height");
+                _copyKneeStorable = plugin?.GetFloatJSONParam(isPerson ? "kneeHeight" : "Knee Height");
+                _copyFromUidPrev = uid;
+            }
+
+            float multiplier = isPerson ? 100 : 1;
+            if(_ui.manualMarkersCopyRelative.val) {
+                float myHeight = _ui.fullHeightStorable.val;
+                float theirHeight = (_copyHeightStorable?.val ?? 0) / (isPerson ? 1 : 100);
+                if(myHeight > 0 && theirHeight > 0) {
+                    multiplier *= myHeight/theirHeight;
+                }
+            }
+
+
+            _ui.manualHeightStorable.val = (_copyHeightStorable?.val ?? 0) * multiplier;
+            _ui.manualChinHeightStorable.val = (_copyChinStorable?.val ?? 0) * multiplier;
+            _ui.manualShoulderHeightStorable.val = (_copyShoulderStorable?.val ?? 0) * multiplier;
+            _ui.manualNippleHeightStorable.val = (_copyNippleStorable?.val ?? 0) * multiplier;
+            _ui.manualUnderbustHeightStorable.val = (_copyUnderbustStorable?.val ?? 0) * multiplier;
+            _ui.manualNavelHeightStorable.val = (_copyNavelStorable?.val ?? 0) * multiplier;
+            _ui.manualCrotchHeightStorable.val = (_copyCrotchStorable?.val ?? 0) * multiplier;
+            _ui.manualKneeBottomHeightStorable.val = (_copyKneeStorable?.val ?? 0) * multiplier;
+        }
+
         private JSONStorableFloat _scaleStorable;
         private JSONStorableFloat GetScaleStorable() {
             if(_scaleStorable == null) {
@@ -695,14 +740,6 @@ namespace LFE
             }
             return 0;
         }
-
-        private void SetScale(float x) {
-            var scale = GetScaleStorable();
-            if(scale != null) {
-                scale.val = x;
-            }
-        }
-
 
         // LineRenderer _debugLine;
         public CharacterMeasurements AutoMeasurements(UI ui, Atom atom) {
@@ -875,6 +912,43 @@ namespace LFE
                 HeelToFloorOffset = Vector3.zero
             };
             return measurements;
+        }
+
+
+        private JSONStorable _hmpCached;
+        public JSONStorable GetHeightMeasurePluginForAtom(Atom atom) {
+            if(atom == null) {
+                return null;
+            }
+            if(_hmpCached == null || (_hmpCached != null && _hmpCached.containingAtom.uid != atom.uid)) {
+                _hmpCached = null;
+                foreach(var s in GetPluginStorables(atom)) {
+                    if(s.name.Contains("LFE.HeightMeasurePlugin")) {
+                        _hmpCached = s;
+                    }
+                }
+            }
+            return _hmpCached;
+        }
+
+        public IEnumerable<JSONStorable> GetPluginStorables(Atom atom)
+        {
+            MVRPluginManager manager = atom.GetComponentInChildren<MVRPluginManager>();
+            if (manager != null)
+            {
+                var plugins = manager.GetJSON(true, true)["plugins"].AsObject;
+                foreach(var pluginId in plugins.Keys)
+                {
+                    var receivers = atom
+                        .GetStorableIDs()
+                        .Where((sid) => sid.StartsWith(pluginId))
+                        .Select((sid) => atom.GetStorableByID(sid));
+                    foreach(var r in receivers)
+                    {
+                        yield return r;
+                    }
+                }
+            }
         }
 
     }
