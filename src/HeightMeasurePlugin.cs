@@ -553,21 +553,23 @@ namespace LFE
             // manual feature guide
             _mainGuidesManual.ShowDocumentation = !_ui.hideDocsStorable.val;
             _mainGuidesManual.Enabled = _ui.showManualMarkersStorable.val;
-            _mainGuidesManual.LabelsEnabled = _ui.showManualMarkersStorable.val && _mainGuidesManual.Measurements.Height > 0;
+            _mainGuidesManual.LabelsEnabled = _ui.showManualMarkersStorable.val && _mainGuidesManual.Measurements.Height > 0 && _ui.showManualMarkerLabelsStorable.val;
             _mainGuidesManual.LinesEnabled = true;
             _mainGuidesManual.LineColor = HSVToColor(_ui.manualMarkerColor.val);
             _mainGuidesManual.LineThickness = _ui.lineThicknessManualStorable.val;
+            _mainGuidesManual.FlipDirection = _ui.flipManualMarkerSide.val;
             _mainGuidesManual.UnitDisplay = _ui.unitsStorable.val;
             _mainGuidesManual.Offset = pos - spreadVector - new Vector3(0, 0, 0.002f); // put these just a bit behind the auto guides
             _mainGuidesManual.OffsetSpread = spreadVector;
 
             // manual head height guide
             _headGuidesManual.ShowDocumentation = !_ui.hideDocsStorable.val;
-            _headGuidesManual.Enabled = _ui.showManualMarkersStorable.val && _headGuidesManual.Measurements.Height > 0;
+            _headGuidesManual.Enabled = _ui.showManualMarkersStorable.val && _headGuidesManual.Measurements.Height > 0 && _ui.showManualMarkerHeadsGuideStorable.val;
             _headGuidesManual.LabelsEnabled = true;
             _headGuidesManual.LinesEnabled = true;
             _headGuidesManual.LineColor = HSVToColor(_ui.manualMarkerColor.val);
             _headGuidesManual.LineThickness = _ui.lineThicknessManualStorable.val;
+            _headGuidesManual.FlipDirection = _ui.flipManualMarkerSide.val;
             _headGuidesManual.UnitDisplay = _ui.unitsStorable.val;
             _headGuidesManual.Offset = pos + spreadVector - new Vector3(0, 0, 0.002f); // put these just a bit behind the auto guides
             _headGuidesManual.OffsetSpread = spreadVector;
