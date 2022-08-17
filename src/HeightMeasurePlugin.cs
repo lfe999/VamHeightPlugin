@@ -931,11 +931,17 @@ namespace LFE
             return _hmpCached;
         }
 
+        private Dictionary<string, MVRPluginManager> atomPluginManagers = new Dictionary<string, MVRPluginManager>();
         public IEnumerable<JSONStorable> GetPluginStorables(Atom atom)
         {
-            MVRPluginManager manager = atom.GetComponentInChildren<MVRPluginManager>();
-            if (manager != null)
-            {
+            if(atomPluginManagers.Count == 0) {
+                foreach(var c in transform.root.GetComponentsInChildren<MVRPluginManager>(true)) {
+                    atomPluginManagers[c.containingAtom.uid] = c;
+                }
+            }
+
+            if(atomPluginManagers.ContainsKey(atom.uid)) {
+                var manager = atomPluginManagers[atom.uid];
                 var plugins = manager.GetJSON(true, true)["plugins"].AsObject;
                 foreach(var pluginId in plugins.Keys)
                 {
