@@ -13,6 +13,7 @@ namespace LFE {
         public Vector3 OffsetSpread { get; set; } = Vector3.zero;
         public float Spread { get; set; } = 0;
         public bool FlipDirection { get; set; } = false;
+        public bool ShowCalculate { get; set; } = false;
         public CharacterMeasurements Measurements { get; set; } = null;
     }
 }

@@ -101,7 +101,7 @@ namespace LFE {
             var shoulderWidth = Measurements.ShoulderWidth ?? 0;
             var shoulderLineBuffer = 0;
             // var shoulderLineBuffer = _markerChin.Length;
-            _markerShoulder.Label = $"Chin To Shoulder - {UnitUtils.ToUnitString(chinToShoulder, UnitDisplay)} Width - {UnitUtils.ToUnitString(shoulderWidth, UnitDisplay)}";
+            _markerShoulder.Label = $"Chin To Shoulder - {UnitUtils.ToUnitString(chinToShoulder, UnitDisplay)} | Width - {UnitUtils.ToUnitString(shoulderWidth, UnitDisplay)}";
             SetMainMarkerProperties(_markerShoulder, Measurements.ShoulderHeight);
             _markerShoulder.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(offset.x - shoulderLineBuffer, offset.y, offset.z)) + parentPos;
             _markerShoulder.LineDirection = FlipDirection ? Vector3.right: Vector3.left;
@@ -185,6 +185,8 @@ namespace LFE {
 
             var kneeToHeel = (Measurements.KneeHeight ?? 0) - (Measurements.HeelHeight ?? 0);
             _markerHeel.Label = $"Heel - Knee to Heel {UnitUtils.ToUnitString(kneeToHeel, UnitDisplay)}";
+            var crotchToHeel = (Measurements.CrotchHeight ?? 0) - (Measurements.HeelHeight ?? 0);
+            _markerHeel.Label += $" | Crotch to Heel {UnitUtils.ToUnitString(crotchToHeel, UnitDisplay)}";
             SetMainMarkerProperties(_markerHeel, Measurements.HeelHeight);
             _markerHeel.Enabled = Enabled; // don't hide heel if it's height is 0!
             _markerHeel.transform.position = parentRotEuler * (new Vector3(0, Measurements.HeelHeight ?? 0, 0) + offset) + parentPos;

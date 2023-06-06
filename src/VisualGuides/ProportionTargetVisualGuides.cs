@@ -103,6 +103,9 @@ namespace LFE {
             var headHeight = 1 * unitsPerHead;
             var chinHeight = height - headHeight;
             _markerChin.Label = $"Head Size";
+            if(ShowCalculate){
+                _markerChin.Label += $" ({UnitUtils.ToUnitString(headHeight, UnitDisplay)})";
+            }
             SetMainMarkerProperties(_markerChin, chinHeight);
             _markerChin.transform.position = parentRotEuler * (new Vector3(0, chinHeight, 0) + offset) + parentPos;
             _markerChin.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
@@ -111,7 +114,15 @@ namespace LFE {
             var shoulderHeight = chinHeight - (targetProportion.FigureChinToShoulder * unitsPerHead);
             var shoulderWidth = targetProportion.FigureShoulderWidth * unitsPerHead;
             var shoulderLineBuffer = Mathf.Abs(offset.x) < Mathf.Abs(shoulderWidth/2) ? shoulderWidth/2 + 0.02f : 0;
-            _markerShoulder.Label = $"Chin To Shoulder - Target {targetProportion.FigureChinToShoulder} h.u. Width Target {targetProportion.FigureShoulderWidth} h.u.";
+            var neckHeight = targetProportion.FigureChinToShoulder * unitsPerHead;
+            _markerShoulder.Label = $"Chin To Shoulder - Target {targetProportion.FigureChinToShoulder} h.u.";
+            if(ShowCalculate) {
+                _markerShoulder.Label += $" ({UnitUtils.ToUnitString(neckHeight, UnitDisplay)})";
+            }
+            _markerShoulder.Label += $" | Width Target {targetProportion.FigureShoulderWidth} h.u.";
+            if(ShowCalculate){
+                _markerShoulder.Label += $" ({UnitUtils.ToUnitString(shoulderWidth, UnitDisplay)})";
+            }
             SetMainMarkerProperties(_markerShoulder, shoulderHeight);
             _markerShoulder.transform.position = parentRotEuler * (new Vector3(0, shoulderHeight, 0) + new Vector3(offset.x - (shoulderLineBuffer * (FlipDirection ? -1 : 1)), offset.y, offset.z)) + parentPos;
             _markerShoulder.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
@@ -128,41 +139,69 @@ namespace LFE {
             var armLength = targetProportion.FigureLengthOfUpperLimb * unitsPerHead;
             var actualShoulderWidth = Measurements.ShoulderWidth ?? 0;
             _markerArmLength.Label = $"Arm - Target {targetProportion.FigureLengthOfUpperLimb} h.u.";
+            if(ShowCalculate){
+                _markerArmLength.Label += $" ({UnitUtils.ToUnitString(armLength, UnitDisplay)})";
+            }
             SetMainMarkerProperties(_markerArmLength, armLength);
             _markerArmLength.Length = armLength;
             _markerArmLength.transform.position = parentRotEuler * (new Vector3(0, Measurements.ShoulderHeight ?? 0, 0) + new Vector3(offset.x + (OffsetSpread.x + actualShoulderWidth/2 + 0.20f) * (FlipDirection ? -1 : 1), offset.y, offset.z)) + parentPos;
             _markerArmLength.LineDirection = Vector3.down;
             _markerArmLength.Enabled = _markerArmLength.Enabled && ShowArm;
 
-            var nippleHeight = shoulderHeight - (targetProportion.FigureShoulderToNipples * unitsPerHead);
+            var shoulderToNipple = targetProportion.FigureShoulderToNipples * unitsPerHead;
+            var nippleHeight = shoulderHeight - shoulderToNipple;
             _markerNipple.Label = $"Shoulder To Nipple - Target {targetProportion.FigureShoulderToNipples} h.u.";
+            if(ShowCalculate){
+                _markerNipple.Label += $" ({UnitUtils.ToUnitString(shoulderToNipple, UnitDisplay)})";
+            }
             SetMainMarkerProperties(_markerNipple, nippleHeight);
             _markerNipple.transform.position = parentRotEuler * (new Vector3(0, nippleHeight, 0) + offset) + parentPos;
             _markerNipple.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerNipple.Enabled = _markerNipple.Enabled && ShowNipple;
 
-            var navelHeight = shoulderHeight - (targetProportion.FigureShoulderToNavel * unitsPerHead);
+            var shoulderToNavel = targetProportion.FigureShoulderToNavel * unitsPerHead;
+            var navelHeight = shoulderHeight - shoulderToNavel;
             _markerNavel.Label = $"Shoulder To Navel - Target {targetProportion.FigureShoulderToNavel} h.u.";
+            if(ShowCalculate){
+                _markerNavel.Label += $" ({UnitUtils.ToUnitString(shoulderToNavel, UnitDisplay)})";
+            }
             SetMainMarkerProperties(_markerNavel, navelHeight);
             _markerNavel.transform.position = parentRotEuler * (new Vector3(0, navelHeight, 0) + offset) + parentPos;
             _markerNavel.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerNavel.Enabled = _markerNavel.Enabled && ShowNavel;
 
-            var crotchHeight = shoulderHeight - (targetProportion.FigureShoulderToCrotch * unitsPerHead);
+            var shoulderToCroth = targetProportion.FigureShoulderToCrotch * unitsPerHead;
+            var crotchHeight = shoulderHeight - shoulderToCroth;
             _markerGroin.Label = $"Shoulder To Crotch - Target {targetProportion.FigureShoulderToCrotch} h.u.";
+            if(ShowCalculate){
+                _markerGroin.Label += $" ({UnitUtils.ToUnitString(shoulderToCroth, UnitDisplay)})";
+            }
             SetMainMarkerProperties(_markerGroin, crotchHeight);
             _markerGroin.transform.position = parentRotEuler * (new Vector3(0, crotchHeight, 0) + offset) + parentPos;
             _markerGroin.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerGroin.Enabled = _markerGroin.Enabled && ShowCrotch;
 
-            var kneeHeight = crotchHeight - (targetProportion.FigureCrotchToBottomOfKnees * unitsPerHead);
+            var crotchToKnee = targetProportion.FigureCrotchToBottomOfKnees * unitsPerHead;
+            var kneeHeight = crotchHeight - crotchToKnee;
             _markerKnee.Label = $"Crotch To Knee - Target {targetProportion.FigureCrotchToBottomOfKnees} h.u.";
+            if(ShowCalculate){
+                _markerKnee.Label += $" ({UnitUtils.ToUnitString(crotchToKnee, UnitDisplay)})";
+            }
             SetMainMarkerProperties(_markerKnee, kneeHeight);
             _markerKnee.transform.position = parentRotEuler * (new Vector3(0, kneeHeight, 0) + offset) + parentPos;
             _markerKnee.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerKnee.Enabled = _markerKnee.Enabled && ShowKnee;
 
+            var kneeToHeel = targetProportion.FigureBottomOfKneesToHeels * unitsPerHead;
             _markerHeel.Label = $"Knee to Heel - Target {targetProportion.FigureBottomOfKneesToHeels} h.u.";
+            if(ShowCalculate){
+                _markerHeel.Label += $" ({UnitUtils.ToUnitString(kneeToHeel, UnitDisplay)})";
+            }
+            var crotchToHeel = targetProportion.FigureLengthOfLowerLimb * unitsPerHead;
+            _markerHeel.Label += $" | Crotch To Heel - Target {targetProportion.FigureLengthOfLowerLimb} h.u.";
+            if(ShowCalculate){
+                _markerHeel.Label += $" ({UnitUtils.ToUnitString(crotchToHeel, UnitDisplay)})";
+            }
             SetMainMarkerProperties(_markerHeel, Measurements.HeelHeight);
             _markerHeel.Enabled = Measurements.HeelHeight != null && Enabled;
             _markerHeel.transform.position = parentRotEuler * (new Vector3(0, Measurements.HeelHeight ?? 0, 0) + offset) + parentPos;

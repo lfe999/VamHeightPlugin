@@ -533,6 +533,7 @@ namespace LFE
                 _proportionGuides.LinesEnabled = true;
                 _proportionGuides.LineColor = HSVToColor(_ui.proportionMarkerColor.val);
                 _proportionGuides.LineThickness = _ui.lineThicknessProportionStorable.val;
+                _proportionGuides.ShowCalculate = _ui.showProportionMarkerCalc.val;
                 _proportionGuides.FlipDirection = _ui.flipProportionMarkerSide.val;
                 _proportionGuides.UnitDisplay = _ui.unitsStorable.val;
                 _proportionGuides.Offset = pos - spreadVector - new Vector3(0, 0, 0.004f); // put these just a bit behind the auto guides

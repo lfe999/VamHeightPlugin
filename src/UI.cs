@@ -143,6 +143,7 @@ namespace LFE {
         public JSONStorableBool showProportionMarkerLineShoulder;
         public JSONStorableBool showProportionMarkerLineShoulderWidth;
         public JSONStorableBool showProportionMarkerLineArm;
+        public JSONStorableBool showProportionMarkerCalc;
         public JSONStorableBool flipProportionMarkerSide;
 
         public JSONStorableBool showTargetHeadRatioStorable;
@@ -427,6 +428,12 @@ namespace LFE {
             });
             flipProportionMarkerSide.storeType = JSONStorableParam.StoreType.Full;
             _plugin.RegisterBool(flipProportionMarkerSide);
+
+            showProportionMarkerCalc = new JSONStorableBool("Proportion Guide Show Calculate", false, (bool value) => {
+                Draw();
+            });
+            showProportionMarkerCalc.storeType = JSONStorableParam.StoreType.Full;
+            _plugin.RegisterBool(showProportionMarkerCalc);
 
 
             //////////////////
@@ -762,6 +769,7 @@ namespace LFE {
         private UIDynamicColorPicker _proportionMarkerColorPicker;
         private UIDynamicSlider _proportionMarkerLineThickness;
         private UIDynamicPopup _proportionSelection;
+        private UIDynamicToggle _proportionMarkerShowCalc;
         private UIDynamicToggle _proportionMarkerFlipSide;
 
         private UIDynamicTextField _proportionEditName;
@@ -1264,6 +1272,7 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
                                 _proportionMarkerColorPicker = _plugin.CreateColorPicker(proportionMarkerColor, rightSide: false);
                             }
                             _proportionMarkerLineThickness = _plugin.CreateSlider(lineThicknessProportionStorable, rightSide: false);
+                            _proportionMarkerShowCalc = _plugin.CreateToggle(showProportionMarkerCalc, rightSide: false);
                             _proportionMarkerFlipSide = _plugin.CreateToggle(flipProportionMarkerSide, rightSide: false);
 
                             _proportionSelection = _plugin.CreateScrollablePopup(proportionSelectionStorable, rightSide: false);
@@ -1578,6 +1587,9 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
 
             if(_proportionMarkerToggle) {
                 _plugin.RemoveToggle(_proportionMarkerToggle);
+            }
+            if(_proportionMarkerShowCalc) {
+                _plugin.RemoveToggle(_proportionMarkerShowCalc);
             }
             if(_proportionMarkerFlipSide) {
                 _plugin.RemoveToggle(_proportionMarkerFlipSide);
