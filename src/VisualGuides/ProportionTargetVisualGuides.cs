@@ -149,7 +149,7 @@ namespace LFE {
             _markerNavel.Enabled = _markerNavel.Enabled && ShowNavel;
 
             var crotchHeight = shoulderHeight - (targetProportion.FigureShoulderToCrotch * unitsPerHead);
-            _markerGroin.Label = $"Shoulder To Crotch - Target {targetProportion.FigureShoulderToNavel} h.u.";
+            _markerGroin.Label = $"Shoulder To Crotch - Target {targetProportion.FigureShoulderToCrotch} h.u.";
             SetMainMarkerProperties(_markerGroin, crotchHeight);
             _markerGroin.transform.position = parentRotEuler * (new Vector3(0, crotchHeight, 0) + offset) + parentPos;
             _markerGroin.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
@@ -162,7 +162,7 @@ namespace LFE {
             _markerKnee.LineDirection = FlipDirection ? Vector3.right : Vector3.left;
             _markerKnee.Enabled = _markerKnee.Enabled && ShowKnee;
 
-            _markerHeel.Label = $"Knee to Heel - Target {targetProportion.FigureBottomOfKneesToHeels}";
+            _markerHeel.Label = $"Knee to Heel - Target {targetProportion.FigureBottomOfKneesToHeels} h.u.";
             SetMainMarkerProperties(_markerHeel, Measurements.HeelHeight);
             _markerHeel.Enabled = Measurements.HeelHeight != null && Enabled;
             _markerHeel.transform.position = parentRotEuler * (new Vector3(0, Measurements.HeelHeight ?? 0, 0) + offset) + parentPos;
