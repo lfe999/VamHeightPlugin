@@ -1322,6 +1322,8 @@ See https://hpc.anatomy4sculptors.com for more proportions or search the web for
                             _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineCrotch, rightSide: true));
                             _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineKnee, rightSide: true));
                             _featureLineToggles.Add(_plugin.CreateToggle(showProportionMarkerLineHeel, rightSide: true));
+                            CreateStandardSpacer(defaultButtonHeight, rightSide: true);
+
                             CreateStandardSpacer(defaultButtonHeight, rightSide: false);
                             CreateStandardSpacer(defaultButtonHeight + 10, rightSide: false);
 

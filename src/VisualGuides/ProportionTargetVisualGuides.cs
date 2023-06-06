@@ -88,7 +88,7 @@ namespace LFE {
             var parentRotEuler = Quaternion.Euler(parentRot.eulerAngles);
 
             // set the head height to use for all unit conversions
-            UnitUtils.HeadHeightInUnity = Measurements.Height ?? 0;
+            UnitUtils.HeadHeightInUnity = Measurements.HeadHeight ?? 0;
 
             var height = (Measurements.Height ?? 0) - (Measurements.HeelHeight ?? 0);
             var unitsPerHead = height / targetHeads;
